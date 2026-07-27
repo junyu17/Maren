@@ -1,0 +1,18 @@
+{
+  "menstrual": {
+    "zh": "经期是子宫内膜脱落的阶段,也就是月经来潮的这几天。很多人会感到能量偏低、想休息,或伴随痛经、腰酸。这是身体在正常工作,允许自己放慢一点、多喝温水、照顾好自己。",
+    "en": "Menstruation is when the uterine lining sheds — the days your period flows. Many people feel lower energy, want more rest, or have cramps and back aches. It's your body doing normal work; it's okay to slow down, stay warm, and be kind to yourself."
+  },
+  "follicular": {
+    "zh": "经期结束后进入卵泡期,雌激素逐渐上升。这段时间不少人会觉得精力和心情慢慢回升,思路更清晰,适合开始一些期待已久的事。",
+    "en": "After your period, the follicular phase begins and estrogen gradually rises. Many people notice energy and mood climbing back up and thinking feeling clearer — often a good stretch to start things you've been looking forward to."
+  },
+  "ovulatory": {
+    "zh": "排卵期前后雌激素达到高点,很多人在这几天感觉精力最充沛、更愿意社交、也更自信。这里显示的是基于你记录的估算日期,可能与实际有偏差,仅供参考。",
+    "en": "Around ovulation, estrogen peaks and many people feel their most energetic, social, and confident. The days shown here are an estimate based on your records and may differ from reality — for reference only."
+  },
+  "luteal": {
+    "zh": "排卵之后进入黄体期,孕激素先升后降。临近经期时,不少人会出现情绪起伏、食欲变化、疲惫或乳房胀痛等经前感受。这段时间对自己宽容一点,把标准放低都没关系。",
+    "en": "After ovulation comes the luteal phase, when progesterone rises and then falls. As your period nears, many people notice mood swings, cravings, fatigue, or tender breasts. Go easy on yourself here — lowering the bar a little is completely okay."
+  }
+}

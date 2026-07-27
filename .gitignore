@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+._*
+
+# Xcode (工程由 project.yml 经 xcodegen 生成,克隆后跑 `xcodegen generate` 即可)
+Vela.xcodeproj/
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.xcscmblueprint
+*.xccheckout
+build/
+
+# Swift Package Manager
+.build/
+.swiftpm/configuration/
+Package.resolved
+
+# 本地 StoreKit 测试配置(可选;若想在团队间共享测试产品可取消注释)
+# *.storekit
+
+# 临时导出
+*.csv
+*.pdf
