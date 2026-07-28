@@ -60,13 +60,22 @@ struct PaywallView: View {
         VStack(alignment: .leading, spacing: 12) {
             featureRow("wand.and.stars",
                         title: String(localized: "个性化洞察"),
-                        body: String(localized: "心情与周期的关联、最常出现的症状、周期稳定度——由你的记录在本机计算。"))
+                        body: String(localized: "心情与周期的关联、最常出现的症状、周期稳定度--由你的记录在本机计算。"))
+            featureRow("bell.badge.fill",
+                        title: String(localized: "高级提醒"),
+                        body: String(localized: "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。"))
             featureRow("chart.xyaxis.line",
-                        title: String(localized: "高级趋势"),
-                        body: String(localized: "更丰富的图表与周期回顾(陆续上线)。"))
+                        title: String(localized: "深度趋势"),
+                        body: String(localized: "心情、症状与体重的走势分析,看懂身体的规律。"))
+            featureRow("heart.text.square",
+                        title: String(localized: "PCOS 专项支持"),
+                        body: String(localized: "为不规律 / PCOS 周期而设的追踪与洞察。"))
+            featureRow("paintpalette",
+                        title: String(localized: "主题与无限自定义追踪项"),
+                        body: String(localized: "5 套配色,想追踪什么就加什么,不限数量。"))
             featureRow("lock.shield.fill",
                         title: String(localized: "支持独立开发"),
-                        body: String(localized: "一次购买或订阅,直接支持一个不卖你数据的独立开发者。"))
+                        body: String(localized: "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

@@ -37,6 +37,7 @@
 - 产品 ID:`cd.cc.vela.premium.yearly` / `.monthly` / `.lifetime`(写死在 `Store.ProductID`,改 ID 要同步改)。
 - entitlement 存本机 UserDefaults(`store.premium`),启动与交易更新时用 `Transaction.currentEntitlements` 校验。
 - 首批解锁功能:「趋势·洞察」卡(`InsightEngine`)。要锁更多功能就加 `if Store.shared.premium { … } else { /* 锁定态 */ }`。
+- 已解锁功能:「趋势·洞察」(`InsightEngine`)+ **「高级提醒」(Pro)**:经期提前天数自定义(1–5)、PMS/黄体期关怀提醒、按周期阶段的智能提醒(`SmartReminderEngine`)、用药多时段 + 按周几排程(`ReminderSlot`)。Pro 入口在设置页「Pro · 高级提醒」与用药编辑器。
 - 未做 App Store Connect 注册前,本地测试需在 Xcode 建 `Vela.storekit` + Edit Scheme 选它;步骤见 `内购配置指南.md`。
 - 隐私铁律:购买由 Apple 处理,不接触支付信息、不接触健康数据;必须保留「恢复购买」入口。
 
@@ -56,7 +57,7 @@ V2(付费解锁):AI 洞察(设备端优先)、PCOS 专项、CloudKit 多设备�
 ## 定价
 
 Freemium。免费永久含:全部追踪、基础预测、每日一句、数据导出。
-Premium:$3.99/月 · $19.99–24.99/年 · 终身买断 $39–49。刻意比 Flo($10/月)便宜且提供买断。取消零障碍、无暗黑续费。
+Premium:$3.99/月 · $29.99/年 · 终身买断 $69.99。刻意比 Flo($10/月)便宜且提供买断。取消零障碍、无暗黑续费。
 
 ## 成本基线
 

@@ -329,11 +329,16 @@ struct CalendarView: View {
         refreshPeriodReminder()
     }
 
-    /// 经期数据一变,预测就变,已排期的「经期临近」提醒必须跟着重排。
+    /// 经期数据一变,预测就变,已排期的提醒必须跟着重排。
     /// 否则提醒会停留在旧预测上(一次性触发后就再也不响)。
     private func refreshPeriodReminder() {
-        let next = CyclePredictor.predict(from: periodDays, manual: manual).nextPeriodStart
-        NotificationManager.shared.schedulePeriodReminder(enabled: periodReminderEnabled, nextPeriodStart: next)
+        let p = CyclePredictor.predict(from: periodDays, manual: manual)
+        let next = p.nextPeriodStart
+        let advance = Store.shared.premium ? ProReminderSettings.periodAdvanceDays : 2
+        NotificationManager.shared.schedulePeriodReminder(enabled: periodReminderEnabled, advanceDays: advance, nextPeriodStart: next)
+        // Pro 高级提醒跟随预测一起重排;免费层传 false 不残留。
+        NotificationManager.shared.schedulePMSReminder(enabled: Store.shared.premium && ProReminderSettings.pmsEnabled, nextPeriodStart: next)
+        NotificationManager.shared.scheduleSmartReminders(enabled: Store.shared.premium && ProReminderSettings.smartEnabled, prediction: p, logs: logs)
         WidgetSync.refresh(periodDays: periodDays, logs: logs)
     }
 }

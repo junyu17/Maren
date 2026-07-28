@@ -22,6 +22,10 @@ struct SettingsView: View {
     @AppStorage("notif.dailyEnabled") private var dailyEnabled: Bool = false
     @AppStorage("notif.dailyHour") private var dailyHour: Int = 21
     @AppStorage("notif.periodEnabled") private var periodEnabled: Bool = false
+    // Pro 高级提醒偏好(免费层忽略;UI 仅 Premium 可见)。
+    @AppStorage(ProReminderSettings.Keys.periodAdvanceDays) private var periodAdvanceDays: Int = 2
+    @AppStorage(ProReminderSettings.Keys.pmsEnabled) private var pmsEnabled: Bool = false
+    @AppStorage(ProReminderSettings.Keys.smartEnabled) private var smartEnabled: Bool = false
 
     // 手动周期设置
     @AppStorage(ManualCycle.Keys.enabled) private var manualEnabled = false
@@ -196,10 +200,63 @@ struct SettingsView: View {
                 Section {
                     Toggle("经期临近提醒", isOn: $periodEnabled)
                         .onChange(of: periodEnabled) { _, _ in reschedule() }
+                    if periodEnabled && store.premium {
+                        Stepper(value: $periodAdvanceDays, in: ProReminderSettings.advanceRange) {
+                            HStack {
+                                Text("提前提醒天数")
+                                Spacer()
+                                Text("\(periodAdvanceDays) 天").foregroundStyle(.secondary)
+                            }
+                        }
+                        .onChange(of: periodAdvanceDays) { _, _ in reschedule() }
+                    }
                 } footer: {
-                    Text("在预测经期前 2 天提醒你(需要先记录出足够的周期)。")
+                    if periodEnabled && store.premium {
+                        Text("在预测经期前 \(periodAdvanceDays) 天提醒你。")
+                    } else {
+                        Text("在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。")
+                    }
                 }
                 .disabled(!notifs.authorized)
+
+                if store.premium {
+                    Section {
+                        Toggle("PMS / 黄体期关怀提醒", isOn: $pmsEnabled)
+                            .onChange(of: pmsEnabled) { _, _ in reschedule() }
+                        Toggle("按周期阶段的智能提醒", isOn: $smartEnabled)
+                            .onChange(of: smartEnabled) { _, _ in reschedule() }
+                        if smartEnabled,
+                           let preview = SmartReminderEngine.preview(prediction: prediction, logs: allLogs) {
+                            Text(preview)
+                                .font(.caption).foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    } header: {
+                        Text("Pro · 高级提醒")
+                    } footer: {
+                        Text("PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。")
+                    }
+                    .disabled(!notifs.authorized)
+                } else {
+                    Section {
+                        Button {
+                            showPaywall = true
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "bell.badge.fill").foregroundStyle(FlowLevel.medium.tint)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("高级提醒(Pro)").font(.subheadline.weight(.semibold))
+                                    Text("多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。")
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+                            }
+                        }
+                    } header: {
+                        Text("Pro · 高级提醒")
+                    }
+                }
 
                 Section {
                     Toggle(isOn: $lockEnabled) {
@@ -252,7 +309,11 @@ struct SettingsView: View {
 
     private func reschedule() {
         notifs.scheduleDailyReminder(enabled: dailyEnabled, hour: dailyHour)
-        notifs.schedulePeriodReminder(enabled: periodEnabled, nextPeriodStart: prediction.nextPeriodStart)
+        let advance = store.premium ? periodAdvanceDays : 2
+        notifs.schedulePeriodReminder(enabled: periodEnabled, advanceDays: advance, nextPeriodStart: prediction.nextPeriodStart)
+        // Pro 高级提醒:免费层强制以 false 传入,确保不残留旧排期。
+        notifs.schedulePMSReminder(enabled: store.premium && pmsEnabled, nextPeriodStart: prediction.nextPeriodStart)
+        notifs.scheduleSmartReminders(enabled: store.premium && smartEnabled, prediction: prediction, logs: allLogs)
     }
 
     /// 一键清空本机全部健康数据。「你的数据永远属于你」也包含「随时能全部带走或抹掉」。
@@ -262,15 +323,17 @@ struct SettingsView: View {
         for l in allLogs { context.delete(l) }
         // 用药相关:先撤掉已排期的本地通知,再删库。
         let meds = (try? context.fetch(FetchDescriptor<Medication>())) ?? []
-        for m in meds { NotificationManager.shared.cancelMedicationReminder(id: m.notificationId) }
+        for m in meds { NotificationManager.shared.cancelAllMedicationReminders(notificationId: m.notificationId) }
         meds.forEach { context.delete($0) }
         (try? context.fetch(FetchDescriptor<MedicationIntake>()))?.forEach { context.delete($0) }
         (try? context.fetch(FetchDescriptor<CustomSymptom>()))?.forEach { context.delete($0) }
         try? context.save()
         // 自定义症状快照也要刷新,否则导出/洞察仍用旧显示名。
         CustomSymptomStore.refresh(context)
-        // 数据没了,已排期的经期提醒也必须撤掉,否则会基于旧预测继续弹。
-        notifs.schedulePeriodReminder(enabled: periodEnabled, nextPeriodStart: nil)
+        // 数据没了,已排期的提醒也必须撤掉,否则会基于旧预测继续弹。
+        notifs.schedulePeriodReminder(enabled: periodEnabled, advanceDays: 2, nextPeriodStart: nil)
+        notifs.schedulePMSReminder(enabled: false, nextPeriodStart: nil)
+        notifs.scheduleSmartReminders(enabled: false, prediction: .empty, logs: [])
         WidgetCenter.shared.reloadAllTimelines()
     }
 

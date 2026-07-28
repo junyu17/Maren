@@ -1,12 +1,13 @@
 import SwiftUI
 import SwiftData
 
-/// 层级 2 · 用药 / 补剂管理。增删改 + 每日提醒。
+/// 层级 2 · 用药 / 补剂管理。增删改 + 每日提醒(免费单次 / Pro 多时段按周几)。
 struct MedicationManagerView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Medication.createdAt) private var meds: [Medication]
     @State private var editing: Medication?
     @State private var showAdd = false
+    @ObservedObject private var store = Store.shared
 
     var body: some View {
         List {
@@ -20,12 +21,7 @@ struct MedicationManagerView: View {
                         Text(med.emoji)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(med.name).foregroundStyle(.primary)
-                            if med.reminderEnabled {
-                                Text(String(localized: "每天 \(timeText(med.reminderHour, med.reminderMinute)) 提醒"))
-                                    .font(.caption).foregroundStyle(.secondary)
-                            } else {
-                                Text("未开启提醒").font(.caption).foregroundStyle(.secondary)
-                            }
+                            Text(summary(med)).font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
                         Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
@@ -49,6 +45,16 @@ struct MedicationManagerView: View {
         }
     }
 
+    private func summary(_ med: Medication) -> String {
+        if med.proScheduleEnabled && store.premium && !med.slots.isEmpty {
+            return String(localized: "\(med.slots.count) 个提醒时段")
+        }
+        if med.reminderEnabled {
+            return String(localized: "每天 \(timeText(med.reminderHour, med.reminderMinute)) 提醒")
+        }
+        return String(localized: "未开启提醒")
+    }
+
     private func timeText(_ h: Int, _ m: Int) -> String {
         var c = DateComponents(); c.hour = h; c.minute = m
         let d = Cal.current.date(from: c) ?? Date()
@@ -60,27 +66,41 @@ struct MedicationManagerView: View {
         let med: Medication
         if let existing = draft.existing {
             med = existing
+            // 先撤掉旧排期(单次 + 旧多时段),再改字段重排,避免残留。
+            NotificationManager.shared.cancelAllMedicationReminders(notificationId: med.notificationId)
             med.name = draft.name
             med.emoji = draft.emoji
+        } else {
+            med = Medication(name: draft.name, emoji: draft.emoji)
+            context.insert(med)
+        }
+        let usePro = draft.proScheduleEnabled && store.premium && !draft.slots.isEmpty
+        med.proScheduleEnabled = usePro
+        if usePro {
+            med.setSlots(draft.slots)
+            med.reminderEnabled = true
+        } else {
+            med.setSlots([])
             med.reminderEnabled = draft.reminderEnabled
             med.reminderHour = draft.hour
             med.reminderMinute = draft.minute
-        } else {
-            med = Medication(name: draft.name, emoji: draft.emoji,
-                             reminderEnabled: draft.reminderEnabled,
-                             reminderHour: draft.hour, reminderMinute: draft.minute)
-            context.insert(med)
         }
         try? context.save()
-        NotificationManager.shared.scheduleMedicationReminder(
-            id: med.notificationId, name: med.name,
-            enabled: med.reminderEnabled, hour: med.reminderHour, minute: med.reminderMinute)
+        // 重排:Pro 走多时段,否则走单次。
+        if usePro {
+            NotificationManager.shared.scheduleMedicationSlots(
+                notificationId: med.notificationId, name: med.name, slots: med.slots)
+        } else if med.reminderEnabled {
+            NotificationManager.shared.scheduleMedicationReminder(
+                id: med.notificationId, name: med.name,
+                enabled: true, hour: med.reminderHour, minute: med.reminderMinute)
+        }
     }
 
     private func delete(_ offsets: IndexSet) {
         for i in offsets {
             let med = meds[i]
-            NotificationManager.shared.cancelMedicationReminder(id: med.notificationId)
+            NotificationManager.shared.cancelAllMedicationReminders(notificationId: med.notificationId)
             context.delete(med)
         }
         try? context.save()
@@ -96,9 +116,12 @@ struct MedicationEditor: View {
         var reminderEnabled: Bool
         var hour: Int
         var minute: Int
+        var proScheduleEnabled: Bool
+        var slots: [ReminderSlot]
     }
 
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var store = Store.shared
     let med: Medication?
     let onSave: (Draft) -> Void
 
@@ -106,6 +129,8 @@ struct MedicationEditor: View {
     @State private var emoji: String
     @State private var reminderEnabled: Bool
     @State private var time: Date
+    @State private var proScheduleEnabled: Bool
+    @State private var slots: [ReminderSlot]
 
     private let choices = ["💊", "🟡", "🔵", "🧴", "💉", "🌿", "🩹", "☀️"]
 
@@ -117,7 +142,12 @@ struct MedicationEditor: View {
         _reminderEnabled = State(initialValue: med?.reminderEnabled ?? false)
         var c = DateComponents(); c.hour = med?.reminderHour ?? 9; c.minute = med?.reminderMinute ?? 0
         _time = State(initialValue: Cal.current.date(from: c) ?? Date())
+        _proScheduleEnabled = State(initialValue: med?.proScheduleEnabled ?? false)
+        _slots = State(initialValue: med?.slots ?? [])
     }
+
+    /// Pro 模式生效需同时:开关开 + 已升级 + 至少一个时段。
+    private var usePro: Bool { proScheduleEnabled && store.premium }
 
     var body: some View {
         NavigationStack {
@@ -136,13 +166,25 @@ struct MedicationEditor: View {
                         }
                     }
                 }
+
                 Section {
-                    Toggle("每日提醒", isOn: $reminderEnabled)
-                    if reminderEnabled {
-                        DatePicker("提醒时间", selection: $time, displayedComponents: .hourAndMinute)
+                    if store.premium {
+                        Toggle("高级排程(多时段 / 按周几)", isOn: $proScheduleEnabled)
+                    }
+                    if usePro {
+                        slotEditor
+                    } else {
+                        Toggle("每日提醒", isOn: $reminderEnabled)
+                        if reminderEnabled {
+                            DatePicker("提醒时间", selection: $time, displayedComponents: .hourAndMinute)
+                        }
                     }
                 } footer: {
-                    Text("提醒在本机生成,不经过服务器。")
+                    if usePro {
+                        Text("可设多个时间点,并选择只在某些周几提醒。提醒在本机生成,不经过服务器。")
+                    } else {
+                        Text("提醒在本机生成,不经过服务器。")
+                    }
                 }
             }
             .navigationTitle(med == nil ? String(localized: "添加用药") : String(localized: "编辑用药"))
@@ -155,11 +197,76 @@ struct MedicationEditor: View {
                         onSave(Draft(existing: med,
                                      name: name.trimmingCharacters(in: .whitespacesAndNewlines),
                                      emoji: emoji, reminderEnabled: reminderEnabled,
-                                     hour: c.hour ?? 9, minute: c.minute ?? 0))
+                                     hour: c.hour ?? 9, minute: c.minute ?? 0,
+                                     proScheduleEnabled: proScheduleEnabled,
+                                     slots: slots))
                         dismiss()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+            }
+        }
+    }
+
+    /// Pro 多时段编辑器:每个时段一个时间 + 周几选择;可增删,上限 `maxSlots`。
+    @ViewBuilder
+    private var slotEditor: some View {
+        ForEach($slots) { $slot in
+            VStack(alignment: .leading, spacing: 10) {
+                DatePicker("时间", selection: Binding(
+                    get: { dateFromTime(slot.hour, slot.minute) },
+                    set: {
+                        let c = Cal.current.dateComponents([.hour, .minute], from: $0)
+                        slot.hour = c.hour ?? 9; slot.minute = c.minute ?? 0
+                    }),
+                    displayedComponents: .hourAndMinute)
+                WeekdayPicker(weekdays: $slot.weekdays)
+            }
+            .padding(.vertical, 2)
+        }
+        .onDelete { offsets in slots.remove(atOffsets: offsets) }
+        if slots.count < MedicationSlotsPolicy.maxSlots {
+            Button {
+                slots.append(ReminderSlot())
+            } label: {
+                Label("添加时段", systemImage: "plus")
+            }
+        } else {
+            Text("已达 \(MedicationSlotsPolicy.maxSlots) 个时段上限。")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+    }
+
+    private func dateFromTime(_ h: Int, _ m: Int) -> Date {
+        var c = DateComponents(); c.hour = h; c.minute = m
+        return Cal.current.date(from: c) ?? Date()
+    }
+}
+
+/// 周几选择器:7 个可切换的按钮(Sun…Sat,用系统本地化短符号)。
+struct WeekdayPicker: View {
+    @Binding var weekdays: [Int]
+    private let symbols = Cal.current.shortWeekdaySymbols // [Sun, Mon, ...] 下标 0-6;weekday 1=Sunday
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(1...7, id: \.self) { w in
+                let idx = w - 1
+                let on = weekdays.contains(w)
+                Button {
+                    if on { weekdays.removeAll { $0 == w } }
+                    else { weekdays.append(w); weekdays.sort() }
+                } label: {
+                    Text(symbols.indices.contains(idx) ? symbols[idx] : "\(w)")
+                        .font(.caption.weight(.medium))
+                        .frame(width: 34, height: 30)
+                        .foregroundStyle(on ? .white : .primary)
+                        .background(on ? FlowLevel.medium.tint : Color.secondary.opacity(0.12),
+                                    in: RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(symbols.indices.contains(idx) ? symbols[idx] : "\(w)")
+                .accessibilityAddTraits(on ? [.isButton, .isSelected] : [.isButton])
             }
         }
     }

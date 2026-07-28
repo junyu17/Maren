@@ -4316,6 +4316,406 @@
           }
         }
       }
+    },
+    "每天": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every day"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天"
+          }
+        }
+      }
+    },
+    "进入黄体期": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entering the luteal phase"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进入黄体期"
+          }
+        }
+      }
+    },
+    "你的「%@」常在黄体期升高,这几天注意休息。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your \"%@\" tends to rise during the luteal phase — take it easy these days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的「%@」常在黄体期升高,这几天注意休息。"
+          }
+        }
+      }
+    },
+    "你的心情在黄体期通常偏低,这几天多关照自己。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your mood is usually lower during the luteal phase — be kind to yourself these days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的心情在黄体期通常偏低,这几天多关照自己。"
+          }
+        }
+      }
+    },
+    "黄体期情绪和身体容易起伏,对自己温柔一点。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mood and body can fluctuate during the luteal phase — be gentle with yourself."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "黄体期情绪和身体容易起伏,对自己温柔一点。"
+          }
+        }
+      }
+    },
+    "对自己好一点": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Be kind to yourself"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "对自己好一点"
+          }
+        }
+      }
+    },
+    "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your period is near; mood and body may fluctuate during the luteal phase — treat yourself gently."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。"
+          }
+        }
+      }
+    },
+    "预测你的经期约在 %lld 天后,可以提前做点准备。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your period may be about %lld days away — maybe prep a little."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预测你的经期约在 %lld 天后,可以提前做点准备。"
+          }
+        }
+      }
+    },
+    "提前提醒天数": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Days before to remind"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提前提醒天数"
+          }
+        }
+      }
+    },
+    "在预测经期前 %lld 天提醒你。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminds you %lld days before your predicted period."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在预测经期前 %lld 天提醒你。"
+          }
+        }
+      }
+    },
+    "在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminds you 2 days before your predicted period. Upgrade to Pro to customize 1–5 days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。"
+          }
+        }
+      }
+    },
+    "PMS / 黄体期关怀提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS / luteal-phase self-care reminder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS / 黄体期关怀提醒"
+          }
+        }
+      }
+    },
+    "按周期阶段的智能提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smart reminders by cycle phase"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按周期阶段的智能提醒"
+          }
+        }
+      }
+    },
+    "Pro · 高级提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro · Advanced reminders"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro · 高级提醒"
+          }
+        }
+      }
+    },
+    "PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS: a \"be kind to yourself\" nudge a few days before your period. Smart reminders: when you enter the luteal phase, get a nudge based on your own logs (e.g. \"anxiety tends to rise in the luteal phase\")."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。"
+          }
+        }
+      }
+    },
+    "高级提醒(Pro)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced reminders (Pro)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级提醒(Pro)"
+          }
+        }
+      }
+    },
+    "多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multi-time medication reminders, custom period lead days, PMS self-care, smart phase-based reminders."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。"
+          }
+        }
+      }
+    },
+    "%lld 个提醒时段": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld reminder slots"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个提醒时段"
+          }
+        }
+      }
+    },
+    "高级排程(多时段 / 按周几)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced schedule (multi-time / by weekday)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级排程(多时段 / 按周几)"
+          }
+        }
+      }
+    },
+    "可设多个时间点,并选择只在某些周几提醒。提醒在本机生成,不经过服务器。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set multiple times and choose specific weekdays. Reminders are generated on-device, never via a server."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可设多个时间点,并选择只在某些周几提醒。提醒在本机生成,不经过服务器。"
+          }
+        }
+      }
+    },
+    "时间": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间"
+          }
+        }
+      }
+    },
+    "添加时段": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a time slot"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加时段"
+          }
+        }
+      }
+    },
+    "已达 %lld 个时段上限。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reached the limit of %lld time slots."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已达 %lld 个时段上限。"
+          }
+        }
+      }
+    },
+    "高级提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced reminders"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级提醒"
+          }
+        }
+      }
+    },
+    "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multi-time medication reminders, custom period lead days, PMS self-care, and smart phase-based reminders — in tune with your rhythm."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
