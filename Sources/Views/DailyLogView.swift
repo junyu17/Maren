@@ -27,6 +27,8 @@ struct DailyLogView: View {
     @State private var note: String = ""
     @State private var savedFlash = false
     @State private var showAddSymptom = false
+    @State private var showPaywall = false
+    @ObservedObject private var store = Store.shared
 
     /// 睡眠时长显示文本,跟随地区数字格式(3.5 / 3,5)。
     private var sleepText: String {
@@ -34,6 +36,15 @@ struct DailyLogView: View {
     }
     private var weightText: String {
         (weight ?? 0).formatted(.number.precision(.fractionLength(0...1)))
+    }
+
+    /// 添加自定义症状:免费层达 3 个上限时弹付费墙,Pro 无限。
+    private func tryAddCustomSymptom() {
+        if !store.premium && customSymptoms.count >= CustomSymptom.freeLimit {
+            showPaywall = true
+        } else {
+            showAddSymptom = true
+        }
     }
 
     /// 只在「今天」这一天显示用药打卡(过去的日子不补吃药)。
@@ -179,7 +190,7 @@ struct DailyLogView: View {
                 Section("症状") {
                     ChipGrid(selected: $symptoms, customTags: customSymptoms.map {
                         SymptomTag(key: $0.key, label: $0.label, emoji: $0.emoji)
-                    }, onAdd: { showAddSymptom = true })
+                    }, onAdd: { tryAddCustomSymptom() })
                 }
 
                 Section("备注") {
@@ -215,6 +226,7 @@ struct DailyLogView: View {
                     symptoms.insert(s.key)   // 新建即选中
                 }
             }
+            .sheet(isPresented: $showPaywall) { PaywallView() }
             .onAppear {
                 // 跨过午夜后自动跟到新的今天(前提是用户没有手动选过别的日期)。
                 let today = Cal.startOfDay(Date())

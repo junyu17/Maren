@@ -84,3 +84,29 @@ Pro 高级提醒 = 更灵活/更聪明的那层:
 4. **通知权限**:Pro 提醒依赖已授权通知;首次开 Pro 开关时若未授权,需先走「开启通知权限」。
 5. **视觉走查**:我无法看图,设置页「Pro · 高级提醒」区、用药编辑器多时段/周几选择器、付费墙新卖点行的视觉请 Billy 过一眼。
 6. **可选增强**:PMS 提前天数目前固定 4 天(代码常量,未做 UI);如要可调可加 Stepper。智能提醒目前只排「下次黄体期」一次,周期刷新时会重排;如要覆盖多周期可扩展。
+
+## 七、第二轮(2026-07-28 补):PMS 天数可调 + Free/Pro 矩阵 gating
+
+### PMS 提前天数
+- 免费固定 4 天;Pro 可调 1–7(`@AppStorage pmsLeadDays`,设置页 Stepper)。
+
+### Free/Pro 区别矩阵核对与补 gate(原仅「个性化洞察」gated)
+| 区块 | Free | Pro | 处理 |
+|---|---|---|---|
+| 趋势 | 周期长度图 + 历史周期列表 | 个性化洞察 + 心情30天 + 症状频次 + 体重曲线 | 心情/症状/体重三卡用 `lockedCard` 锁 Pro ✅ |
+| PCOS | - | 专项模块 | 设置页「关于 PCOS」入口锁 Pro(未升级跳付费墙)✅ |
+| 个性化 | 3 个自定义追踪项 | 无限 + 5 套主题 | 自定义项 `CustomSymptom.freeLimit=3` 上限(DailyLogView + Manager 两处 gate)✅;主题免费仅默认玫瑰色,其余锁 Pro ✅ |
+| 多设备 | - | CloudKit 同步 | **未 gate**:CloudSync 仍是骨架(无 UI 开关,且需先去 `@Attribute(.unique)` + Billy 配 iCloud capability),待真正实装时再加 Pro gate |
+
+### 改动文件(第二轮)
+- `Sources/Views/TrendsView.swift`:心情/症状/体重三卡 Pro gate + `lockedCard` 辅助
+- `Sources/Views/SettingsView.swift`:PMS Stepper、PCOS 入口锁、主题锁(免费仅玫瑰色)
+- `Sources/Models/CustomSymptom.swift`:加 `static let freeLimit = 3`
+- `Sources/Views/DailyLogView.swift`:自定义症状添加入口 3 上限 gate + paywall
+- `Sources/Views/CustomSymptomManagerView.swift`:同上 + 上限提示 footer
+- `Resources/Localizable.xcstrings`:补 7 条
+- 验证:`xcodegen` + `xcodebuild` BUILD SUCCEEDED;模拟器启动存活无崩(有一条既有的 SwiftUI ForEach 重复 ID 警告,非本次引入)
+
+### 待确认的产品决策
+- 免费主题 = 仅默认玫瑰色(其余 4 套锁 Pro)。若想给免费 2 套可调。
+- PCOS 目前只 gate 了「关于 PCOS」科普入口;PCOS 相关症状(脱发/多毛/体重)的录入没单独锁(它们在免费症状区仍可记)。要不要也锁?

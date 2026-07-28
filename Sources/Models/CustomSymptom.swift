@@ -16,6 +16,9 @@ final class CustomSymptom {
         self.emoji = emoji
         self.createdAt = Date()
     }
+
+    /// 免费层最多自定义追踪项数;Pro 无限。
+    static let freeLimit = 3
 }
 
 /// 静态快照,供非 View 场景(导出 / 洞察 / 趋势)解析自定义标签的显示名。

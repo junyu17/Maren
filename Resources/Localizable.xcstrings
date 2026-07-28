@@ -4716,6 +4716,118 @@
           }
         }
       }
+    },
+    "升级 Pro,查看近 30 天心情走势。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro to see your 30-day mood trend."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "升级 Pro,查看近 30 天心情走势。"
+          }
+        }
+      }
+    },
+    "升级 Pro,查看体重曲线(PCOS 相关追踪)。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro to see your weight trend (PCOS-related tracking)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "升级 Pro,查看体重曲线(PCOS 相关追踪)。"
+          }
+        }
+      }
+    },
+    "升级 Pro,查看症状出现频次。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro to see how often your symptoms appear."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "升级 Pro,查看症状出现频次。"
+          }
+        }
+      }
+    },
+    "PMS 提前几天": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS days before period"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS 提前几天"
+          }
+        }
+      }
+    },
+    "5 套配色随心换。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch between 5 color themes."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 套配色随心换。"
+          }
+        }
+      }
+    },
+    "默认玫瑰色。升级 Pro 解锁全部 5 套配色。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Default rose. Upgrade to Pro to unlock all 5 themes."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "默认玫瑰色。升级 Pro 解锁全部 5 套配色。"
+          }
+        }
+      }
+    },
+    "免费最多 %lld 个自定义项,Pro 无限。已达上限时点「＋」升级。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free allows up to %lld custom items; Pro is unlimited. Tap + to upgrade when you reach the limit."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免费最多 %lld 个自定义项,Pro 无限。已达上限时点「＋」升级。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

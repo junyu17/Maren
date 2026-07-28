@@ -158,21 +158,26 @@ struct TrendsView: View {
 
     @ViewBuilder
     private var moodTrendCard: some View {
-        let points = recentMoodPoints()
-        card(title: String(localized: "近 30 天心情"), systemImage: "face.smiling") {
-            if points.count >= 2 {
-                Chart(points, id: \.date) { p in
-                    LineMark(x: .value(String(localized: "日期"), p.date), y: .value(String(localized: "心情"), p.value))
-                        .interpolationMethod(.catmullRom)
-                        .foregroundStyle(FlowLevel.medium.tint)
-                    PointMark(x: .value(String(localized: "日期"), p.date), y: .value(String(localized: "心情"), p.value))
-                        .foregroundStyle(FlowLevel.medium.tint)
+        if store.premium {
+            let points = recentMoodPoints()
+            card(title: String(localized: "近 30 天心情"), systemImage: "face.smiling") {
+                if points.count >= 2 {
+                    Chart(points, id: \.date) { p in
+                        LineMark(x: .value(String(localized: "日期"), p.date), y: .value(String(localized: "心情"), p.value))
+                            .interpolationMethod(.catmullRom)
+                            .foregroundStyle(FlowLevel.medium.tint)
+                        PointMark(x: .value(String(localized: "日期"), p.date), y: .value(String(localized: "心情"), p.value))
+                            .foregroundStyle(FlowLevel.medium.tint)
+                    }
+                    .chartYScale(domain: 1...5)
+                    .frame(height: 150)
+                } else {
+                    emptyHint(String(localized: "多记几天心情后显示。"))
                 }
-                .chartYScale(domain: 1...5)
-                .frame(height: 150)
-            } else {
-                emptyHint(String(localized: "多记几天心情后显示。"))
             }
+        } else {
+            lockedCard(title: String(localized: "近 30 天心情"), systemImage: "face.smiling",
+                       teaser: String(localized: "升级 Pro,查看近 30 天心情走势。"))
         }
     }
 
@@ -188,22 +193,27 @@ struct TrendsView: View {
 
     @ViewBuilder
     private var weightCard: some View {
-        let points = logs.compactMap { log in log.weight.map { (log.date, $0) } }
-            .sorted { $0.0 < $1.0 }
-        // 只在有人真的记过体重时才显示这张卡,避免打扰不关心体重的用户。
-        if points.count >= 2 {
-            card(title: String(localized: "体重趋势"), systemImage: "scalemass") {
-                Chart(points, id: \.0) { p in
-                    LineMark(x: .value(String(localized: "日期"), p.0),
-                             y: .value(String(localized: "体重"), p.1))
-                        .interpolationMethod(.catmullRom)
-                        .foregroundStyle(FlowLevel.medium.tint)
-                    PointMark(x: .value(String(localized: "日期"), p.0),
-                              y: .value(String(localized: "体重"), p.1))
-                        .foregroundStyle(FlowLevel.medium.tint)
+        if store.premium {
+            let points = logs.compactMap { log in log.weight.map { (log.date, $0) } }
+                .sorted { $0.0 < $1.0 }
+            // 只在有人真的记过体重时才显示这张卡,避免打扰不关心体重的用户。
+            if points.count >= 2 {
+                card(title: String(localized: "体重趋势"), systemImage: "scalemass") {
+                    Chart(points, id: \.0) { p in
+                        LineMark(x: .value(String(localized: "日期"), p.0),
+                                 y: .value(String(localized: "体重"), p.1))
+                            .interpolationMethod(.catmullRom)
+                            .foregroundStyle(FlowLevel.medium.tint)
+                        PointMark(x: .value(String(localized: "日期"), p.0),
+                                  y: .value(String(localized: "体重"), p.1))
+                            .foregroundStyle(FlowLevel.medium.tint)
+                    }
+                    .frame(height: 150)
                 }
-                .frame(height: 150)
             }
+        } else {
+            lockedCard(title: String(localized: "体重趋势"), systemImage: "scalemass",
+                       teaser: String(localized: "升级 Pro,查看体重曲线(PCOS 相关追踪)。"))
         }
     }
 
@@ -211,27 +221,32 @@ struct TrendsView: View {
 
     @ViewBuilder
     private var symptomCard: some View {
-        let freq = symptomFrequency()
-        card(title: String(localized: "症状频次"), systemImage: "list.bullet") {
-            if !freq.isEmpty {
-                // 留出 1 格空白,让次数标注不被裁掉;刻度按整数走,避免出现 0.5 次。
-                let maxCount = freq.map(\.value).max() ?? 1
-                Chart(freq, id: \.key) { item in
-                    BarMark(
-                        x: .value(String(localized: "次数"), item.value),
-                        y: .value(String(localized: "症状"), Symptoms.label(for: item.key))
-                    )
-                    .foregroundStyle(FlowLevel.light.tint)
-                    .annotation(position: .trailing) {
-                        Text("\(item.value)").font(.caption2).foregroundStyle(.secondary)
+        if store.premium {
+            let freq = symptomFrequency()
+            card(title: String(localized: "症状频次"), systemImage: "list.bullet") {
+                if !freq.isEmpty {
+                    // 留出 1 格空白,让次数标注不被裁掉;刻度按整数走,避免出现 0.5 次。
+                    let maxCount = freq.map(\.value).max() ?? 1
+                    Chart(freq, id: \.key) { item in
+                        BarMark(
+                            x: .value(String(localized: "次数"), item.value),
+                            y: .value(String(localized: "症状"), Symptoms.label(for: item.key))
+                        )
+                        .foregroundStyle(FlowLevel.light.tint)
+                        .annotation(position: .trailing) {
+                            Text("\(item.value)").font(.caption2).foregroundStyle(.secondary)
+                        }
                     }
+                    .chartXScale(domain: 0...(maxCount + 1))
+                    .chartXAxis { AxisMarks(values: .stride(by: 1)) }
+                    .frame(height: CGFloat(freq.count) * 34 + 20)
+                } else {
+                    emptyHint(String(localized: "还没有症状记录。"))
                 }
-                .chartXScale(domain: 0...(maxCount + 1))
-                .chartXAxis { AxisMarks(values: .stride(by: 1)) }
-                .frame(height: CGFloat(freq.count) * 34 + 20)
-            } else {
-                emptyHint(String(localized: "还没有症状记录。"))
             }
+        } else {
+            lockedCard(title: String(localized: "症状频次"), systemImage: "list.bullet",
+                       teaser: String(localized: "升级 Pro,查看症状出现频次。"))
         }
     }
 
@@ -262,5 +277,26 @@ struct TrendsView: View {
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
+    }
+
+    /// Pro 锁定卡:未升级时替代表格,提示升级并跳付费墙。
+    private func lockedCard(title: String, systemImage: String, teaser: String) -> some View {
+        card(title: title, systemImage: systemImage) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(teaser)
+                    .font(.subheadline).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button {
+                    showPaywall = true
+                } label: {
+                    Label("升级解锁", systemImage: "lock.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity).padding(.vertical, 6)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(FlowLevel.medium.tint)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }

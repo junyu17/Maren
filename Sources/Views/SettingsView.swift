@@ -26,6 +26,7 @@ struct SettingsView: View {
     @AppStorage(ProReminderSettings.Keys.periodAdvanceDays) private var periodAdvanceDays: Int = 2
     @AppStorage(ProReminderSettings.Keys.pmsEnabled) private var pmsEnabled: Bool = false
     @AppStorage(ProReminderSettings.Keys.smartEnabled) private var smartEnabled: Bool = false
+    @AppStorage(ProReminderSettings.Keys.pmsLeadDays) private var pmsLeadDays: Int = 4
 
     // 手动周期设置
     @AppStorage(ManualCycle.Keys.enabled) private var manualEnabled = false
@@ -109,8 +110,9 @@ struct SettingsView: View {
                 Section {
                     HStack(spacing: 14) {
                         ForEach(AppTheme.allCases) { t in
+                            let locked = !store.premium && t != .rose
                             Button {
-                                themeRaw = t.rawValue
+                                if locked { showPaywall = true } else { themeRaw = t.rawValue }
                             } label: {
                                 Circle()
                                     .fill(t.accent)
@@ -120,7 +122,14 @@ struct SettingsView: View {
                                             Image(systemName: "checkmark")
                                                 .font(.caption.weight(.bold))
                                                 .foregroundStyle(.white)
+                                        } else if locked {
+                                            Image(systemName: "lock.fill")
+                                                .font(.caption2)
+                                                .foregroundStyle(.white)
                                         }
+                                    }
+                                    .overlay {
+                                        if locked { Circle().stroke(.gray.opacity(0.4), lineWidth: 1) }
                                     }
                             }
                             .buttonStyle(.plain)
@@ -132,6 +141,12 @@ struct SettingsView: View {
                     .padding(.vertical, 4)
                 } header: {
                     Text("主题")
+                } footer: {
+                    if store.premium {
+                        Text("5 套配色随心换。")
+                    } else {
+                        Text("默认玫瑰色。升级 Pro 解锁全部 5 套配色。")
+                    }
                 }
 
                 Section {
@@ -146,9 +161,15 @@ struct SettingsView: View {
                         Label("自定义追踪项", systemImage: "slider.horizontal.3")
                     }
                     Button {
-                        showPCOS = true
+                        if store.premium { showPCOS = true } else { showPaywall = true }
                     } label: {
-                        Label("关于 PCOS", systemImage: "heart.text.square")
+                        HStack {
+                            Label("关于 PCOS", systemImage: "heart.text.square")
+                            Spacer()
+                            if !store.premium {
+                                Image(systemName: "lock.fill").font(.caption).foregroundStyle(.tertiary)
+                            }
+                        }
                     }
                 } header: {
                     Text("追踪与提醒")
@@ -223,6 +244,16 @@ struct SettingsView: View {
                     Section {
                         Toggle("PMS / 黄体期关怀提醒", isOn: $pmsEnabled)
                             .onChange(of: pmsEnabled) { _, _ in reschedule() }
+                        if pmsEnabled {
+                            Stepper(value: $pmsLeadDays, in: 1...7) {
+                                HStack {
+                                    Text("PMS 提前几天")
+                                    Spacer()
+                                    Text("\(pmsLeadDays) 天").foregroundStyle(.secondary)
+                                }
+                            }
+                            .onChange(of: pmsLeadDays) { _, _ in reschedule() }
+                        }
                         Toggle("按周期阶段的智能提醒", isOn: $smartEnabled)
                             .onChange(of: smartEnabled) { _, _ in reschedule() }
                         if smartEnabled,
