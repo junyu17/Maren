@@ -8,7 +8,8 @@ import SwiftData
 /// - Pro:多时段 + 按周几(`proScheduleEnabled` + `scheduleSlotsJSON`),覆盖单次提醒。
 @Model
 final class Medication {
-    @Attribute(.unique) var id: UUID
+    /// 本 app 内的稳定标识(UUID,创建时生成)。不用 `@Attribute(.unique)`(CloudKit 不支持)。
+    var id: UUID
     var name: String
     var emoji: String
     var reminderEnabled: Bool
@@ -69,8 +70,9 @@ final class Medication {
 /// 某天某药「已服用」的打卡记录。存在即表示当天已吃。
 @Model
 final class MedicationIntake {
-    /// 唯一键 = 药 id + 日键,防止一天重复打卡。
-    @Attribute(.unique) var key: String
+    /// 逻辑唯一键 = 药 id + 日键,防止一天重复打卡。
+    /// ⚠️ 不用 `@Attribute(.unique)`(CloudKit 不支持);去重由 `DailyLogView.toggleMed` 先查后写。
+    var key: String
     var medicationId: UUID
     var dayKey: Int
     var takenAt: Date

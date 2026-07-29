@@ -4,8 +4,10 @@ import SwiftData
 /// F3:每日情绪 + 症状打卡。一天一条,3 秒记录。
 @Model
 final class DailyLog {
-    /// 唯一日期主键,yyyymmdd 整数(见 `DayKey`),与时区无关。
-    @Attribute(.unique) var dayKey: Int
+    /// 逻辑唯一键:yyyymmdd 整数(见 `DayKey`),与时区无关。
+    /// ⚠️ 不用 `@Attribute(.unique)`(CloudKit 不支持);去重由写入路径手动完成
+    ///(`DailyLogView.save` / `QuickLogApplier`,先查后写)。
+    var dayKey: Int
 
     /// 心情原始值(1...5),0 表示未选。
     var moodRaw: Int

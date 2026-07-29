@@ -36,6 +36,11 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.cd.cc.vela
+        # CloudKit 私有库同步(V2):数据存用户自己的 iCloud,我们的服务器零接触。
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.cd.cc.vela
+        com.apple.developer.icloud-services:
+          - CloudKit
         # HealthKit(经期数据双向同步)。真机需在该 App ID 勾 HealthKit capability;模拟器可直接跑。
         com.apple.developer.healthkit: true
     settings:

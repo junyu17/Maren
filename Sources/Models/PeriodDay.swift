@@ -5,10 +5,12 @@ import SwiftData
 /// 以「天」为粒度存储,天然支持不规律 / 长周期(不假设固定经期长度)。
 @Model
 final class PeriodDay {
-    /// 唯一日期主键,yyyymmdd 整数(见 `DayKey`)。
+    /// 逻辑唯一键:yyyymmdd 整数(见 `DayKey`)。
     /// 用整数而不是 Date:跨时区 / 夏令时后,「本地零点」的时间戳会变,
     /// 会造成同一天重复记录或记录消失;整数日键只描述「哪一天」,永远稳定。
-    @Attribute(.unique) var dayKey: Int
+    /// ⚠️ 不用 `@Attribute(.unique)`:CloudKit 不支持唯一约束。同 dayKey 的去重
+    /// 由写入路径手动完成(`CalendarView.upsertPeriod` / `QuickLogApplier`,先查后写)。
+    var dayKey: Int
     /// 存原始值,SwiftData 对基础类型最稳。
     var flowRaw: Int
     var createdAt: Date

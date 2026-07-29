@@ -5,7 +5,8 @@ import SwiftData
 /// DailyLog.symptoms 里存的是 key;自定义项的 key 形如 "c:<uuid>",内置项用原有英文 key。
 @Model
 final class CustomSymptom {
-    @Attribute(.unique) var key: String
+    /// 逻辑唯一键:`c:<uuid>`,UUID 保证全局唯一(无需 DB 唯一约束,CloudKit 不支持)。
+    var key: String
     var label: String
     var emoji: String
     var createdAt: Date

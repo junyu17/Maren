@@ -17,6 +17,8 @@ struct SettingsView: View {
     @State private var showPaywall = false
     @State private var showRestoreAlert = false
     @State private var restoreMsg = ""
+    @AppStorage(CloudSync.storageKey) private var cloudSyncEnabled = false
+    @State private var showSyncRestart = false
     @AppStorage("lock.enabled") private var lockEnabled = false
     @AppStorage(AppTheme.storageKey) private var themeRaw = AppTheme.rose.rawValue
 
@@ -333,6 +335,25 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    if CloudSync.isConfigured {
+                        Toggle("iCloud 同步", isOn: $cloudSyncEnabled)
+                            .onChange(of: cloudSyncEnabled) { _, _ in showSyncRestart = true }
+                    } else {
+                        // 未登录 iCloud 或无 entitlement:不展示开关,直接说明不可用。
+                        HStack(spacing: 10) {
+                            Image(systemName: "icloud.slash").foregroundStyle(.secondary)
+                            Text("iCloud 同步当前不可用").foregroundStyle(.secondary)
+                        }
+                    }
+                } header: {
+                    Text("同步")
+                } footer: {
+                    Text(cloudSyncEnabled
+                         ? "已开启:数据同步到你自己的 iCloud 私有库(我们的服务器无法访问),可在登录同一 Apple ID 的设备间同步。"
+                         : "开启后,数据存到你自己的 iCloud 私有库,可在你登录同一 Apple ID 的设备间同步。我们的服务器永不接触。开启或关闭需重启 Maren 生效。")
+                }
+
+                Section {
                     Toggle(isOn: $lockEnabled) {
                         Label("Face ID / 密码锁", systemImage: "faceid")
                     }
@@ -377,6 +398,11 @@ struct SettingsView: View {
             .alert("恢复购买", isPresented: $showRestoreAlert) {
                 Button("好") {}
             } message: { Text(restoreMsg) }
+            .alert("需要重启 Maren", isPresented: $showSyncRestart) {
+                Button("好") {}
+            } message: {
+                Text("iCloud 同步设置将在下次打开 Maren 时生效。")
+            }
             .onAppear { notifs.refreshAuthorization() }
         }
     }

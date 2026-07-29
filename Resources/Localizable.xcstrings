@@ -61,6 +61,22 @@
         }
       }
     },
+    "%lld 个提醒时段": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld reminder slots"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个提醒时段"
+          }
+        }
+      }
+    },
     "%lld 天": {
       "localizations": {
         "en": {
@@ -101,6 +117,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "3 秒记一次"
+          }
+        }
+      }
+    },
+    "5 套配色,想追踪什么就加什么,不限数量。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 color themes, and add as many custom trackers as you like."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 套配色,想追踪什么就加什么,不限数量。"
+          }
+        }
+      }
+    },
+    "5 套配色随心换。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch between 5 color themes."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 套配色随心换。"
+          }
+        }
+      }
+    },
+    "Apple 健康": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Health"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple 健康"
           }
         }
       }
@@ -249,6 +313,22 @@
         }
       }
     },
+    "PCOS 专项支持": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCOS-focused support"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCOS 专项支持"
+          }
+        }
+      }
+    },
     "PCOS 值得追踪什么": {
       "localizations": {
         "en": {
@@ -261,6 +341,118 @@
           "stringUnit": {
             "state": "translated",
             "value": "PCOS 值得追踪什么"
+          }
+        }
+      }
+    },
+    "PMS / 黄体期关怀提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS / luteal-phase self-care reminder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS / 黄体期关怀提醒"
+          }
+        }
+      }
+    },
+    "PMS 提前几天": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS days before period"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS 提前几天"
+          }
+        }
+      }
+    },
+    "PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS: a \"be kind to yourself\" nudge a few days before your period. Smart reminders: when you enter the luteal phase, get a nudge based on your own logs (e.g. \"anxiety tends to rise in the luteal phase\")."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。"
+          }
+        }
+      }
+    },
+    "Pro · 高级提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro · Advanced reminders"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro · 高级提醒"
+          }
+        }
+      }
+    },
+    "iCloud 同步": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud Sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同步"
+          }
+        }
+      }
+    },
+    "iCloud 同步当前不可用": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud sync is unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同步当前不可用"
+          }
+        }
+      }
+    },
+    "iCloud 同步设置将在下次打开 Maren 时生效。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud sync settings take effect the next time you open Maren."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud 同步设置将在下次打开 Maren 时生效。"
           }
         }
       }
@@ -501,6 +693,22 @@
         }
       }
     },
+    "为不规律 / PCOS 周期而设的追踪与洞察。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tracking and insights built for irregular / PCOS cycles."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为不规律 / PCOS 周期而设的追踪与洞察。"
+          }
+        }
+      }
+    },
     "为不规律的周期而生": {
       "localizations": {
         "en": {
@@ -529,6 +737,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "主题"
+          }
+        }
+      }
+    },
+    "主题与无限自定义追踪项": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Themes & unlimited custom trackers"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主题与无限自定义追踪项"
           }
         }
       }
@@ -821,6 +1045,22 @@
         }
       }
     },
+    "你的「%@」常在黄体期升高,这几天注意休息。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your \"%@\" tends to rise during the luteal phase — take it easy these days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的「%@」常在黄体期升高,这几天注意休息。"
+          }
+        }
+      }
+    },
     "你的周期很规律,稳定在 %lld 天左右。": {
       "localizations": {
         "en": {
@@ -865,6 +1105,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的心情在%1$@通常偏低,在%2$@相对更好。"
+          }
+        }
+      }
+    },
+    "你的心情在黄体期通常偏低,这几天多关照自己。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your mood is usually lower during the luteal phase — be kind to yourself these days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的心情在黄体期通常偏低,这几天多关照自己。"
           }
         }
       }
@@ -1077,6 +1333,22 @@
         }
       }
     },
+    "免费最多 %lld 个自定义项,Pro 无限。已达上限时点「＋」升级。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free allows up to %lld custom items; Pro is unlimited. Tap + to upgrade when you reach the limit."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免费最多 %lld 个自定义项,Pro 无限。已达上限时点「＋」升级。"
+          }
+        }
+      }
+    },
     "关于 PCOS": {
       "localizations": {
         "en": {
@@ -1189,6 +1461,54 @@
         }
       }
     },
+    "升级 Pro,查看体重曲线(PCOS 相关追踪)。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro to see your weight trend (PCOS-related tracking)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "升级 Pro,查看体重曲线(PCOS 相关追踪)。"
+          }
+        }
+      }
+    },
+    "升级 Pro,查看症状出现频次。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro to see how often your symptoms appear."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "升级 Pro,查看症状出现频次。"
+          }
+        }
+      }
+    },
+    "升级 Pro,查看近 30 天心情走势。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Pro to see your 30-day mood trend."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "升级 Pro,查看近 30 天心情走势。"
+          }
+        }
+      }
+    },
     "升级解锁": {
       "localizations": {
         "en": {
@@ -1253,6 +1573,22 @@
         }
       }
     },
+    "双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two-way period sync: import periods already in Health, and write the periods you log in Maren back to Health. Data only moves between apps on your device — never through a server."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。"
+          }
+        }
+      }
+    },
     "取消": {
       "localizations": {
         "en": {
@@ -1293,6 +1629,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "可能已延后约 %lld 天"
+          }
+        }
+      }
+    },
+    "可设多个时间点,并选择只在某些周几提醒。提醒在本机生成,不经过服务器。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set multiple times and choose specific weekdays. Reminders are generated on-device, never via a server."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可设多个时间点,并选择只在某些周几提醒。提醒在本机生成,不经过服务器。"
+          }
+        }
+      }
+    },
+    "同步": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sync"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同步"
           }
         }
       }
@@ -1425,6 +1793,22 @@
         }
       }
     },
+    "在预测经期前 %lld 天提醒你。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminds you %lld days before your predicted period."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在预测经期前 %lld 天提醒你。"
+          }
+        }
+      }
+    },
     "在预测经期前 2 天提醒你(需要先记录出足够的周期)。": {
       "localizations": {
         "en": {
@@ -1437,6 +1821,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "在预测经期前 2 天提醒你(需要先记录出足够的周期)。"
+          }
+        }
+      }
+    },
+    "在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminds you 2 days before your predicted period. Upgrade to Pro to customize 1–5 days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。"
           }
         }
       }
@@ -1501,6 +1901,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "备注"
+          }
+        }
+      }
+    },
+    "多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multi-time medication reminders, custom period lead days, PMS self-care, smart phase-based reminders."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。"
+          }
+        }
+      }
+    },
+    "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multi-time medication reminders, custom period lead days, PMS self-care, and smart phase-based reminders — in tune with your rhythm."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。"
           }
         }
       }
@@ -1681,6 +2113,22 @@
         }
       }
     },
+    "对自己好一点": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Be kind to yourself"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "对自己好一点"
+          }
+        }
+      }
+    },
     "导出数据": {
       "localizations": {
         "en": {
@@ -1761,6 +2209,22 @@
         }
       }
     },
+    "已开启:数据同步到你自己的 iCloud 私有库(我们的服务器无法访问),可在登录同一 Apple ID 的设备间同步。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On: your data syncs to your own private iCloud database (our servers can't access it), across devices signed in to the same Apple ID."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启:数据同步到你自己的 iCloud 私有库(我们的服务器无法访问),可在登录同一 Apple ID 的设备间同步。"
+          }
+        }
+      }
+    },
     "已恢复你的 Premium 权益。": {
       "localizations": {
         "en": {
@@ -1821,6 +2285,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "已记录经期,流量%@"
+          }
+        }
+      }
+    },
+    "已达 %lld 个时段上限。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reached the limit of %lld time slots."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已达 %lld 个时段上限。"
+          }
+        }
+      }
+    },
+    "已连接 Apple 健康": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected to Apple Health"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接 Apple 健康"
           }
         }
       }
@@ -1917,6 +2413,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "年"
+          }
+        }
+      }
+    },
+    "开启后,数据存到你自己的 iCloud 私有库,可在你登录同一 Apple ID 的设备间同步。我们的服务器永不接触。开启或关闭需重启 Maren 生效。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When on, your data is stored in your own private iCloud database and syncs across devices signed in to the same Apple ID. Our servers never touch it. Toggling takes effect after restarting Maren."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后,数据存到你自己的 iCloud 私有库,可在你登录同一 Apple ID 的设备间同步。我们的服务器永不接触。开启或关闭需重启 Maren 生效。"
           }
         }
       }
@@ -2061,6 +2573,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "心情"
+          }
+        }
+      }
+    },
+    "心情、症状与体重的走势分析,看懂身体的规律。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trend analysis of mood, symptoms, and weight — understand your body's patterns."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "心情、症状与体重的走势分析,看懂身体的规律。"
           }
         }
       }
@@ -2225,6 +2753,22 @@
         }
       }
     },
+    "按周期阶段的智能提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smart reminders by cycle phase"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按周期阶段的智能提醒"
+          }
+        }
+      }
+    },
     "按我自己的经验设置": {
       "localizations": {
         "en": {
@@ -2269,6 +2813,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "排卵期"
+          }
+        }
+      }
+    },
+    "提前提醒天数": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Days before to remind"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提前提醒天数"
           }
         }
       }
@@ -2385,6 +2945,22 @@
         }
       }
     },
+    "断开": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disconnect"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "断开"
+          }
+        }
+      }
+    },
     "日": {
       "localizations": {
         "en": {
@@ -2429,6 +3005,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "日期"
+          }
+        }
+      }
+    },
+    "时间": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间"
           }
         }
       }
@@ -2717,6 +3309,22 @@
         }
       }
     },
+    "每天": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every day"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天"
+          }
+        }
+      }
+    },
     "每天 %@ 提醒": {
       "localizations": {
         "en": {
@@ -2777,6 +3385,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "每日记录提醒"
+          }
+        }
+      }
+    },
+    "永久删除本机上的全部经期、每日记录、自定义症状、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permanently deletes every period, daily log, custom symptom, medication, and check-in on this device. This can't be undone — consider exporting a backup from the Calendar tab first."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除本机上的全部经期、每日记录、自定义症状、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。"
           }
         }
       }
@@ -2845,6 +3469,22 @@
         }
       }
     },
+    "深度趋势": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deeper trends"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深度趋势"
+          }
+        }
+      }
+    },
     "添加": {
       "localizations": {
         "en": {
@@ -2857,6 +3497,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "添加"
+          }
+        }
+      }
+    },
+    "添加时段": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a time slot"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加时段"
           }
         }
       }
@@ -3149,6 +3805,22 @@
         }
       }
     },
+    "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Directly support an indie developer who won't sell your data. Your logs and export stay free forever."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。"
+          }
+        }
+      }
+    },
     "睡眠": {
       "localizations": {
         "en": {
@@ -3273,6 +3945,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "经期"
+          }
+        }
+      }
+    },
+    "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your period is near; mood and body may fluctuate during the luteal phase — treat yourself gently."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。"
           }
         }
       }
@@ -4029,6 +4717,22 @@
         }
       }
     },
+    "这会清空 %lld 条经期记录、%lld 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This will erase %1$lld period records, %2$lld daily logs, and all custom symptoms, medications, and check-ins. This cannot be undone."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这会清空 %lld 条经期记录、%lld 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。"
+          }
+        }
+      }
+    },
     "这会清空 %lld 条经期记录和 %lld 条每日记录,且无法恢复。": {
       "localizations": {
         "en": {
@@ -4057,6 +4761,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "这次启动的记录不会被保存。请重启 app 再试;如果仍有问题,请确认设备存储空间是否充足。你已保存的数据没有被删除。"
+          }
+        }
+      }
+    },
+    "进入黄体期": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entering the luteal phase"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进入黄体期"
+          }
+        }
+      }
+    },
+    "连接 Apple 健康": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect Apple Health"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接 Apple 健康"
+          }
+        }
+      }
+    },
+    "连接中…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接中…"
           }
         }
       }
@@ -4141,6 +4893,22 @@
         }
       }
     },
+    "需要重启 Maren": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restart Maren"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要重启 Maren"
+          }
+        }
+      }
+    },
     "青": {
       "localizations": {
         "en": {
@@ -4153,6 +4921,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "青"
+          }
+        }
+      }
+    },
+    "预测你的经期约在 %lld 天后,可以提前做点准备。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your period may be about %lld days away — maybe prep a little."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "预测你的经期约在 %lld 天后,可以提前做点准备。"
           }
         }
       }
@@ -4285,6 +5069,54 @@
         }
       }
     },
+    "高级排程(多时段 / 按周几)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced schedule (multi-time / by weekday)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级排程(多时段 / 按周几)"
+          }
+        }
+      }
+    },
+    "高级提醒": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced reminders"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级提醒"
+          }
+        }
+      }
+    },
+    "高级提醒(Pro)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced reminders (Pro)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级提醒(Pro)"
+          }
+        }
+      }
+    },
     "高级趋势": {
       "localizations": {
         "en": {
@@ -4317,70 +5149,6 @@
         }
       }
     },
-    "每天": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Every day"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每天"
-          }
-        }
-      }
-    },
-    "进入黄体期": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Entering the luteal phase"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "进入黄体期"
-          }
-        }
-      }
-    },
-    "你的「%@」常在黄体期升高,这几天注意休息。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your \"%@\" tends to rise during the luteal phase — take it easy these days."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的「%@」常在黄体期升高,这几天注意休息。"
-          }
-        }
-      }
-    },
-    "你的心情在黄体期通常偏低,这几天多关照自己。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your mood is usually lower during the luteal phase — be kind to yourself these days."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的心情在黄体期通常偏低,这几天多关照自己。"
-          }
-        }
-      }
-    },
     "黄体期情绪和身体容易起伏,对自己温柔一点。": {
       "localizations": {
         "en": {
@@ -4397,406 +5165,6 @@
         }
       }
     },
-    "对自己好一点": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Be kind to yourself"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "对自己好一点"
-          }
-        }
-      }
-    },
-    "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your period is near; mood and body may fluctuate during the luteal phase — treat yourself gently."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。"
-          }
-        }
-      }
-    },
-    "预测你的经期约在 %lld 天后,可以提前做点准备。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your period may be about %lld days away — maybe prep a little."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "预测你的经期约在 %lld 天后,可以提前做点准备。"
-          }
-        }
-      }
-    },
-    "提前提醒天数": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Days before to remind"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "提前提醒天数"
-          }
-        }
-      }
-    },
-    "在预测经期前 %lld 天提醒你。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reminds you %lld days before your predicted period."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在预测经期前 %lld 天提醒你。"
-          }
-        }
-      }
-    },
-    "在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reminds you 2 days before your predicted period. Upgrade to Pro to customize 1–5 days."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。"
-          }
-        }
-      }
-    },
-    "PMS / 黄体期关怀提醒": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PMS / luteal-phase self-care reminder"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PMS / 黄体期关怀提醒"
-          }
-        }
-      }
-    },
-    "按周期阶段的智能提醒": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smart reminders by cycle phase"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "按周期阶段的智能提醒"
-          }
-        }
-      }
-    },
-    "Pro · 高级提醒": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pro · Advanced reminders"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pro · 高级提醒"
-          }
-        }
-      }
-    },
-    "PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PMS: a \"be kind to yourself\" nudge a few days before your period. Smart reminders: when you enter the luteal phase, get a nudge based on your own logs (e.g. \"anxiety tends to rise in the luteal phase\")."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。"
-          }
-        }
-      }
-    },
-    "高级提醒(Pro)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Advanced reminders (Pro)"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高级提醒(Pro)"
-          }
-        }
-      }
-    },
-    "多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Multi-time medication reminders, custom period lead days, PMS self-care, smart phase-based reminders."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。"
-          }
-        }
-      }
-    },
-    "%lld 个提醒时段": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld reminder slots"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 个提醒时段"
-          }
-        }
-      }
-    },
-    "高级排程(多时段 / 按周几)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Advanced schedule (multi-time / by weekday)"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高级排程(多时段 / 按周几)"
-          }
-        }
-      }
-    },
-    "可设多个时间点,并选择只在某些周几提醒。提醒在本机生成,不经过服务器。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set multiple times and choose specific weekdays. Reminders are generated on-device, never via a server."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "可设多个时间点,并选择只在某些周几提醒。提醒在本机生成,不经过服务器。"
-          }
-        }
-      }
-    },
-    "时间": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Time"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "时间"
-          }
-        }
-      }
-    },
-    "添加时段": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add a time slot"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加时段"
-          }
-        }
-      }
-    },
-    "已达 %lld 个时段上限。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reached the limit of %lld time slots."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已达 %lld 个时段上限。"
-          }
-        }
-      }
-    },
-    "高级提醒": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Advanced reminders"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高级提醒"
-          }
-        }
-      }
-    },
-    "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Multi-time medication reminders, custom period lead days, PMS self-care, and smart phase-based reminders — in tune with your rhythm."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。"
-          }
-        }
-      }
-    },
-    "升级 Pro,查看近 30 天心情走势。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upgrade to Pro to see your 30-day mood trend."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "升级 Pro,查看近 30 天心情走势。"
-          }
-        }
-      }
-    },
-    "升级 Pro,查看体重曲线(PCOS 相关追踪)。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upgrade to Pro to see your weight trend (PCOS-related tracking)."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "升级 Pro,查看体重曲线(PCOS 相关追踪)。"
-          }
-        }
-      }
-    },
-    "升级 Pro,查看症状出现频次。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upgrade to Pro to see how often your symptoms appear."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "升级 Pro,查看症状出现频次。"
-          }
-        }
-      }
-    },
-    "PMS 提前几天": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PMS days before period"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PMS 提前几天"
-          }
-        }
-      }
-    },
-    "5 套配色随心换。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Switch between 5 color themes."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5 套配色随心换。"
-          }
-        }
-      }
-    },
     "默认玫瑰色。升级 Pro 解锁全部 5 套配色。": {
       "localizations": {
         "en": {
@@ -4809,262 +5177,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "默认玫瑰色。升级 Pro 解锁全部 5 套配色。"
-          }
-        }
-      }
-    },
-    "免费最多 %lld 个自定义项,Pro 无限。已达上限时点「＋」升级。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Free allows up to %lld custom items; Pro is unlimited. Tap + to upgrade when you reach the limit."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免费最多 %lld 个自定义项,Pro 无限。已达上限时点「＋」升级。"
-          }
-        }
-      }
-    },
-    "深度趋势": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deeper trends"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "深度趋势"
-          }
-        }
-      }
-    },
-    "心情、症状与体重的走势分析,看懂身体的规律。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trend analysis of mood, symptoms, and weight — understand your body's patterns."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "心情、症状与体重的走势分析,看懂身体的规律。"
-          }
-        }
-      }
-    },
-    "PCOS 专项支持": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PCOS-focused support"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PCOS 专项支持"
-          }
-        }
-      }
-    },
-    "为不规律 / PCOS 周期而设的追踪与洞察。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tracking and insights built for irregular / PCOS cycles."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "为不规律 / PCOS 周期而设的追踪与洞察。"
-          }
-        }
-      }
-    },
-    "主题与无限自定义追踪项": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Themes & unlimited custom trackers"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "主题与无限自定义追踪项"
-          }
-        }
-      }
-    },
-    "5 套配色,想追踪什么就加什么,不限数量。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5 color themes, and add as many custom trackers as you like."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5 套配色,想追踪什么就加什么,不限数量。"
-          }
-        }
-      }
-    },
-    "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Directly support an indie developer who won't sell your data. Your logs and export stay free forever."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。"
-          }
-        }
-      }
-    },
-    "永久删除本机上的全部经期、每日记录、自定义症状、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Permanently deletes every period, daily log, custom symptom, medication, and check-in on this device. This can't be undone — consider exporting a backup from the Calendar tab first."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "永久删除本机上的全部经期、每日记录、自定义症状、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。"
-          }
-        }
-      }
-    },
-    "这会清空 %lld 条经期记录、%lld 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This will erase %1$lld period records, %2$lld daily logs, and all custom symptoms, medications, and check-ins. This cannot be undone."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这会清空 %lld 条经期记录、%lld 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。"
-          }
-        }
-      }
-    },
-    "Apple 健康": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Health"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple 健康"
-          }
-        }
-      }
-    },
-    "双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Two-way period sync: import periods already in Health, and write the periods you log in Maren back to Health. Data only moves between apps on your device — never through a server."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。"
-          }
-        }
-      }
-    },
-    "已连接 Apple 健康": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connected to Apple Health"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已连接 Apple 健康"
-          }
-        }
-      }
-    },
-    "断开": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disconnect"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "断开"
-          }
-        }
-      }
-    },
-    "连接 Apple 健康": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connect Apple Health"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "连接 Apple 健康"
-          }
-        }
-      }
-    },
-    "连接中…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connecting…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "连接中…"
           }
         }
       }
