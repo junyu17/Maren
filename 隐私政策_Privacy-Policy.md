@@ -1,7 +1,7 @@
 # Maren — Privacy Policy / 隐私政策
 
-> **Effective date / 生效日期:** [FILL BEFORE LAUNCH]
-> **Contact / 联系:** Jun.yu@live.com
+> **Effective date / 生效日期:** 2026-07-28
+> **Contact / 联系:** billy.yu@me.com
 >
 > ⚠️ **重要提醒(给 Billy,非用户可见)**:我(Claude)不是律师,以下是基于 Maren「本地优先」架构起草的隐私政策 + 自审清单。它写得已经相当扎实且贴合美区 App Store 与 Apple「App Privacy」要求,但**它成立的唯一前提是:app 的实际行为和下面写的一字不差**。Flo 就是政策写得漂亮、代码却把数据发给了 Facebook,被 FTC 罚。所以这份文件既是给用户看的,也是你的**开发验收清单**。落地前请至少走一遍文末 §Self-Audit。
 
@@ -59,7 +59,7 @@ Maren is a **tracking and insight** tool for personal awareness. **It is not a c
 Maren is not directed to children under 13 (under 16 in the EEA/UK). We do not knowingly collect data from them.
 
 ### 9. Your rights & controls
-You can, at any time, from within the app: view all your data, export it (CSV/PDF), and permanently delete it. Deleting the app removes local data; if sync was enabled, you can delete iCloud data from within the app or via iOS iCloud settings. Because we do not hold your data on our servers, most data‑subject requests (GDPR/CCPA access, deletion, portability) you can fulfill yourself directly in the app. For questions, contact Jun.yu@live.com.
+You can, at any time, from within the app: view all your data, export it (CSV/PDF), and permanently delete it. Deleting the app removes local data; if sync was enabled, you can delete iCloud data from within the app or via iOS iCloud settings. Because we do not hold your data on our servers, most data‑subject requests (GDPR/CCPA access, deletion, portability) you can fulfill yourself directly in the app. For questions, contact billy.yu@me.com.
 
 ### 10. Legal bases & regions
 We process the minimal data described above to provide the service you request. This policy is designed to align with **GDPR (EEA/UK)** and **CCPA/CPRA (California)** principles. Where required, health data is treated as sensitive/special‑category data and is processed only on your device / your iCloud with your consent.
@@ -68,7 +68,7 @@ We process the minimal data described above to provide the service you request. 
 We will post any changes here and update the effective date. Material changes will be surfaced in‑app.
 
 ### 12. Contact
-[Developer / entity name] - Jun.yu@live.com - [optional address]
+Jun Yu - billy.yu@me.com
 
 ---
 
@@ -96,6 +96,6 @@ We will post any changes here and update the effective date. Material changes wi
 - [ ] app 内显著位置放**医疗免责声明**(§7 内容)。
 - [ ] Apple App Store Connect 的 **"App Privacy" 问卷**如实填写(数据类型、是否用于追踪);因为我们不追踪,大部分可勾"Data Not Collected / Not Linked to You"。
 - [ ] 隐私政策 URL 上线可访问(放官网,填进 App Store Connect)。
-- [ ] 填好本文件里所有 `[FILL...]` / `[your-...]` 占位符。
+- [x] 占位符已全部填好:邮箱 billy.yu@me.com、法定名 Jun Yu、生效日期 2026-07-28。✅
 
 > 我不是律师,这份文件把风险降到很低但不能替代法律意见。若日后进军欧盟或做付费医疗声明,建议届时再花小钱找律师过一遍——MVP 阶段(本地优先、不做避孕定位、不追踪)按上表执行,风险已可控。
