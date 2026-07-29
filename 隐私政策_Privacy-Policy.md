@@ -1,7 +1,7 @@
 # Maren — Privacy Policy / 隐私政策
 
 > **Effective date / 生效日期:** [FILL BEFORE LAUNCH]
-> **Contact / 联系:** [your-support-email]
+> **Contact / 联系:** Jun.yu@live.com
 >
 > ⚠️ **重要提醒(给 Billy,非用户可见)**:我(Claude)不是律师,以下是基于 Maren「本地优先」架构起草的隐私政策 + 自审清单。它写得已经相当扎实且贴合美区 App Store 与 Apple「App Privacy」要求,但**它成立的唯一前提是:app 的实际行为和下面写的一字不差**。Flo 就是政策写得漂亮、代码却把数据发给了 Facebook,被 FTC 罚。所以这份文件既是给用户看的,也是你的**开发验收清单**。落地前请至少走一遍文末 §Self-Audit。
 
@@ -59,7 +59,7 @@ Maren is a **tracking and insight** tool for personal awareness. **It is not a c
 Maren is not directed to children under 13 (under 16 in the EEA/UK). We do not knowingly collect data from them.
 
 ### 9. Your rights & controls
-You can, at any time, from within the app: view all your data, export it (CSV/PDF), and permanently delete it. Deleting the app removes local data; if sync was enabled, you can delete iCloud data from within the app or via iOS iCloud settings. Because we do not hold your data on our servers, most data‑subject requests (GDPR/CCPA access, deletion, portability) you can fulfill yourself directly in the app. For questions, contact [your-support-email].
+You can, at any time, from within the app: view all your data, export it (CSV/PDF), and permanently delete it. Deleting the app removes local data; if sync was enabled, you can delete iCloud data from within the app or via iOS iCloud settings. Because we do not hold your data on our servers, most data‑subject requests (GDPR/CCPA access, deletion, portability) you can fulfill yourself directly in the app. For questions, contact Jun.yu@live.com.
 
 ### 10. Legal bases & regions
 We process the minimal data described above to provide the service you request. This policy is designed to align with **GDPR (EEA/UK)** and **CCPA/CPRA (California)** principles. Where required, health data is treated as sensitive/special‑category data and is processed only on your device / your iCloud with your consent.
@@ -68,7 +68,7 @@ We process the minimal data described above to provide the service you request. 
 We will post any changes here and update the effective date. Material changes will be surfaced in‑app.
 
 ### 12. Contact
-[Developer / entity name] — [your-support-email] — [optional address]
+[Developer / entity name] - Jun.yu@live.com - [optional address]
 
 ---
 
