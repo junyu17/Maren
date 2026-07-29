@@ -309,14 +309,22 @@ struct CalendarView: View {
 
     private func upsertPeriod(on date: Date, flow: FlowLevel) {
         let key = Cal.startOfDay(date)
+        let day: PeriodDay
         if let existing = periodByDay[key] {
             existing.flow = flow
+            day = existing
         } else {
-            context.insert(PeriodDay(date: key, flow: flow))
+            let new = PeriodDay(date: key, flow: flow)
+            context.insert(new)
+            day = new
         }
         try? context.save()
         selectedDay = nil
         refreshPeriodReminder()
+        // 已连接 Apple 健康时,把这天写回「健康」。
+        if HealthKitBridge.syncEnabled {
+            Task { await HealthKitBridge.writePeriodDay(day) }
+        }
     }
 
     private func clearPeriod(on date: Date) {
@@ -327,6 +335,9 @@ struct CalendarView: View {
         }
         selectedDay = nil
         refreshPeriodReminder()
+        if HealthKitBridge.syncEnabled {
+            Task { await HealthKitBridge.deletePeriodDay(key) }
+        }
     }
 
     /// 经期数据一变,预测就变,已排期的提醒必须跟着重排。

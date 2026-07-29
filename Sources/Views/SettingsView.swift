@@ -10,6 +10,8 @@ struct SettingsView: View {
     @Query private var allLogs: [DailyLog]
 
     @State private var showDeleteConfirm = false
+    @State private var healthSyncEnabled = HealthKitBridge.syncEnabled
+    @State private var healthConnecting = false
     @State private var showPCOS = false
     @ObservedObject private var store = Store.shared
     @State private var showPaywall = false
@@ -36,6 +38,25 @@ struct SettingsView: View {
     private var prediction: CyclePredictor.Prediction {
         CyclePredictor.predict(from: periodDays, manual: ManualCycle(
             enabled: manualEnabled, cycleLength: manualCycleLength, periodLength: manualPeriodLength))
+    }
+
+    /// 连接 Apple 健康:请求授权 → 导出已有经期 → 导入「健康」里 Maren 还没有的经期。
+    @MainActor
+    private func connectHealth() async {
+        healthConnecting = true
+        defer { healthConnecting = false }
+        guard await HealthKitBridge.requestAuthorization() else { return }
+        HealthKitBridge.syncEnabled = true
+        healthSyncEnabled = true
+        // 导出:把 Maren 已有经期写回「健康」。
+        await HealthKitBridge.exportAll(periodDays)
+        // 导入:「健康」里有、但 Maren 没有的经期,插进来。
+        let existing = Set(periodDays.map { $0.dayKey })
+        let fromHealth = await HealthKitBridge.readRecentPeriodDays()
+        for (date, flow) in fromHealth where !existing.contains(DayKey.from(date)) {
+            context.insert(PeriodDay(date: date, flow: flow))
+        }
+        try? context.save()
     }
 
     var body: some View {
@@ -160,16 +181,12 @@ struct SettingsView: View {
                     } label: {
                         Label("自定义追踪项", systemImage: "slider.horizontal.3")
                     }
+                    // 科普/教育内容保持免费:向 PCOS 人群收「读一页说明」的费用既招骂又无价值;
+                    // PCOS 的真正付费价值由洞察 / 趋势 / 无限自定义项承载(那些才是 Pro)。
                     Button {
-                        if store.premium { showPCOS = true } else { showPaywall = true }
+                        showPCOS = true
                     } label: {
-                        HStack {
-                            Label("关于 PCOS", systemImage: "heart.text.square")
-                            Spacer()
-                            if !store.premium {
-                                Image(systemName: "lock.fill").font(.caption).foregroundStyle(.tertiary)
-                            }
-                        }
+                        Label("关于 PCOS", systemImage: "heart.text.square")
                     }
                 } header: {
                     Text("追踪与提醒")
@@ -286,6 +303,32 @@ struct SettingsView: View {
                         }
                     } header: {
                         Text("Pro · 高级提醒")
+                    }
+                }
+
+                if HealthKitBridge.isAvailable {
+                    Section {
+                        if healthSyncEnabled {
+                            Label("已连接 Apple 健康", systemImage: "heart.fill")
+                                .foregroundStyle(.pink)
+                            Button("断开") {
+                                healthSyncEnabled = false
+                                HealthKitBridge.syncEnabled = false
+                            }
+                            .foregroundStyle(.secondary)
+                        } else {
+                            Button {
+                                Task { await connectHealth() }
+                            } label: {
+                                Label(healthConnecting ? String(localized: "连接中…") : String(localized: "连接 Apple 健康"),
+                                      systemImage: "heart.text.square")
+                            }
+                            .disabled(healthConnecting)
+                        }
+                    } header: {
+                        Text("Apple 健康")
+                    } footer: {
+                        Text("双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。")
                     }
                 }
 

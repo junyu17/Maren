@@ -1,19 +1,26 @@
 import Foundation
 import HealthKit
 
-/// 层级 4 · Apple Health 双向同步(骨架)。
+/// 层级 4 · Apple Health 双向同步(F 已启用)。
 ///
-/// **当前状态:代码就绪,但需要你在 Xcode 里配好开发者账号才能真正启用。**
-/// 需要的操作(必须由 Billy 本人做,涉及你的 Apple 账号):
-///   1. Xcode → 选中 Vela target → Signing & Capabilities → 填入你的 Team;
-///   2. 点 “+ Capability” 添加 **HealthKit**;
-///   3. 重新运行即可。`isAvailable` 会自动变 true,下面的读写就生效。
-/// 用法说明文案已在 project.yml 配好(NSHealthShareUsageDescription / NSHealthUpdateUsageDescription)。
+/// 需要构建配置(已在 project.yml 配好):HealthKit capability(entitlement)+
+/// `NSHealthShareUsageDescription` / `NSHealthUpdateUsageDescription`。
+/// 真机需你的 Apple 账号在该 App ID 上勾 HealthKit;模拟器可直接跑。
+///
+/// 双向:连接时把「健康」里的经期读进 Maren(导入),并把 Maren 已有经期写回「健康」(导出);
+/// 之后每次标记/清除经期都会同步到「健康」。
 ///
 /// 铁律遵守:HealthKit 数据**仅本地使用**,不外传、不用于广告 —— 与隐私政策 §4 一致。
 enum HealthKitBridge {
 
     private static let store = HKHealthStore()
+
+    /// 用户是否开启了 Apple 健康同步(本机开关)。
+    private static let syncKey = "health.syncEnabled"
+    static var syncEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: syncKey) }
+        set { UserDefaults.standard.set(newValue, forKey: syncKey) }
+    }
 
     /// 设备支持 HealthKit 且 app 已获得 HealthKit 能力时为 true。
     /// 没配 capability 时这里是 false,全部调用会安全地空转,不会崩。
@@ -52,6 +59,23 @@ enum HealthKitBridge {
                                       start: start, end: end,
                                       metadata: [HKMetadataKeyMenstrualCycleStart: false])
         try? await store.save(sample)
+    }
+
+    /// 从 Apple Health 删除某一天由本 app 写入的经期样本(用户在 Maren 里清除时调用)。
+    static func deletePeriodDay(_ date: Date) async {
+        guard isAvailable, let type = menstrualType else { return }
+        let start = Cal.startOfDay(date)
+        let end = Cal.current.date(byAdding: .day, value: 1, to: start) ?? start
+        // 只删本 app 写入的样本(source = 本 app),不动用户在别处记的。
+        let inDay = HKQuery.predicateForSamples(withStart: start, end: end, options: [.strictStartDate])
+        let mine = HKQuery.predicateForObjects(from: HKSource.default())
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [inDay, mine])
+        try? await store.deleteObjects(of: type, predicate: predicate)
+    }
+
+    /// 一次性把 Maren 已有的经期全部写回 Apple Health(连接时的「导出」)。
+    static func exportAll(_ periodDays: [PeriodDay]) async {
+        for day in periodDays { await writePeriodDay(day) }
     }
 
     /// 从 Apple Health 读回最近的经期记录(供导入)。

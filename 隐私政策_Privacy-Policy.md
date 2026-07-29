@@ -1,23 +1,23 @@
-# Vela — Privacy Policy / 隐私政策
+# Maren — Privacy Policy / 隐私政策
 
 > **Effective date / 生效日期:** [FILL BEFORE LAUNCH]
 > **Contact / 联系:** [your-support-email]
 >
-> ⚠️ **重要提醒(给 Billy,非用户可见)**:我(Claude)不是律师,以下是基于 Vela「本地优先」架构起草的隐私政策 + 自审清单。它写得已经相当扎实且贴合美区 App Store 与 Apple「App Privacy」要求,但**它成立的唯一前提是:app 的实际行为和下面写的一字不差**。Flo 就是政策写得漂亮、代码却把数据发给了 Facebook,被 FTC 罚。所以这份文件既是给用户看的,也是你的**开发验收清单**。落地前请至少走一遍文末 §Self-Audit。
+> ⚠️ **重要提醒(给 Billy,非用户可见)**:我(Claude)不是律师,以下是基于 Maren「本地优先」架构起草的隐私政策 + 自审清单。它写得已经相当扎实且贴合美区 App Store 与 Apple「App Privacy」要求,但**它成立的唯一前提是:app 的实际行为和下面写的一字不差**。Flo 就是政策写得漂亮、代码却把数据发给了 Facebook,被 FTC 罚。所以这份文件既是给用户看的,也是你的**开发验收清单**。落地前请至少走一遍文末 §Self-Audit。
 
 ---
 
 ## Privacy Policy (English — App Store submission version)
 
-**Your health data is yours. We built Vela so that we never see it.**
+**Your health data is yours. We built Maren so that we never see it.**
 
 > **Scope note - what the current version (v0.1) actually does.** This policy must describe the shipped
 > binary exactly. The current version stores your **health data** (cycles, symptoms, mood, medications)
 > **only on this device** - it never transmits health data anywhere. It includes **StoreKit (Apple In-App
 > Purchase)** for the optional Maren Premium upgrade: purchase transactions are handled by Apple; we receive
 > only your entitlement status (whether you have Premium) and never your payment details. It contains **no
-> iCloud/CloudKit sync, no HealthKit integration, and no analytics SDK, and no networking code of any kind
-> other than StoreKit's communication with Apple.** Sections 3 (iCloud sync), 4 (HealthKit) and 5 (Analytics)
+> iCloud/CloudKit sync, no analytics SDK, and no networking code of any kind
+> other than StoreKit's communication with Apple.** Sections 3 (iCloud sync) and 5 (Analytics)
 > describe features that are **not present in the current version** and are marked accordingly - do not
 > publish them as active until the corresponding code actually ships.
 
@@ -28,7 +28,7 @@
 - **We do not use your data for advertising**, and we do not embed third‑party advertising or social‑media tracking SDKs.
 - You can **export all your data** (CSV/PDF) or **delete it** at any time.
 
-### 2. What data Vela handles and where it lives
+### 2. What data Maren handles and where it lives
 | Data | Where it is stored | Who can access it |
 |---|---|---|
 | Cycle, period, symptom, mood entries you log | Your device (local storage) only in v0.1; your private iCloud if you enable sync in a future version | **Only you.** Not us. Not third parties. |
@@ -39,10 +39,10 @@
 We do **not** collect your name, email, phone number, contacts, precise location, or advertising identifier for the purpose of tracking.
 
 ### 3. iCloud sync — *NOT IN THE CURRENT VERSION (planned)*
-If you enable sync, your data is stored in **your own iCloud account** using Apple's CloudKit private database. It is transmitted and stored under Apple's encryption. **Vela's developer has no access to your CloudKit private data.** Sync is entirely optional; with it off, your data never leaves your device except when you choose to export it.
+If you enable sync, your data is stored in **your own iCloud account** using Apple's CloudKit private database. It is transmitted and stored under Apple's encryption. **Maren's developer has no access to your CloudKit private data.** Sync is entirely optional; with it off, your data never leaves your device except when you choose to export it.
 
-### 4. HealthKit — *NOT IN THE CURRENT VERSION (planned)*
-If you grant permission, Vela may read from and/or write to Apple Health. Data obtained from HealthKit is used **only** to provide in‑app features on your device, is **never** used for advertising or marketing, and is **never** shared with third parties or sold, consistent with Apple's HealthKit requirements.
+### 4. Apple Health(可选,已实装)
+If you grant permission, Maren may read from and/or write to Apple Health. Data obtained from HealthKit is used **only** to provide in‑app features on your device, is **never** used for advertising or marketing, and is **never** shared with third parties or sold, consistent with Apple's HealthKit requirements.
 
 ### 5. Analytics — *NOT USED IN THE CURRENT VERSION*
 **The current version collects no analytics at all and contains no analytics SDK.** If this ever changes: to fix crashes and improve the app we may collect **anonymous, aggregated** technical data (e.g., crash logs, feature‑usage counts) via a privacy‑focused analytics provider that does **not** collect personal identifiers and does **not** build user profiles. This data cannot be tied back to you and **never** includes your health entries. You can opt out in Settings. *(Provider to name here, e.g. TelemetryDeck — or remove this section if no analytics.)*
@@ -50,11 +50,11 @@ If you grant permission, Vela may read from and/or write to Apple Health. Data o
 ### 6. Purchases
 Subscriptions and one‑time purchases are processed by **Apple** via StoreKit. We receive only your entitlement status (whether you have Premium). We never receive your payment details.
 
-### 7. What Vela is NOT
-Vela is a **tracking and insight** tool for personal awareness. **It is not a contraceptive, not a medical device, and does not provide medical advice or guarantees about fertility, ovulation, or pregnancy prevention.** Predictions are estimates and may be inaccurate, especially for irregular cycles. Always consult a qualified healthcare professional for medical decisions.
+### 7. What Maren is NOT
+Maren is a **tracking and insight** tool for personal awareness. **It is not a contraceptive, not a medical device, and does not provide medical advice or guarantees about fertility, ovulation, or pregnancy prevention.** Predictions are estimates and may be inaccurate, especially for irregular cycles. Always consult a qualified healthcare professional for medical decisions.
 
 ### 8. Children
-Vela is not directed to children under 13 (under 16 in the EEA/UK). We do not knowingly collect data from them.
+Maren is not directed to children under 13 (under 16 in the EEA/UK). We do not knowingly collect data from them.
 
 ### 9. Your rights & controls
 You can, at any time, from within the app: view all your data, export it (CSV/PDF), and permanently delete it. Deleting the app removes local data; if sync was enabled, you can delete iCloud data from within the app or via iOS iCloud settings. Because we do not hold your data on our servers, most data‑subject requests (GDPR/CCPA access, deletion, portability) you can fulfill yourself directly in the app. For questions, contact [your-support-email].
@@ -76,7 +76,7 @@ We will post any changes here and update the effective date. Material changes wi
 - **我们没有存你健康数据的服务器,我们看不到你的数据。**
 - **绝不出售、出租、共享**你的个人/健康数据;**不用于广告**;不嵌入第三方广告/社交追踪 SDK。
 - 数据可**随时导出(CSV/PDF)或删除**。
-- Vela 是**追踪与洞察工具,不是避孕工具、不是医疗器械**,预测仅为估算(不规律周期尤其可能不准),医疗决定请咨询专业医生。
+- Maren 是**追踪与洞察工具,不是避孕工具、不是医疗器械**,预测仅为估算(不规律周期尤其可能不准),医疗决定请咨询专业医生。
 
 ---
 

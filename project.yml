@@ -21,6 +21,8 @@ targets:
       - path: Sources
       - path: Resources
       - path: Shared
+      - path: Maren.storekit
+        buildPhase: none
     dependencies:
       - target: VelaWidgetExtension
         embed: true
@@ -34,6 +36,8 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.cd.cc.vela
+        # HealthKit(经期数据双向同步)。真机需在该 App ID 勾 HealthKit capability;模拟器可直接跑。
+        com.apple.developer.healthkit: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: cd.cc.vela
@@ -51,10 +55,10 @@ targets:
         # 声明实际支持的语言。英文作为开发/回退语言:
         # 法语、德语等未翻译的系统语言会回退到英文,而不是中文。
         INFOPLIST_KEY_CFBundleLocalizations: "en zh-Hans"
-        INFOPLIST_KEY_NSFaceIDUsageDescription: "用 Face ID 解锁 Maren,保护你的健康记录只有你能看到。"
-        # Apple Health 骨架:用法说明先配好,等你在 Xcode 加上 HealthKit capability 即可启用。
-        INFOPLIST_KEY_NSHealthShareUsageDescription: "读取「健康」App 里的经期记录,便于把已有数据导入 Maren。数据仅在本机使用,绝不外传。"
-        INFOPLIST_KEY_NSHealthUpdateUsageDescription: "把你在 Maren 记录的经期写回「健康」App,方便与其他 App 共用。数据仅在本机使用,绝不外传。"
+        INFOPLIST_KEY_NSFaceIDUsageDescription: "Use Face ID to unlock Maren so only you can see your health records."
+        # Apple Health 双向同步的用途说明(HealthKit capability 已在上面 entitlements 启用)。
+        INFOPLIST_KEY_NSHealthShareUsageDescription: "Read period entries from Apple Health to import your existing data into Maren. Used only on your device — never shared."
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: "Write the periods you log in Maren back to Apple Health so other apps can use them. Used only on your device — never shared."
 
   VelaWidgetExtension:
     type: app-extension
@@ -102,3 +106,16 @@ targets:
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: cd.cc.vela
         SKIP_INSTALL: YES
         TARGETED_DEVICE_FAMILY: "4"
+
+schemes:
+  Vela:
+    build:
+      targets:
+        Vela: all
+    run:
+      config: Debug
+      storeKitConfiguration: Maren.storekit
+    test:
+      config: Debug
+    archive:
+      config: Release

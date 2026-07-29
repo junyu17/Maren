@@ -1,0 +1,88 @@
+{
+  "identifier" : "A1B2C3D4-0000-4000-8000-MAREN0000001",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "69.99",
+      "familyShareable" : false,
+      "internalID" : "A1B2C3D4-0000-4000-8000-LIFETIME0001",
+      "localizations" : [
+        {
+          "description" : "Maren Premium forever. One-time payment.",
+          "displayName" : "Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "cd.cc.vela.premium.lifetime",
+      "referenceName" : "Maren Premium Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : []
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "A1B2C3D4-0000-4000-8000-GROUP0000001",
+      "localizations" : [
+        {
+          "description" : "Maren Premium",
+          "displayName" : "Maren Premium",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "Maren Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "29.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "A1B2C3D4-0000-4000-8000-YEARLY000001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Maren Premium, billed yearly. Best value.",
+              "displayName" : "Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "cd.cc.vela.premium.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Maren Premium Yearly",
+          "subscriptionGroupID" : "A1B2C3D4-0000-4000-8000-GROUP0000001",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "3.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "A1B2C3D4-0000-4000-8000-MONTHLY00001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Maren Premium, billed monthly.",
+              "displayName" : "Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "cd.cc.vela.premium.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Maren Premium Monthly",
+          "subscriptionGroupID" : "A1B2C3D4-0000-4000-8000-GROUP0000001",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

@@ -4828,6 +4828,246 @@
           }
         }
       }
+    },
+    "深度趋势": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deeper trends"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深度趋势"
+          }
+        }
+      }
+    },
+    "心情、症状与体重的走势分析,看懂身体的规律。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trend analysis of mood, symptoms, and weight — understand your body's patterns."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "心情、症状与体重的走势分析,看懂身体的规律。"
+          }
+        }
+      }
+    },
+    "PCOS 专项支持": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCOS-focused support"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCOS 专项支持"
+          }
+        }
+      }
+    },
+    "为不规律 / PCOS 周期而设的追踪与洞察。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tracking and insights built for irregular / PCOS cycles."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为不规律 / PCOS 周期而设的追踪与洞察。"
+          }
+        }
+      }
+    },
+    "主题与无限自定义追踪项": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Themes & unlimited custom trackers"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主题与无限自定义追踪项"
+          }
+        }
+      }
+    },
+    "5 套配色,想追踪什么就加什么,不限数量。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 color themes, and add as many custom trackers as you like."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 套配色,想追踪什么就加什么,不限数量。"
+          }
+        }
+      }
+    },
+    "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Directly support an indie developer who won't sell your data. Your logs and export stay free forever."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。"
+          }
+        }
+      }
+    },
+    "永久删除本机上的全部经期、每日记录、自定义症状、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permanently deletes every period, daily log, custom symptom, medication, and check-in on this device. This can't be undone — consider exporting a backup from the Calendar tab first."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除本机上的全部经期、每日记录、自定义症状、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。"
+          }
+        }
+      }
+    },
+    "这会清空 %lld 条经期记录、%lld 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This will erase %1$lld period records, %2$lld daily logs, and all custom symptoms, medications, and check-ins. This cannot be undone."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这会清空 %lld 条经期记录、%lld 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。"
+          }
+        }
+      }
+    },
+    "Apple 健康": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Health"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple 健康"
+          }
+        }
+      }
+    },
+    "双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two-way period sync: import periods already in Health, and write the periods you log in Maren back to Health. Data only moves between apps on your device — never through a server."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。"
+          }
+        }
+      }
+    },
+    "已连接 Apple 健康": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected to Apple Health"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接 Apple 健康"
+          }
+        }
+      }
+    },
+    "断开": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disconnect"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "断开"
+          }
+        }
+      }
+    },
+    "连接 Apple 健康": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect Apple Health"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接 Apple 健康"
+          }
+        }
+      }
+    },
+    "连接中…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接中…"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -1,0 +1,54 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "NSFaceIDUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use Face ID to unlock Maren so only you can see your health records."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用 Face ID 解锁 Maren,保护你的健康记录只有你能看到。"
+          }
+        }
+      }
+    },
+    "NSHealthShareUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read period entries from Apple Health to import your existing data into Maren. Used only on your device — never shared."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读取「健康」App 里的经期记录,便于把已有数据导入 Maren。数据仅在本机使用,绝不外传。"
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write the periods you log in Maren back to Apple Health so other apps can use them. Used only on your device — never shared."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把你在 Maren 记录的经期写回「健康」App,方便与其他 App 共用。数据仅在本机使用,绝不外传。"
+          }
+        }
+      }
+    }
+  }
+}
