@@ -12,17 +12,19 @@
 **Your health data is yours. We built Maren so that we never see it.**
 
 > **Scope note - what the current version (v0.1) actually does.** This policy must describe the shipped
-> binary exactly. The current version stores your **health data** (cycles, symptoms, mood, medications)
-> **only on this device** - it never transmits health data anywhere. It includes **StoreKit (Apple In-App
-> Purchase)** for the optional Maren Premium upgrade: purchase transactions are handled by Apple; we receive
-> only your entitlement status (whether you have Premium) and never your payment details. It contains **no
-> iCloud/CloudKit sync, no analytics SDK, and no networking code of any kind
-> other than StoreKit's communication with Apple.** Sections 3 (iCloud sync) and 5 (Analytics)
-> describe features that are **not present in the current version** and are marked accordingly - do not
-> publish them as active until the corresponding code actually ships.
+> binary exactly. By default the current version stores your **health data** (cycles, symptoms, mood,
+> medications) **only on this device** - it never transmits health data anywhere unless you explicitly turn
+> on a feature. It includes: **StoreKit (Apple In-App Purchase)** for the optional Maren Premium upgrade
+> (purchase transactions handled by Apple; we receive only your entitlement status, never your payment
+> details); **optional iCloud (CloudKit) sync** (off by default; when on, data syncs to your own private
+> iCloud account - see §3); and **optional Apple Health integration** (see §4). It contains **no analytics
+> SDK, and no networking code of any kind other than StoreKit's communication with Apple and, if you enable
+> sync, Apple's CloudKit.** Section 5 (Analytics) describes a feature that is **not present in the current
+> version** and is marked accordingly - do not publish it as active until the corresponding code actually
+> ships.
 
 ### 1. The short version
-- Your cycle, symptom, and mood entries are stored **on your device**. (Optional sync to your own private iCloud account is planned but **not included in the current version**.)
+- Your cycle, symptom, and mood entries are stored **on your device** by default. You may optionally turn on **iCloud sync (§3)** to sync them to your own private iCloud account across your devices.
 - **We do not operate a server that stores your health data.** We cannot read it.
 - **We do not sell, rent, or share your personal or health data with anyone.**
 - **We do not use your data for advertising**, and we do not embed third‑party advertising or social‑media tracking SDKs.
@@ -31,14 +33,14 @@
 ### 2. What data Maren handles and where it lives
 | Data | Where it is stored | Who can access it |
 |---|---|---|
-| Cycle, period, symptom, mood entries you log | Your device (local storage) only in v0.1; your private iCloud if you enable sync in a future version | **Only you.** Not us. Not third parties. |
+| Cycle, period, symptom, mood entries you log | Your device (local storage) by default; your private iCloud if you turn on sync (§3) | **Only you.** Not us. Not third parties. |
 | App settings & preferences | Your device / your iCloud | Only you |
 | Anonymous, aggregated crash & usage stats | **None collected in v0.1** (see §5) | — |
 | Purchase/subscription status | Apple (StoreKit) | Apple and us (status only, no health data) |
 
 We do **not** collect your name, email, phone number, contacts, precise location, or advertising identifier for the purpose of tracking.
 
-### 3. iCloud sync — *NOT IN THE CURRENT VERSION (planned)*
+### 3. iCloud sync(可选,默认关闭,已实装)
 If you enable sync, your data is stored in **your own iCloud account** using Apple's CloudKit private database. It is transmitted and stored under Apple's encryption. **Maren's developer has no access to your CloudKit private data.** Sync is entirely optional; with it off, your data never leaves your device except when you choose to export it.
 
 ### 4. Apple Health(可选,已实装)
@@ -87,7 +89,7 @@ We will post any changes here and update the effective date. Material changes wi
 - [ ] **没有**把任何健康数据发送到我们自建/租用的服务器。
 - [ ] **没有**集成 Facebook SDK、Google Analytics(含 Firebase Analytics)、任何广告 SDK、任何 attribution/追踪 SDK。(Flo 的原罪就在这。)
 - [ ] 如接 TelemetryDeck 之类分析:确认它**匿名、不采集设备广告 ID、不含健康数据**;并在 Settings 提供关闭开关。
-- [ ] iCloud 同步用的是 **CloudKit 私有库(private database)**,不是 public 库。
+- [x] iCloud 同步用的是 **CloudKit 私有库(private database,代码用 `.private(containerIdentifier)`)**,不是 public 库。✅
 - [ ] HealthKit 数据**仅本地使用**,不外传、不用于营销。
 - [ ] app 内提供**导出**和**永久删除**入口,且删除是真删。
 - [ ] 文案全局搜索并移除 "birth control"、"safe days"、"contraception"、"guaranteed"、"prevent pregnancy" 等词。
