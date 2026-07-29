@@ -32,13 +32,18 @@ enum WidgetSync {
             value = String(localized: "开始记录")
         }
 
-        // 每日一句(按当天阶段)。
+        // 今天所处阶段 + 该注意什么 + 鼓励一句话(均按当天阶段)。
         let phase = PhaseModel.phase(for: today, prediction: p,
                                      periodDates: Set(periodDays.map { $0.date }))
         let quote = DailyQuote.forToday(phase: phase, date: today)
 
-        let snapshot = WidgetSnapshot(title: title, value: value, note: quote,
-                                      themeRaw: AppTheme.current.rawValue, updated: Date())
+        let snapshot = WidgetSnapshot(
+            title: title, value: value,
+            phaseKey: phase.rawValue,
+            phaseLabel: phase == .unknown ? nil : phase.label,
+            phaseTip: PhaseInfo.tip(for: phase),
+            note: quote,
+            themeRaw: AppTheme.current.rawValue, updated: Date())
         WidgetSnapshotStore.write(snapshot)
         WidgetCenter.shared.reloadAllTimelines()
         // 同一份快照也推给手表(手表只展示,不存库)。

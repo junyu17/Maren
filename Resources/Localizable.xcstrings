@@ -1905,6 +1905,22 @@
         }
       }
     },
+    "多休息、注意保暖": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rest more, stay warm"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多休息、注意保暖"
+          }
+        }
+      }
+    },
     "多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。": {
       "localizations": {
         "en": {
@@ -1949,6 +1965,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "多毛"
+          }
+        }
+      }
+    },
+    "多记几天,就能看到你的规律": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log a few more days to see your patterns"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多记几天,就能看到你的规律"
           }
         }
       }
@@ -2641,6 +2673,22 @@
         }
       }
     },
+    "情绪可能起伏,对自己宽容点": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mood may fluctuate - go easy on yourself"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "情绪可能起伏,对自己宽容点"
+          }
+        }
+      }
+    },
     "想记点什么…": {
       "localizations": {
         "en": {
@@ -3229,6 +3277,22 @@
         }
       }
     },
+    "查看今天所处周期、注意事项与下次经期;大尺寸可点开记录今天。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See today's cycle phase, what to watch for, and your next period. The large widget opens straight to logging."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看今天所处周期、注意事项与下次经期;大尺寸可点开记录今天。"
+          }
+        }
+      }
+    },
     "查看距下次经期还有几天,以及今天的一句话。": {
       "localizations": {
         "en": {
@@ -3613,6 +3677,22 @@
         }
       }
     },
+    "点开记录今天": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap to log today"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点开记录今天"
+          }
+        }
+      }
+    },
     "点滴": {
       "localizations": {
         "en": {
@@ -3641,6 +3721,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "焦虑"
+          }
+        }
+      }
+    },
+    "状态通常最好,精力充沛": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Often your best state - plenty of energy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态通常最好,精力充沛"
           }
         }
       }
@@ -3913,6 +4009,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "第 %lld 天"
+          }
+        }
+      }
+    },
+    "精力回升,适合开始新的事": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Energy returning - a good time to start something new"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "精力回升,适合开始新的事"
           }
         }
       }

@@ -79,6 +79,14 @@ struct RootView: View {
         } message: {
             Text("这次启动的记录不会被保存。请重启 app 再试;如果仍有问题,请确认设备存储空间是否充足。你已保存的数据没有被删除。")
         }
+        // widget deep link:点开 widget 进对应标签页。中尺寸 ->「今天」记录;小尺寸 ->「日历」。
+        .onOpenURL { url in
+            switch url.host {
+            case "today":    selection = 1
+            case "calendar": selection = 0
+            default: break
+            }
+        }
     }
 }
 
