@@ -6,10 +6,10 @@ import SwiftData
 @Model
 final class CustomSymptom {
     /// 逻辑唯一键:`c:<uuid>`,UUID 保证全局唯一(无需 DB 唯一约束,CloudKit 不支持)。
-    var key: String
-    var label: String
-    var emoji: String
-    var createdAt: Date
+    var key: String = ""
+    var label: String = ""
+    var emoji: String = ""
+    var createdAt: Date = Date.now
 
     init(label: String, emoji: String) {
         self.key = "c:\(UUID().uuidString)"

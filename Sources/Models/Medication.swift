@@ -9,17 +9,17 @@ import SwiftData
 @Model
 final class Medication {
     /// 本 app 内的稳定标识(UUID,创建时生成)。不用 `@Attribute(.unique)`(CloudKit 不支持)。
-    var id: UUID
-    var name: String
-    var emoji: String
-    var reminderEnabled: Bool
-    var reminderHour: Int      // 0...23
-    var reminderMinute: Int    // 0/30 等
+    var id: UUID = UUID()
+    var name: String = ""
+    var emoji: String = "💊"
+    var reminderEnabled: Bool = false
+    var reminderHour: Int = 9      // 0...23
+    var reminderMinute: Int = 0    // 0/30 等
     /// Pro:启用多时段 / 按周几的高级排程(开启后覆盖单次提醒)。
-    var proScheduleEnabled: Bool
+    var proScheduleEnabled: Bool = false
     /// Pro:`[ReminderSlot]` 的 JSON。非 Pro 或未启用时为 "[]"。
-    var scheduleSlotsJSON: String
-    var createdAt: Date
+    var scheduleSlotsJSON: String = "[]"
+    var createdAt: Date = Date.now
 
     init(name: String, emoji: String = "💊",
          reminderEnabled: Bool = false, reminderHour: Int = 9, reminderMinute: Int = 0) {
@@ -72,10 +72,10 @@ final class Medication {
 final class MedicationIntake {
     /// 逻辑唯一键 = 药 id + 日键,防止一天重复打卡。
     /// ⚠️ 不用 `@Attribute(.unique)`(CloudKit 不支持);去重由 `DailyLogView.toggleMed` 先查后写。
-    var key: String
-    var medicationId: UUID
-    var dayKey: Int
-    var takenAt: Date
+    var key: String = ""
+    var medicationId: UUID = UUID()
+    var dayKey: Int = 0
+    var takenAt: Date = Date.now
 
     init(medicationId: UUID, dayKey: Int) {
         self.key = "\(medicationId.uuidString)-\(dayKey)"

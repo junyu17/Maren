@@ -10,10 +10,10 @@ final class PeriodDay {
     /// 会造成同一天重复记录或记录消失;整数日键只描述「哪一天」,永远稳定。
     /// ⚠️ 不用 `@Attribute(.unique)`:CloudKit 不支持唯一约束。同 dayKey 的去重
     /// 由写入路径手动完成(`CalendarView.upsertPeriod` / `QuickLogApplier`,先查后写)。
-    var dayKey: Int
+    var dayKey: Int = 0
     /// 存原始值,SwiftData 对基础类型最稳。
-    var flowRaw: Int
-    var createdAt: Date
+    var flowRaw: Int = FlowLevel.medium.rawValue
+    var createdAt: Date = Date.now
 
     /// 该日在当前时区下的零点。派生属性,不入库,仅供显示与日期运算。
     var date: Date { DayKey.date(from: dayKey) }

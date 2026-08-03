@@ -7,23 +7,23 @@ final class DailyLog {
     /// 逻辑唯一键:yyyymmdd 整数(见 `DayKey`),与时区无关。
     /// ⚠️ 不用 `@Attribute(.unique)`(CloudKit 不支持);去重由写入路径手动完成
     ///(`DailyLogView.save` / `QuickLogApplier`,先查后写)。
-    var dayKey: Int
+    var dayKey: Int = 0
 
     /// 心情原始值(1...5),0 表示未选。
-    var moodRaw: Int
+    var moodRaw: Int = 0
     /// 能量 1...5,0 表示未选。
-    var energy: Int
+    var energy: Int = 0
     /// 疼痛 1...5,-1 表示未选。
-    var pain: Int
+    var pain: Int = -1
     /// 睡眠小时数,nil 表示未记录。
     var sleepHours: Double?
     /// 体重(kg),nil 表示未记录。PCOS 相关追踪项。
     var weight: Double?
     /// 已选症状标签(存标签的 key)。
-    var symptoms: [String]
+    var symptoms: [String] = []
     /// 自由备注。
-    var note: String
-    var updatedAt: Date
+    var note: String = ""
+    var updatedAt: Date = Date.now
 
     /// 该日在当前时区下的零点。派生属性,不入库。
     var date: Date { DayKey.date(from: dayKey) }
