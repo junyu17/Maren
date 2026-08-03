@@ -59,4 +59,22 @@ enum DemoSeed {
 
         try? context.save()
     }
+
+    /// 开发自测:`--seed-dups` 为已存在的某天再插一条重复 `PeriodDay` / `DailyLog`,
+    /// 模拟 CloudKit「两端并发写同一天」产生的重复。`DedupSweep` 启动时会折叠它们。
+    /// DailyLog 重复记录除症状外加 headache、其余字段留空,专门验证 sweep 的字段回填与症状并集。
+    static func seedDuplicates(_ container: ModelContainer) {
+        guard ProcessInfo.processInfo.arguments.contains("--seed-dups") else { return }
+        let context = ModelContext(container)
+
+        if let first = (try? context.fetch(FetchDescriptor<PeriodDay>(sortBy: [.init(\.dayKey)])))?.first {
+            context.insert(PeriodDay(date: first.date, flow: first.flow == .heavy ? .light : .heavy))
+        }
+        if let first = (try? context.fetch(FetchDescriptor<DailyLog>(sortBy: [.init(\.dayKey)])))?.first {
+            let dup = DailyLog(date: first.date, mood: nil, energy: 0, pain: -1,
+                               sleepHours: nil, weight: nil, symptoms: ["headache"], note: "")
+            context.insert(dup)
+        }
+        try? context.save()
+    }
 }

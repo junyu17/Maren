@@ -29,7 +29,10 @@ struct VelaApp: App {
         }
         #if DEBUG
         DemoSeed.runIfRequested(container)
+        DemoSeed.seedDuplicates(container)
         #endif
+        // CloudKit 多端同步可能在同 dayKey 产生重复记录;启动折叠一次(无重复则 no-op)。
+        DedupSweep.run(in: container)
         // 注入给手表连接层,让它收到记录后能直接落库(不依赖任何视图存活)。
         let c = container
         Task { @MainActor in PhoneConnectivity.container = c }
