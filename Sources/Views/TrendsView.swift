@@ -62,6 +62,8 @@ struct TrendsView: View {
                         }
                         Text("均由你的记录在本机计算,不联网、不外传。")
                             .font(.caption2).foregroundStyle(.tertiary)
+                        Text("以上统计与洞察仅供参考,不构成医学建议。")
+                            .font(.caption2).foregroundStyle(.tertiary)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }

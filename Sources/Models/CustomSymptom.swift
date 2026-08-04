@@ -30,9 +30,14 @@ enum CustomSymptomStore {
     @MainActor
     static func refresh(_ context: ModelContext) {
         let items = (try? context.fetch(FetchDescriptor<CustomSymptom>())) ?? []
-        byKey = Dictionary(uniqueKeysWithValues: items.map {
-            ($0.key, SymptomTag(key: $0.key, label: $0.label, emoji: $0.emoji))
-        })
+        // 用 reduce 后写赢而不是 Dictionary(uniqueKeysWithValues:):
+        // 后者在 DB 出现重复 key(异常导入/CloudKit 合并/未来版本)时会直接崩溃,
+        // 而 CustomSymptomStore.refresh 在启动即触发,crash 会让 app 打不开。
+        var map: [String: SymptomTag] = [:]
+        for item in items {
+            map[item.key] = SymptomTag(key: item.key, label: item.label, emoji: item.emoji)
+        }
+        byKey = map
     }
 
     static func tags() -> [SymptomTag] {

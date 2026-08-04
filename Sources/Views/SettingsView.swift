@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var showDeleteConfirm = false
     @State private var healthSyncEnabled = HealthKitBridge.syncEnabled
     @State private var healthConnecting = false
+    @State private var healthAuthDenied = false
     @State private var showPCOS = false
     @ObservedObject private var store = Store.shared
     @State private var showPaywall = false
@@ -21,6 +22,7 @@ struct SettingsView: View {
     @State private var showSyncRestart = false
     @AppStorage("lock.enabled") private var lockEnabled = false
     @AppStorage(AppTheme.storageKey) private var themeRaw = AppTheme.rose.rawValue
+    @AppStorage(NotificationManager.hideSensitiveKey) private var hideSensitiveNotifs = false
 
     // 提醒偏好放在 View 层(@AppStorage 会驱动界面刷新)。
     @AppStorage("notif.dailyEnabled") private var dailyEnabled: Bool = false
@@ -47,16 +49,23 @@ struct SettingsView: View {
     private func connectHealth() async {
         healthConnecting = true
         defer { healthConnecting = false }
-        guard await HealthKitBridge.requestAuthorization() else { return }
+        guard await HealthKitBridge.requestAuthorization() else {
+            healthAuthDenied = true
+            return
+        }
         HealthKitBridge.syncEnabled = true
         healthSyncEnabled = true
-        // 导出:把 Maren 已有经期写回「健康」。
+        // 导出:把 Maren 已有经期写回「健康」(幂等,重复连接不会累积重复样本)。
         await HealthKitBridge.exportAll(periodDays)
         // 导入:「健康」里有、但 Maren 没有的经期,插进来。
-        let existing = Set(periodDays.map { $0.dayKey })
+        // 注意:existing 必须在循环内同步更新,否则同一天多条样本会全部插入(DB 重复)。
+        var existing = Set(periodDays.map { $0.dayKey })
         let fromHealth = await HealthKitBridge.readRecentPeriodDays()
-        for (date, flow) in fromHealth where !existing.contains(DayKey.from(date)) {
+        for (date, flow) in fromHealth {
+            let key = DayKey.from(date)
+            guard !existing.contains(key) else { continue }
             context.insert(PeriodDay(date: date, flow: flow))
+            existing.insert(key)
         }
         try? context.save()
     }
@@ -224,6 +233,16 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Toggle("锁屏隐藏提醒内容", isOn: $hideSensitiveNotifs)
+                        .onChange(of: hideSensitiveNotifs) { _, newValue in
+                            NotificationManager.hideSensitiveContent = newValue
+                            reschedule()  // 用新偏好重排,让已排期的通知立即生效
+                        }
+                } footer: {
+                    Text("开启后,经期 / 关怀类提醒在锁屏上只显示「打开 Maren 查看提醒」,不显示经期、黄体期等敏感信息。")
+                }
+
+                Section {
                     Toggle("每日记录提醒", isOn: $dailyEnabled)
                         .onChange(of: dailyEnabled) { _, _ in reschedule() }
                     if dailyEnabled {
@@ -330,7 +349,7 @@ struct SettingsView: View {
                     } header: {
                         Text("Apple 健康")
                     } footer: {
-                        Text("双向同步经期:导入「健康」里已有的经期,并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器。")
+                        Text("双向同步经期:导入「健康」里最近 180 天的经期记录(含其他 App 记的),并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器;Maren 删除记录时只会删除本 App 写入的样本,不会动你在其他 App 的记录。")
                     }
                 }
 
@@ -349,8 +368,8 @@ struct SettingsView: View {
                     Text("同步")
                 } footer: {
                     Text(cloudSyncEnabled
-                         ? "已开启:数据同步到你自己的 iCloud 私有库(我们的服务器无法访问),可在登录同一 Apple ID 的设备间同步。"
-                         : "开启后,数据存到你自己的 iCloud 私有库,可在你登录同一 Apple ID 的设备间同步。我们的服务器永不接触。开启或关闭需重启 Maren 生效。")
+                         ? "已开启:数据同步到你自己的 iCloud 私有库(我们的服务器无法访问),可在登录同一 Apple ID 的设备间同步。⚠️ 切换需重启 Maren 才生效。"
+                         : "开启后,数据存到你自己的 iCloud 私有库,可在你登录同一 Apple ID 的设备间同步。我们的服务器永不接触。⚠️ 关闭同步不会删除 iCloud 云端已有的副本,数据仍保留在你的 iCloud 中。开启或关闭需重启 Maren 生效。")
                 }
 
                 Section {
@@ -385,7 +404,9 @@ struct SettingsView: View {
             .confirmationDialog("确定要删除所有数据吗?",
                                 isPresented: $showDeleteConfirm,
                                 titleVisibility: .visible) {
-                Button("删除全部记录", role: .destructive) { deleteAllData() }
+                Button("删除全部记录", role: .destructive) {
+                    Task { await deleteAllData() }
+                }
                 Button("取消", role: .cancel) {}
             } message: {
                 Text("这会清空 \(periodDays.count) 条经期记录、\(allLogs.count) 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。")
@@ -403,7 +424,16 @@ struct SettingsView: View {
             } message: {
                 Text("iCloud 同步设置将在下次打开 Maren 时生效。")
             }
-            .onAppear { notifs.refreshAuthorization() }
+            .alert("无法连接 Apple 健康", isPresented: $healthAuthDenied) {
+                Button("好") {}
+            } message: {
+                Text("未能获得「健康」App 的经期读写授权。你可以在 系统设置 → 隐私与安全性 → 健康 → Maren 中检查授权。")
+            }
+            .onAppear {
+                notifs.refreshAuthorization()
+                // 重新校验 iCloud 账户状态(用户在系统里登录/退出后,开关可用性会变化)。
+                Task { await CloudSync.refreshConfiguredStatus() }
+            }
         }
     }
 
@@ -418,7 +448,14 @@ struct SettingsView: View {
 
     /// 一键清空本机全部健康数据。「你的数据永远属于你」也包含「随时能全部带走或抹掉」。
     /// 必须删掉全部五个模型,否则用药历史/自定义症状会残留,违反隐私承诺。
-    private func deleteAllData() {
+    private func deleteAllData() async {
+        // 若已连接 Apple Health,先把 Maren 写入的经期样本从「健康」里删掉,
+        // 否则删除后数据仍可在健康 App 看到,且重新连接时会被重新导入「复活」。
+        if HealthKitBridge.syncEnabled, HealthKitBridge.isAvailable {
+            for p in periodDays {
+                await HealthKitBridge.deletePeriodDay(p.date)
+            }
+        }
         for p in periodDays { context.delete(p) }
         for l in allLogs { context.delete(l) }
         // 用药相关:先撤掉已排期的本地通知,再删库。
@@ -434,7 +471,16 @@ struct SettingsView: View {
         notifs.schedulePeriodReminder(enabled: periodEnabled, advanceDays: 2, nextPeriodStart: nil)
         notifs.schedulePMSReminder(enabled: false, nextPeriodStart: nil)
         notifs.scheduleSmartReminders(enabled: false, prediction: .empty, logs: [])
+        // 手动周期设置也算「数据」:不重置的话,删除后 widget/趋势仍会基于
+        // 手动周期参数显示预测,与「删除所有数据」语义不符。
+        UserDefaults.standard.set(false, forKey: ManualCycle.Keys.enabled)
+        UserDefaults.standard.removeObject(forKey: ManualCycle.Keys.cycleLength)
+        UserDefaults.standard.removeObject(forKey: ManualCycle.Keys.periodLength)
+        // 关键:把 widget 快照覆写为占位(不残留任何健康信息),并重推手表。
+        // 只 reloadAllTimelines 不够 —— timeline 仍会从 App Group 旧快照读出已删除的数据。
+        WidgetSnapshotStore.write(.placeholder)
         WidgetCenter.shared.reloadAllTimelines()
+        PhoneConnectivity.shared.push(.placeholder)
     }
 
     private func hourLabel(_ h: Int) -> String {

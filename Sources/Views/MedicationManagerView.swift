@@ -7,6 +7,7 @@ struct MedicationManagerView: View {
     @Query(sort: \Medication.createdAt) private var meds: [Medication]
     @State private var editing: Medication?
     @State private var showAdd = false
+    @State private var showSlotsCapped = false
     @ObservedObject private var store = Store.shared
 
     var body: some View {
@@ -42,6 +43,11 @@ struct MedicationManagerView: View {
         }
         .sheet(item: $editing) { med in
             MedicationEditor(med: med) { save($0) }
+        }
+        .alert("提醒已达系统上限", isPresented: $showSlotsCapped) {
+            Button("好") {}
+        } message: {
+            Text("iOS 最多同时安排 64 条本地提醒。本次的部分提醒时段因超限未能排上,建议减少时段数量或选择更少的周几。")
         }
     }
 
@@ -88,8 +94,13 @@ struct MedicationManagerView: View {
         try? context.save()
         // 重排:Pro 走多时段,否则走单次。
         if usePro {
-            NotificationManager.shared.scheduleMedicationSlots(
-                notificationId: med.notificationId, name: med.name, slots: med.slots)
+            // 系统对 pending 本地通知有 64 条硬上限,多药叠加会超限导致静默丢弃;
+            // 返回 false 时提示用户减少时段/周几。
+            Task {
+                let ok = await NotificationManager.shared.scheduleMedicationSlots(
+                    notificationId: med.notificationId, name: med.name, slots: med.slots)
+                if !ok { showSlotsCapped = true }
+            }
         } else if med.reminderEnabled {
             NotificationManager.shared.scheduleMedicationReminder(
                 id: med.notificationId, name: med.name,
@@ -101,6 +112,13 @@ struct MedicationManagerView: View {
         for i in offsets {
             let med = meds[i]
             NotificationManager.shared.cancelAllMedicationReminders(notificationId: med.notificationId)
+            // Medication 与 MedicationIntake 以 UUID 关联(SwiftData 无级联),
+            // 必须手动清掉该药的全部打卡记录,否则孤儿数据永久残留并随 CloudKit 同步。
+            let medId = med.id
+            let intakes = (try? context.fetch(
+                FetchDescriptor<MedicationIntake>(
+                    predicate: #Predicate { $0.medicationId == medId }))) ?? []
+            intakes.forEach { context.delete($0) }
             context.delete(med)
         }
         try? context.save()

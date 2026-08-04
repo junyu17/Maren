@@ -9,7 +9,7 @@
 
 1. developer.apple.com → Certificates, IDs & Profiles → Identifiers → **注册 App ID**
    - Bundle ID(Explicit):`cd.cc.vela`
-   - Capabilities 勾:**App Groups**(`group.cd.cc.vela`)。iCloud/HealthKit 暂不勾(还没启用)。
+   - Capabilities 勾:**App Groups**(`group.cd.cc.vela`)+ **iCloud**(CloudKit,容器 `iCloud.cd.cc.vela`)+ **HealthKit**(已实装,详见代码 `Vela.entitlements` 与 `HealthKitBridge.swift`)。
    - Widget / Watch 的 App ID(`cd.cc.vela.widget` / `cd.cc.vela.watchkitapp`)Xcode 首次带 Team 构建时会自动登记,或手动加。
 2. Xcode 里:每个 target → Signing & Capabilities → **Team 选你的账号**,Automatically manage signing 打勾。
 
@@ -42,10 +42,12 @@
 
 ## 3. 隐私(App Privacy)
 
-- **Privacy Policy URL**(必填):把仓库里 `隐私政策_Privacy-Policy.md` 的英文部分放到一个可访问网页(GitHub Pages / Vercel 免费),粘 URL。
-- **Data Collection 问卷**:选 **「No, we do not collect data from this app」**。
-  - 依据:健康数据只在本机、无网络层、无分析 SDK、无第三方。内购由 Apple 处理、app 不采集。
-  - 这是我们最大的差异化,如实勾「Data Not Collected」即可,别多勾。
+- **Privacy Policy URL**(必填):把 **`AppStore/privacy-policy.md`(干净的提交版,已填联系人与生效日期)** 放到一个可访问网页(GitHub Pages / Vercel 免费),粘 URL。
+  - ⚠️ 不要用 `隐私政策_Privacy-Policy.md`(开发版,含给内部人员的批注与占位符,仅供验收参考)。
+- **Data Collection 问卷**:按实际申报,选 **「Data Collected…Health & Fitness」**(因 app 会请求 HealthKit 经期读写)。
+  - 依据:健康数据只在本机、无网络层、无分析 SDK、无第三方;HealthKit 数据仅在你设备上使用,**不用于追踪**(问卷中该数据类型选 **Not Linked to User / Not Used for Tracking**)。
+  - 内购购买状态由 Apple 处理、app 不采集,无需申报。
+  - 别勾「Data Not Collected」——代码会 `requestAuthorization` HealthKit,不实申报是健康类 app 审核高风险项。
 
 ---
 
@@ -133,7 +135,7 @@ period tracker,cycle,menstrual,PCOS,ovulation,mood,symptom,privacy,irregular,cal
 **App Review Information**
 - Sign-in required:**No**(app 无账号)
 - Contact:你的名字 / 电话 / 邮箱
-- Notes:`No account needed; all data is stored locally on-device. HealthKit/CloudKit are not enabled in this build. Insights appear after logging a couple of cycles.`
+- Notes:`No account needed; all data is stored locally on-device. iCloud (CloudKit) and HealthKit are optional features, OFF by default, and only ever use the user's own private cloud or on-device health data — never sent to our server. Insights appear after logging a couple of cycles.`
 
 **Version Release**:Manually release / Automatically 都行。
 
@@ -174,9 +176,10 @@ Maren is a tracking and insight tool. It is not a contraceptive and does not pro
 
 ## 8. 提交前最后自查
 - [ ] 三个内购 Product ID 与代码 `Store.ProductID` **完全一致**(yearly/monthly/lifetime)。
-- [ ] 隐私政策 URL 可访问、内容与 app 行为一致(尤其「不采集/不共享」)。
+- [ ] 隐私政策 URL 可访问、内容与 app 行为一致(尤其「不采集/不共享/数据仅本机+用户自己 iCloud」)。
 - [ ] 截图为 1284×2778(iPhone)/ 410×502(Watch)。
-- [ ] ⚠️ **HealthKit 未启用**:若这次不上 HealthKit,建议先删掉 project.yml 里
-      `NSHealthShareUsageDescription` / `NSHealthUpdateUsageDescription` 两行(避免审核追问"用了 HealthKit 没")。等真启用再加回。
+- [ ] App ID 已勾 **App Groups + iCloud(CloudKit)+ HealthKit**(与 `Vela.entitlements` 一致),Review Notes 使用上方「HealthKit/CloudKit optional and off by default」版本。
+- [ ] App Privacy 问卷如实申报 **Health & Fitness**(Not Linked to User / Not Used for Tracking),勿勾 Data Not Collected。
+- [ ] Widget 与 Watch target 均已带 `PrivacyInfo.xcprivacy`(UserDefaults CA92.1),避免 ITMS-91053 拒回。
 - [ ] 出口合规:已在 Info.plist 设 `ITSAppUsesNonExemptEncryption=NO`,提交时该问卷会自动过。
 ```

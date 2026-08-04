@@ -997,22 +997,6 @@
         }
       }
     },
-    "你在%1$@最常记录「%2$@」。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You log %2$@ most during your %1$@."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你在%1$@最常记录「%2$@」。"
-          }
-        }
-      }
-    },
     "你在%@最常记录「%@」。": {
       "localizations": {
         "en": {
@@ -1077,22 +1061,6 @@
         }
       }
     },
-    "你的心情在%1$@通常偏低,在%2$@相对更好。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your mood tends to dip during your %1$@ and lift during your %2$@."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的心情在%1$@通常偏低,在%2$@相对更好。"
-          }
-        }
-      }
-    },
     "你的心情在%@通常偏低,在%@相对更好。": {
       "localizations": {
         "en": {
@@ -1141,22 +1109,6 @@
         }
       }
     },
-    "你的能量在%1$@通常较低。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your energy tends to be lower during your %1$@."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的能量在%1$@通常较低。"
-          }
-        }
-      }
-    },
     "你的能量在%@通常较低。": {
       "localizations": {
         "en": {
@@ -1185,22 +1137,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的记录只在这台设备上。验证身份后即可查看。"
-          }
-        }
-      }
-    },
-    "你记录最多的症状是「%1$@」,共 %2$lld 次。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your most-logged symptom is %1$@ (%2$lld times)."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你记录最多的症状是「%1$@」,共 %2$lld 次。"
           }
         }
       }
@@ -2641,6 +2577,38 @@
         }
       }
     },
+    "隐私政策": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐私政策"
+          }
+        }
+      }
+    },
+    "使用条款": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terms of Use"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用条款"
+          }
+        }
+      }
+    },
     "恢复购买": {
       "localizations": {
         "en": {
@@ -3117,22 +3085,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂时无法打开本地数据库"
-          }
-        }
-      }
-    },
-    "更丰富的图表与周期回顾(陆续上线)。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Richer charts and cycle recaps (rolling out soon)."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "更丰富的图表与周期回顾(陆续上线)。"
           }
         }
       }
@@ -4141,22 +4093,6 @@
         }
       }
     },
-    "经期当天你最常记录「%@」,共 %lld 次。": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "On period days you most often log \"%1$@\" (%2$lld times)."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "经期当天你最常记录「%@」,共 %lld 次。"
-          }
-        }
-      }
-    },
     "经期流量": {
       "localizations": {
         "en": {
@@ -4957,6 +4893,38 @@
         }
       }
     },
+    "仍然进入": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter Anyway"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仍然进入"
+          }
+        }
+      }
+    },
+    "这台设备没有设置密码、Face ID 或 Touch ID,无法验证身份。你可以前往「设置」为设备设置密码,或选择仍然进入。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device has no passcode, Face ID, or Touch ID set up, so we can't verify your identity. You can set a device passcode in Settings, or choose to enter anyway."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台设备没有设置密码、Face ID 或 Touch ID,无法验证身份。你可以前往「设置」为设备设置密码,或选择仍然进入。"
+          }
+        }
+      }
+    },
     "重试": {
       "localizations": {
         "en": {
@@ -5289,6 +5257,278 @@
           "stringUnit": {
             "state": "translated",
             "value": "默认玫瑰色。升级 Pro 解锁全部 5 套配色。"
+          }
+        }
+      }
+    },
+    "Maren-用药.csv": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren-Medicines.csv"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren-用药.csv"
+          }
+        }
+      }
+    },
+    "Maren-用药打卡.csv": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren-Medication-Intake.csv"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren-用药打卡.csv"
+          }
+        }
+      }
+    },
+    "Maren-自定义症状.csv": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren-Custom-Symptoms.csv"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren-自定义症状.csv"
+          }
+        }
+      }
+    },
+    "高级排程": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advanced schedule"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高级排程"
+          }
+        }
+      }
+    },
+    "开": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开"
+          }
+        }
+      }
+    },
+    "关": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关"
+          }
+        }
+      }
+    },
+    "用药": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medications"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用药"
+          }
+        }
+      }
+    },
+    "用药打卡": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medication intake"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用药打卡"
+          }
+        }
+      }
+    },
+    "打卡时间": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taken at"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打卡时间"
+          }
+        }
+      }
+    },
+    "代码": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代码"
+          }
+        }
+      }
+    },
+    "提醒已达系统上限": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many reminders scheduled"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒已达系统上限"
+          }
+        }
+      }
+    },
+    "iOS 最多同时安排 64 条本地提醒。本次的部分提醒时段因超限未能排上,建议减少时段数量或选择更少的周几。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS allows at most 64 pending local notifications at once. Some of this schedule's reminders were dropped because the limit was exceeded. Try fewer time slots or fewer weekdays."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS 最多同时安排 64 条本地提醒。本次的部分提醒时段因超限未能排上,建议减少时段数量或选择更少的周几。"
+          }
+        }
+      }
+    },
+    "锁屏隐藏提醒内容": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide reminder details on lock screen"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "锁屏隐藏提醒内容"
+          }
+        }
+      }
+    },
+    "开启后,经期 / 关怀类提醒在锁屏上只显示「打开 Maren 查看提醒」,不显示经期、黄体期等敏感信息。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When on, period and care reminders show only \"Open Maren to see today's reminder\" on the lock screen — no sensitive details like period or luteal phase."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后,经期 / 关怀类提醒在锁屏上只显示「打开 Maren 查看提醒」,不显示经期、黄体期等敏感信息。"
+          }
+        }
+      }
+    },
+    "打开 Maren 查看今天的提醒。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Maren to see today's reminder."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 Maren 查看今天的提醒。"
+          }
+        }
+      }
+    },
+    "以上统计与洞察仅供参考,不构成医学建议。": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These statistics and insights are for reference only and are not medical advice."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以上统计与洞察仅供参考,不构成医学建议。"
+          }
+        }
+      }
+    },
+    "自定义症状": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom symptoms"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自定义症状"
           }
         }
       }

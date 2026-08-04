@@ -10,6 +10,7 @@ struct CalendarView: View {
     @State private var visibleMonth: Date = Cal.startOfDay(Date())
     @State private var selectedDay: Date?
     @State private var exportURLs: [URL]?
+    @State private var showExportFailed = false
     @State private var showPhaseInfo = false
 
     /// 跟随用户地区的星期简写与起始日(中国=周一开头,美国=周日开头)。
@@ -72,8 +73,19 @@ struct CalendarView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        exportURLs = DataExport.makeExportFiles(
-                            periodDays: periodDays, logs: logs, prediction: prediction)
+                        let meds = (try? context.fetch(FetchDescriptor<Medication>())) ?? []
+                        let intakes = (try? context.fetch(FetchDescriptor<MedicationIntake>())) ?? []
+                        let customs = (try? context.fetch(FetchDescriptor<CustomSymptom>())) ?? []
+                        let urls = DataExport.makeExportFiles(
+                            periodDays: periodDays, logs: logs,
+                            medications: meds, intakes: intakes, customSymptoms: customs,
+                            prediction: prediction)
+                        if urls.isEmpty {
+                            // 生成失败(如临时目录写入失败)时给反馈,而不是点了没反应。
+                            showExportFailed = true
+                        } else {
+                            exportURLs = urls
+                        }
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
@@ -100,6 +112,11 @@ struct CalendarView: View {
                     clearPeriod(on: box.date)
                 }
                 .presentationDetents([.height(320)])
+            }
+            .alert("导出失败", isPresented: $showExportFailed) {
+                Button("好") {}
+            } message: {
+                Text("未能生成导出文件,请检查设备存储空间后重试。")
             }
         }
     }
@@ -312,6 +329,7 @@ struct CalendarView: View {
         let day: PeriodDay
         if let existing = periodByDay[key] {
             existing.flow = flow
+            existing.updatedAt = Date()
             day = existing
         } else {
             let new = PeriodDay(date: key, flow: flow)
@@ -322,8 +340,15 @@ struct CalendarView: View {
         selectedDay = nil
         refreshPeriodReminder()
         // 已连接 Apple 健康时,把这天写回「健康」。
+        // 幂等写入;并判断是否为连续经期段的第一天,让健康侧正确识别周期起点。
         if HealthKitBridge.syncEnabled {
-            Task { await HealthKitBridge.writePeriodDay(day) }
+            let isCycleStart: Bool
+            if let prevDate = Cal.current.date(byAdding: .day, value: -1, to: key) {
+                isCycleStart = periodByDay[Cal.startOfDay(prevDate)] == nil
+            } else {
+                isCycleStart = true
+            }
+            Task { await HealthKitBridge.writePeriodDay(day, isCycleStart: isCycleStart) }
         }
     }
 

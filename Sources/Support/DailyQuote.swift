@@ -36,8 +36,10 @@ enum DailyQuote {
         guard !bucket.isEmpty else {
             return String(localized: "记录本身,就是善待自己的一种方式。")
         }
-        // 用「距参考日的天数」做确定性索引,保证当天固定、逐日轮换。
-        let dayNumber = Int((Cal.startOfDay(date).timeIntervalSince1970 / 86_400).rounded())
+        // 用「日期主键」做确定性索引,保证当天固定、逐日轮换。
+        // 不能用 epoch 秒/86400:夏令时切换日或半时区(印度 +5:30 等)下,
+        // 本地午夜除以 86400 的商会跳变/重复,与 dayKey 铁律不一致。
+        let dayNumber = DayKey.from(date)
         let entry = bucket[((dayNumber % bucket.count) + bucket.count) % bucket.count]
         return preferEnglish ? entry.en : entry.zh
     }

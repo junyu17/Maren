@@ -7,9 +7,11 @@ struct WatchRootView: View {
 
     private var accent: Color { watchAccent(conn.snapshot.themeRaw) }
 
-    /// 手表按自己所在时区算「今天」,与手机的 DayKey 编码一致。
+    /// 手表按自己所在时区算「今天」,与手机的 DayKey 编码一致(固定公历,不跟随日历偏好)。
     private var todayKey: Int {
-        let c = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = .current
+        let c = cal.dateComponents([.year, .month, .day], from: Date())
         return (c.year ?? 1970) * 10_000 + (c.month ?? 1) * 100 + (c.day ?? 1)
     }
 

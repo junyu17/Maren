@@ -14,6 +14,8 @@ final class PeriodDay {
     /// 存原始值,SwiftData 对基础类型最稳。
     var flowRaw: Int = FlowLevel.medium.rawValue
     var createdAt: Date = Date.now
+    /// 最近一次修改时刻(用于手表记录的时间戳比较,防止旧值覆盖新值)。
+    var updatedAt: Date = Date.now
 
     /// 该日在当前时区下的零点。派生属性,不入库,仅供显示与日期运算。
     var date: Date { DayKey.date(from: dayKey) }
@@ -27,5 +29,6 @@ final class PeriodDay {
         self.dayKey = DayKey.from(date)
         self.flowRaw = flow.rawValue
         self.createdAt = Date()
+        self.updatedAt = self.createdAt
     }
 }

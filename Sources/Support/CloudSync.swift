@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import CloudKit
 
 /// 层级 4 · CloudKit 私有库同步(V2,已接通)。
 ///
@@ -38,11 +39,30 @@ enum CloudSync {
         UserDefaults.standard.bool(forKey: storageKey)
     }
 
-    /// 当前构建是否具备 CloudKit 能力(配了 iCloud capability 且用户已登录 iCloud 时为 true)。
-    /// 没配时返回 false,app 继续以纯本地模式运行,不受影响。
-    static var isConfigured: Bool {
-        // 有 iCloud 容器 entitlement 且用户登录了 iCloud 时,FileManager 能拿到 ubiquity token。
-        FileManager.default.ubiquityIdentityToken != nil
+    /// 当前构建是否具备 CloudKit 能力(容器 entitlement 配好 **且** 用户已登录 iCloud)。
+    /// 没配 / 未登录时返回 false,app 继续以纯本地模式运行,不受影响。
+    ///
+    /// ⚠️ 不能用 `FileManager.default.ubiquityIdentityToken`:它只对「iCloud Documents /
+    /// ubiquity container」有保证,CloudKit-only entitlement 下可能恒为 nil,
+    /// 导致「明明配了 CloudKit 却永远显示不可用」。改用 `CKContainer.accountStatus()`。
+    /// 注意 `accountStatus` 是异步的,这里返回的是**上次校验的缓存**;启动时由
+    /// `refreshConfiguredStatus()` 刷新一次。
+    private(set) static var isConfigured: Bool = {
+        // 乐观默认:启动瞬间尚未校验完时按「已配置」处理(用户开启就尝试 CloudKit,
+        // 未登录的镜像会自然挂起但不崩,设置页在校验完成后给出准确状态)。
+        true
+    }()
+
+    /// 异步校验 iCloud 账户状态并缓存结果。启动时调用一次;
+    /// 用户登录/退出 iCloud 后重新进入设置页也应刷新。
+    @MainActor
+    static func refreshConfiguredStatus() async {
+        do {
+            let status = try await CKContainer(identifier: containerIdentifier).accountStatus()
+            isConfigured = (status == .available)
+        } catch {
+            isConfigured = false
+        }
     }
 
     /// 生成 ModelConfiguration。启用同步需要同时满足:用户开启 + 构建已配置。

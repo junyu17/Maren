@@ -9,7 +9,7 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: "255R6QQR97"
     CODE_SIGN_STYLE: Automatic
@@ -43,27 +43,44 @@ targets:
           - CloudKit
         # HealthKit(经期数据双向同步)。真机需在该 App ID 勾 HealthKit capability;模拟器可直接跑。
         com.apple.developer.healthkit: true
+    info:
+      path: Vela/Info.plist
+      properties:
+        CFBundleDisplayName: Maren
+        # 版本号从 build settings 继承(MARKETING_VERSION / CURRENT_PROJECT_VERSION),
+        # 与 Widget/Watch 保持一致 —— App Store 要求三端版本号一致。
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+          UISceneConfigurations: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        # 声明不使用非豁免加密,避免每次提审都要人工填出口合规问卷。
+        ITSAppUsesNonExemptEncryption: false
+        # 声明实际支持的语言。英文作为开发/回退语言:
+        # 法语、德语等未翻译的系统语言会回退到英文,而不是中文。
+        CFBundleLocalizations:
+          - en
+          - zh-Hans
+        NSFaceIDUsageDescription: "Use Face ID to unlock Maren so only you can see your health records."
+        # Apple Health 双向同步的用途说明(HealthKit capability 已在上面 entitlements 启用)。
+        NSHealthShareUsageDescription: "Read period entries from Apple Health to import your existing data into Maren. Used only on your device — never shared."
+        NSHealthUpdateUsageDescription: "Write the periods you log in Maren back to Apple Health so other apps can use them. Used only on your device — never shared."
+        # Widget 深链接:点 widget 的「进今天/进日历」打开对应页面。
+        # 与 WidgetSources/VelaWidget.swift 的 widgetURL(maren://today | maren://calendar)、
+        # Sources/Views/RootView.swift 的 onOpenURL 处理逻辑配套。
+        CFBundleURLTypes:
+          - CFBundleURLName: cd.cc.vela
+            CFBundleURLSchemes:
+              - maren
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: cd.cc.vela
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Maren
-        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         DEVELOPMENT_LANGUAGE: en
-        # 声明不使用非豁免加密,避免每次提审都要人工填出口合规问卷。
-        # 必须用 INFOPLIST_KEY_ 前缀才会注入到生成的 Info.plist(裸 build setting 不会)。
-        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
-        # 声明实际支持的语言。英文作为开发/回退语言:
-        # 法语、德语等未翻译的系统语言会回退到英文,而不是中文。
-        INFOPLIST_KEY_CFBundleLocalizations: "en zh-Hans"
-        INFOPLIST_KEY_NSFaceIDUsageDescription: "Use Face ID to unlock Maren so only you can see your health records."
-        # Apple Health 双向同步的用途说明(HealthKit capability 已在上面 entitlements 启用)。
-        INFOPLIST_KEY_NSHealthShareUsageDescription: "Read period entries from Apple Health to import your existing data into Maren. Used only on your device — never shared."
-        INFOPLIST_KEY_NSHealthUpdateUsageDescription: "Write the periods you log in Maren back to Apple Health so other apps can use them. Used only on your device — never shared."
 
   VelaWidgetExtension:
     type: app-extension

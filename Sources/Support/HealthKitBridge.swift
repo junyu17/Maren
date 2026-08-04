@@ -26,6 +26,12 @@ enum HealthKitBridge {
     /// 没配 capability 时这里是 false,全部调用会安全地空转,不会崩。
     static var isAvailable: Bool { HKHealthStore.isHealthDataAvailable() }
 
+    /// 当前经期数据的写入授权状态(用户在系统设置里撤销后这里会变)。
+    static var sharingStatus: HKAuthorizationStatus {
+        guard let type = menstrualType else { return .notDetermined }
+        return store.authorizationStatus(for: type)
+    }
+
     private static var menstrualType: HKCategoryType? {
         HKObjectType.categoryType(forIdentifier: .menstrualFlow)
     }
@@ -41,9 +47,15 @@ enum HealthKitBridge {
         }
     }
 
-    /// 把一天的经期流量写进 Apple Health。
-    static func writePeriodDay(_ day: PeriodDay) async {
+    /// 把一天的经期流量写进 Apple Health(幂等:先删本 app 当天已写的旧样本再写,避免重复累积)。
+    /// - Parameter isCycleStart:该天是否为某个连续经期段的**第一天**。
+    ///   Apple Health 用 `HKMetadataKeyMenstrualCycleStart` 识别周期起点;
+    ///   全部写 false 会导致健康侧无法识别任何周期,其他 App 的预测全错。
+    static func writePeriodDay(_ day: PeriodDay, isCycleStart: Bool = false) async {
         guard isAvailable, let type = menstrualType else { return }
+        // 用户在系统设置里撤销写入授权后,写入会静默失败;这里显式跳过,
+        // 避免每次经期标记都白跑一次 HKHealthStore.save。
+        guard sharingStatus == .sharingAuthorized else { return }
         // 用 HKCategoryValueMenstrualFlow(iOS 13+);iOS 18 才改名 VaginalBleeding,
         // 我们的部署目标是 iOS 17,必须用旧名。
         let value: HKCategoryValueMenstrualFlow
@@ -55,9 +67,11 @@ enum HealthKitBridge {
         }
         let start = Cal.startOfDay(day.date)
         let end = Cal.current.date(byAdding: .day, value: 1, to: start) ?? start
+        // 幂等:先删除本 app 当天已写入的样本,再保存新样本(只删本 app 的,不动别处记录)。
+        await deletePeriodDay(day.date)
         let sample = HKCategorySample(type: type, value: value.rawValue,
                                       start: start, end: end,
-                                      metadata: [HKMetadataKeyMenstrualCycleStart: false])
+                                      metadata: [HKMetadataKeyMenstrualCycleStart: isCycleStart])
         try? await store.save(sample)
     }
 
@@ -70,12 +84,26 @@ enum HealthKitBridge {
         let inDay = HKQuery.predicateForSamples(withStart: start, end: end, options: [.strictStartDate])
         let mine = HKQuery.predicateForObjects(from: HKSource.default())
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [inDay, mine])
-        try? await store.deleteObjects(of: type, predicate: predicate)
+        _ = try? await store.deleteObjects(of: type, predicate: predicate)
     }
 
     /// 一次性把 Maren 已有的经期全部写回 Apple Health(连接时的「导出」)。
+    /// 按连续段计算 `isCycleStart`:每段第一天写 true,其余 false —— 让健康侧能正确识别周期。
+    /// 幂等:writePeriodDay 内部先删后写,重复连接不会累积重复样本。
     static func exportAll(_ periodDays: [PeriodDay]) async {
-        for day in periodDays { await writePeriodDay(day) }
+        let sorted = periodDays.sorted { $0.dayKey < $1.dayKey }
+        var previous: PeriodDay? = nil
+        for day in sorted {
+            let isCycleStart: Bool
+            if let prev = previous {
+                // 与前一天连续(相差 1 天)则不是新周期;出现断档(>1 天)视为新一段。
+                isCycleStart = Cal.daysBetween(prev.date, day.date) > 1
+            } else {
+                isCycleStart = true
+            }
+            await writePeriodDay(day, isCycleStart: isCycleStart)
+            previous = day
+        }
     }
 
     /// 从 Apple Health 读回最近的经期记录(供导入)。

@@ -1,6 +1,14 @@
 import SwiftUI
 import StoreKit
 
+/// 法律文档链接。上线前把这两个 URL 换成实际托管的地址
+/// (隐私政策用 AppStore/privacy-policy.md 的托管版;使用条款用同一地址或单独页)。
+/// App Store 审核要求订阅 app 在付费墙内提供 EULA / 隐私政策入口(Guideline 3.1.2 / 5.1.1)。
+enum LegalLinks {
+    static let privacy = URL(string: "https://vela.app/privacy")!
+    static let terms   = URL(string: "https://vela.app/terms")!
+}
+
 /// 付费墙:展示 Maren Premium 的价值与三个产品,处理购买与恢复。
 /// 价格 / 周期文案全部取自 StoreKit(随用户地区 storefront 变化),不写死。
 struct PaywallView: View {
@@ -180,10 +188,19 @@ struct PaywallView: View {
     }
 
     private var legalText: some View {
-        Text("订阅会自动续期,可在 App Store 账户设置中随时取消。买断为一次性付款,永久有效。所有交易由 Apple 处理,我们不接触你的支付信息。")
+        VStack(spacing: 6) {
+            Text("订阅会自动续期,可在 App Store 账户设置中随时取消。买断为一次性付款,永久有效。所有交易由 Apple 处理,我们不接触你的支付信息。")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            // 审核要求(Guideline 3.1.2 / 5.1.1):付费墙内提供隐私政策与使用条款入口。
+            HStack(spacing: 16) {
+                Link("隐私政策", destination: LegalLinks.privacy)
+                Link("使用条款", destination: LegalLinks.terms)
+            }
             .font(.caption2)
-            .foregroundStyle(.tertiary)
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
+            .foregroundStyle(.blue)
+        }
     }
 }

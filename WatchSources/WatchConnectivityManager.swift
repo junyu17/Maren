@@ -17,15 +17,21 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
     private let cacheKey = "vela.watch.snapshot"
     private let recentKey = "vela.watch.recentLogs"
+    private let outboxKey = "vela.watch.outbox"
 
     /// 会话激活前发起的记录。未激活时投递会静默失败,
     /// 用户刚打开手表 app 就点击的话记录会凭空消失,所以先攒着,激活后补发。
-    private var outbox: [QuickLog] = []
+    /// 持久化到 UserDefaults:watchOS 上 app 被系统终止是常态,
+    /// 只存内存的话,重启后这些记录会永久丢失(而 UI 已显示「已记录」)。
+    private var outbox: [QuickLog] {
+        didSet { persistOutbox() }
+    }
     /// 最近发出的记录(用于 applicationContext 冗余通道)。
     private var recent: [QuickLog] = []
+    /// 上次 applicationContext 更新时间,用于节流(高频连点时合并为低频更新)。
+    private var lastContextUpdate = Date.distantPast
 
     override init() {
-        super.init()
         // 冷启动先用上次缓存,避免一片空白。
         if let data = UserDefaults.standard.data(forKey: cacheKey),
            let s = try? JSONDecoder().decode(WidgetSnapshot.self, from: data) {
@@ -34,6 +40,19 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         if let data = UserDefaults.standard.data(forKey: recentKey),
            let r = try? JSONDecoder().decode([QuickLog].self, from: data) {
             recent = r
+        }
+        // 恢复上次未送达的 outbox(终止前没发出去的记录)。
+        if let data = UserDefaults.standard.data(forKey: outboxKey),
+           let o = try? JSONDecoder().decode([QuickLog].self, from: data) {
+            outbox = o
+        } else {
+            outbox = []
+        }
+    }
+
+    private func persistOutbox() {
+        if let data = try? JSONEncoder().encode(outbox) {
+            UserDefaults.standard.set(data, forKey: outboxKey)
         }
     }
 
@@ -54,10 +73,9 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
     /// 发送一条快速记录。
     func send(_ log: QuickLog) {
         guard let session else { return }
-        Task { @MainActor in self.lastSent = Date() }
 
         guard session.activationState == .activated else {
-            outbox.append(log)   // 还没激活,先攒着
+            outbox.append(log)   // 还没激活,先攒着(已持久化,app 被终止也不丢)
             activate()
             return
         }
@@ -74,23 +92,39 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 
     private func deliver(_ log: QuickLog, via session: WCSession) {
         guard let data = try? JSONEncoder().encode(log) else { return }
+        var deliveredNow = false
 
         if session.isReachable {
             // 通道 1:立即送达。
             session.sendMessage([WatchKeys.quickLog: data], replyHandler: nil) { _ in
                 session.transferUserInfo([WatchKeys.quickLog: data])  // 失败退回排队
             }
+            deliveredNow = true
         } else {
-            // 通道 2:排队投递。
+            // 通道 2:排队投递(系统保证送达,不算丢失)。
             session.transferUserInfo([WatchKeys.quickLog: data])
+            deliveredNow = true
         }
 
         // 通道 3:把最近若干条作为 context 发布,幂等重放兜底。
+        // 按 (kind, dayKey) 去重,避免同一记录在 batch 与 sendMessage 中重复
+        // 推送导致手机端 updatedAt 被反复刷新;高频连点时合并为低频更新。
+        recent.removeAll { $0.kind == log.kind && $0.dayKey == log.dayKey }
         recent.append(log)
         recent = Array(recent.suffix(20))
-        if let batch = try? JSONEncoder().encode(recent) {
-            UserDefaults.standard.set(batch, forKey: recentKey)
-            try? session.updateApplicationContext([WatchKeys.quickLogBatch: batch])
+        let now = Date()
+        if now.timeIntervalSince(lastContextUpdate) > 1.0 {  // 节流:1 秒内只更新一次
+            lastContextUpdate = now
+            if let batch = try? JSONEncoder().encode(recent) {
+                UserDefaults.standard.set(batch, forKey: recentKey)
+                try? session.updateApplicationContext([WatchKeys.quickLogBatch: batch])
+            }
+        }
+
+        // 「已记录」反馈只在真正进入投递通道后显示,而不是在 UI 点按瞬间
+        // 就假装成功(否则用户看到「已记录」但记录可能没发出去)。
+        if deliveredNow {
+            Task { @MainActor in self.lastSent = Date() }
         }
     }
 
@@ -113,5 +147,5 @@ extension WatchConnectivityManager: WCSessionDelegate {
         applyContext(context)
     }
     // 注:sessionDidBecomeInactive / sessionDidDeactivate 是 iOS 专有的,
-    // watchOS 上不可用,只在手机侧 PhoneConnectivity 实现。
+    // watchOS 上被标记为 unavailable,不可 override;只在手机侧 PhoneConnectivity 实现。
 }

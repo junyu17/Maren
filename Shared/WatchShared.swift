@@ -14,12 +14,22 @@ struct QuickLog: Codable, Equatable {
     var moodRaw: Int?
     /// 目标日期(yyyymmdd),由手表按自己时区算出「今天」。
     var dayKey: Int
+    /// 记录发送时刻。手机端据此判断新旧:
+    /// 旧 batch 重放 / 重复送达时,不覆盖手机端更新的值(防止新值被旧值覆盖)。
+    var sentAt: Date
+    /// 发送端 UTC 偏移秒数(手表所在时区)。手机端校验 dayKey 时参考:
+    /// 手表按手表时区算「今天」,若与手机时区不一致,可据此判断差异来源。
+    var tzOffsetSeconds: Int
 
-    static func period(flowRaw: Int, dayKey: Int) -> QuickLog {
-        QuickLog(kind: "period", flowRaw: flowRaw, moodRaw: nil, dayKey: dayKey)
+    static func period(flowRaw: Int, dayKey: Int, sentAt: Date = Date(),
+                       tzOffsetSeconds: Int = TimeZone.current.secondsFromGMT()) -> QuickLog {
+        QuickLog(kind: "period", flowRaw: flowRaw, moodRaw: nil,
+                 dayKey: dayKey, sentAt: sentAt, tzOffsetSeconds: tzOffsetSeconds)
     }
-    static func mood(moodRaw: Int, dayKey: Int) -> QuickLog {
-        QuickLog(kind: "mood", flowRaw: nil, moodRaw: moodRaw, dayKey: dayKey)
+    static func mood(moodRaw: Int, dayKey: Int, sentAt: Date = Date(),
+                     tzOffsetSeconds: Int = TimeZone.current.secondsFromGMT()) -> QuickLog {
+        QuickLog(kind: "mood", flowRaw: nil, moodRaw: moodRaw,
+                 dayKey: dayKey, sentAt: sentAt, tzOffsetSeconds: tzOffsetSeconds)
     }
 }
 

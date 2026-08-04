@@ -34,8 +34,12 @@ struct VelaApp: App {
         // CloudKit 多端同步可能在同 dayKey 产生重复记录;启动折叠一次(无重复则 no-op)。
         DedupSweep.run(in: container)
         // 注入给手表连接层,让它收到记录后能直接落库(不依赖任何视图存活)。
-        let c = container
-        Task { @MainActor in PhoneConnectivity.container = c }
+        // 同步赋值:VelaApp.init 在主线程执行,此时 WCSession 尚未激活,
+        // 手表消息最早也在 RootView.onAppear 的 activate() 之后才可能到达,
+        // 所以这里不会出现「消息到了但 container 还是 nil」的竞态。
+        PhoneConnectivity.container = container
+        // 异步校验 CloudKit 账户状态(登录/退出 iCloud 会影响「iCloud 同步」开关的可用性)。
+        Task { @MainActor in await CloudSync.refreshConfiguredStatus() }
     }
 
     var body: some Scene {

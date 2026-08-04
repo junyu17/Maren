@@ -99,6 +99,16 @@ enum CyclePredictor {
         let cal = Cal.current
         let today = Cal.startOfDay(today)
 
+        // 手动值来自 UserDefaults,可能被篡改/越界(负数、超大值);在入口 clamp 防御,
+        // 避免区间计算出现异常语义(虽然不崩溃)。
+        let manualSafe: ManualCycle? = manual.map {
+            ManualCycle(enabled: $0.enabled,
+                        cycleLength: min(max($0.cycleLength, ManualCycle.cycleRange.lowerBound),
+                                         ManualCycle.cycleRange.upperBound),
+                        periodLength: min(max($0.periodLength, ManualCycle.periodRange.lowerBound),
+                                          ManualCycle.periodRange.upperBound))
+        }
+
         // 1) 归一 + 去重 + 排序参与计算的经期日。
         //    - 未来日期不参与:误点一个将来的日子不该把整个预测锚点挪走。
         //    - 只回溯 lookbackDays:让单次重算的成本有上界,不随使用年限增长。
@@ -170,7 +180,7 @@ enum CyclePredictor {
         }
 
         // 用户手动设置优先:她比统计更清楚自己的身体,且只需记录过 1 次经期就能用。
-        if let m = manual, m.enabled, let lastStart = lastCycleStart {
+        if let m = manualSafe, m.enabled, let lastStart = lastCycleStart {
             let half = 2 // 手动设置不谈波动,给一个克制的 ±2 天窗口
             return Prediction(
                 hasEnoughData: true,
@@ -232,7 +242,9 @@ enum CyclePredictor {
         let half = max(minimumHalfWidth(forSampleCount: recent.count), Int(std.rounded()))
         let base = lastCycleStart ?? today
         let nextStart = cal.date(byAdding: .day, value: center, to: base)
-        let rangeStart = cal.date(byAdding: .day, value: center - half, to: base)
+        // 波动极大(如 15 与 120 并存)时 center - half 可能为负,
+        // 区间下界会回到过去混入已过去的日子;clamp 到经期起点。
+        let rangeStart = max(cal.date(byAdding: .day, value: center - half, to: base) ?? base, base)
         let rangeEnd = cal.date(byAdding: .day, value: center + half, to: base)
 
         return Prediction(

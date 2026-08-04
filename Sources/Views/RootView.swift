@@ -22,21 +22,26 @@ struct RootView: View {
 
     var body: some View {
         mainTabs
+            .privacySensitive()  // 双保险:即便锁屏动画未及完成,快照也自动打码
             .fullScreenCover(isPresented: Binding(get: { !onboardingDone },
                                                   set: { onboardingDone = !$0 })) {
                 OnboardingView { onboardingDone = true }
             }
-            .overlay {
-                // 锁开启且未解锁时,盖住全部内容。
-                if lockEnabled && !lock.unlocked {
-                    LockView(lock: lock)
-                }
+            .fullScreenCover(isPresented: Binding(get: { lockEnabled && !lock.unlocked },
+                                                  set: { _ in })) {
+                // 用 fullScreenCover 而非 overlay:sheet 模态层会被 overlay 盖不住,
+                // 开 sheet 时切后台再回前台,锁屏会被 sheet 压住,健康数据未解锁可见。
+                LockView(lock: lock)
             }
             .onAppear { watch.activate() }
             .onChange(of: scenePhase) { _, phase in
                 switch phase {
-                case .background: if lockEnabled { lock.lock() }
-                case .active: if lockEnabled && !lock.unlocked { lock.authenticate() }
+                // .inactive 就上锁(而不是 .background):
+                // App Switcher 的快照在进入后台时拍摄,等 .background 再锁会拍到完整健康数据。
+                case .inactive, .background:
+                    if lockEnabled { lock.lock() }
+                case .active:
+                    if lockEnabled && !lock.unlocked { lock.authenticate() }
                 default: break
                 }
             }

@@ -9,6 +9,9 @@ final class AppLockManager: ObservableObject {
     @Published var unlocked = false
     /// 上次鉴权是否失败(用于在锁屏上提示重试)。
     @Published var failed = false
+    /// 设备没有配置任何鉴权方式(密码 / Face ID / Touch ID 都没有)。
+    /// 此时不再静默放行 —— 那会让锁形同虚设;改为在锁屏上提示,由用户显式确认。
+    @Published var deviceAuthUnavailable = false
     /// 正在鉴权中。防止 `LockView.onAppear` 与 `RootView.scenePhase=.active`
     /// 在冷启动时同时触发两次 `evaluatePolicy`,导致系统弹窗闪两次 / 互相取消。
     private var isAuthenticating = false
@@ -20,8 +23,9 @@ final class AppLockManager: ObservableObject {
         var err: NSError?
         // 用 deviceOwnerAuthentication:优先生物识别,不可用时回落到设备密码。
         guard ctx.canEvaluatePolicy(.deviceOwnerAuthentication, error: &err) else {
-            // 设备没有任何鉴权方式(如模拟器未设密码)→ 不把用户锁死,直接放行。
-            unlocked = true
+            // 设备没有任何鉴权方式(如模拟器未设密码)→ 不自动放行(否则锁形同虚设),
+            // 在锁屏上提示用户去系统设置开启,并提供「仍然进入」的显式确认。
+            deviceAuthUnavailable = true
             return
         }
         isAuthenticating = true
@@ -35,7 +39,14 @@ final class AppLockManager: ObservableObject {
         }
     }
 
-    /// 进入后台时上锁,下次回前台需要重新鉴权。
+    /// 设备无鉴权方式时,用户显式选择「仍然进入」(比静默放行多一道确认)。
+    func forceUnlock() {
+        unlocked = true
+        deviceAuthUnavailable = false
+        failed = false
+    }
+
+    /// 进入后台 / 切走时上锁,下次回前台需要重新鉴权。
     func lock() {
         unlocked = false
         failed = false

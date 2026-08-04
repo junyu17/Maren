@@ -16,6 +16,7 @@ import StoreKit
 ///   1. Xcode → File → New → File → StoreKit Configuration File,命名 `Vela.storekit`;
 ///   2. 在其中添加上面三个产品 ID(年/月订阅放同一个 Subscription Group);
 ///   3. Edit Scheme → Run → Options → StoreKit Configuration 选 `Vela.storekit`。
+@MainActor
 final class Store: ObservableObject {
     static let shared = Store()
 
@@ -49,6 +50,10 @@ final class Store: ObservableObject {
                 if let transaction = try? Self.checkVerified(result) {
                     await transaction.finish()
                     await self.refreshEntitlements()
+                } else {
+                    // 验签失败的交易:不能 finish(否则会被当成已处理而丢失),
+                    // 但也不能永远滞留;记录一条错误供界面排查。
+                    self.lastError = String(localized: "有一笔交易未能通过签名校验,已跳过。")
                 }
             }
         }
@@ -100,9 +105,16 @@ final class Store: ObservableObject {
         }
     }
 
-    /// 恢复购买:把 App Store 上的 entitlement 拉回本机(Apple 要求提供此入口)。
+    /// 恢复购买:先向 App Store 同步本账号的所有交易,再刷新 entitlement。
+    /// 只调 `refreshEntitlements` 依赖本机 Transaction.currentEntitlements 的缓存,
+    /// 在新设备/缓存未刷新时会返回「没有可恢复的购买」;`AppStore.sync()` 强制拉取。
     @MainActor
     func restore() async {
+        do {
+            try await AppStore.sync()
+        } catch {
+            lastError = error.localizedDescription
+        }
         await refreshEntitlements()
     }
 

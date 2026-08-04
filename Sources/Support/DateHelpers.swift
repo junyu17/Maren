@@ -8,18 +8,22 @@ import Foundation
 /// 整数日键只描述「哪一天」,不含时刻,因此跨时区绝对稳定。
 enum DayKey {
     /// 取该时刻在**当前时区**下所属的日历日,编码为 yyyymmdd。
+    /// 必须固定用公历(Calendar(identifier: .gregorian)):dayKey 的注释契约是「yyyymmdd 公历日期」,
+    /// 若跟随用户日历偏好(日本历/泰历/伊斯兰历等),同一数值会被解析成不同日期,
+    /// CloudKit 同步到另一台设备或用户切换日历后,记录会错位/消失。
     static func from(_ date: Date) -> Int {
-        let c = Cal.current.dateComponents([.year, .month, .day], from: date)
+        let c = Cal.gregorian.dateComponents([.year, .month, .day], from: date)
         return (c.year ?? 1970) * 10_000 + (c.month ?? 1) * 100 + (c.day ?? 1)
     }
 
     /// 还原成该日在**当前时区**下的零点,仅用于显示与日期运算。
+    /// 同样固定公历解析,保证与 `from` 严格互逆。
     static func date(from key: Int) -> Date {
         var c = DateComponents()
         c.year = key / 10_000
         c.month = (key / 100) % 100
         c.day = key % 100
-        return Cal.current.date(from: c) ?? Date(timeIntervalSince1970: 0)
+        return Cal.gregorian.date(from: c) ?? Date(timeIntervalSince1970: 0)
     }
 
     static var today: Int { from(Date()) }
@@ -31,6 +35,13 @@ enum Cal {
     /// 缓存快照会在用户中途切换时区 / 地区 / 日历设置后失效,
     /// 导致 startOfDay 与已存记录对不上,当天记录看起来「消失」。
     static var current: Calendar { Calendar.current }
+
+    /// dayKey 编解码专用公历(带当前时区)。见 `DayKey.from` 的说明。
+    static var gregorian: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = .current
+        return c
+    }
 
     /// 归一化到当天起点。所有存储的 date 都应先经过它。
     static func startOfDay(_ date: Date) -> Date {

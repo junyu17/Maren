@@ -22,6 +22,14 @@ final class NotificationManager: ObservableObject {
     private let pmsId = "vela.pms.selfcare"
     private let smartId = "vela.smart.luteal"
 
+    /// 用户偏好:锁屏上隐藏通知里的敏感健康信息(经期/黄体期等)。
+    /// 开启后,经期/PMS/智能提醒的正文改为中性文案,避免旁人瞥见健康细节。
+    static let hideSensitiveKey = "notif.hideSensitiveContent"
+    static var hideSensitiveContent: Bool {
+        get { UserDefaults.standard.bool(forKey: hideSensitiveKey) }
+        set { UserDefaults.standard.set(newValue, forKey: hideSensitiveKey) }
+    }
+
     func refreshAuthorization() {
         center.getNotificationSettings { settings in
             Task { @MainActor in
@@ -76,8 +84,13 @@ final class NotificationManager: ObservableObject {
               fireDate > Date() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "经期可能快来了")
-        content.body = String(localized: "预测你的经期约在 \(days) 天后,可以提前做点准备。")
+        if Self.hideSensitiveContent {
+            content.title = String(localized: "Maren")
+            content.body = String(localized: "打开 Maren 查看今天的提醒。")
+        } else {
+            content.title = String(localized: "经期可能快来了")
+            content.body = String(localized: "预测你的经期约在 \(days) 天后,可以提前做点准备。")
+        }
         content.sound = .default
 
         var comps = cal.dateComponents([.year, .month, .day], from: fireDate)
@@ -100,8 +113,13 @@ final class NotificationManager: ObservableObject {
               fireDate > Date() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = String(localized: "对自己好一点")
-        content.body = String(localized: "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。")
+        if Self.hideSensitiveContent {
+            content.title = String(localized: "Maren")
+            content.body = String(localized: "打开 Maren 查看今天的提醒。")
+        } else {
+            content.title = String(localized: "对自己好一点")
+            content.body = String(localized: "经期临近,黄体期里情绪和身体可能起伏,温柔对待自己。")
+        }
         content.sound = .default
 
         var comps = cal.dateComponents([.year, .month, .day], from: fireDate)
@@ -123,8 +141,13 @@ final class NotificationManager: ObservableObject {
         guard let r = reminders.first else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = r.title
-        content.body = r.body
+        if Self.hideSensitiveContent {
+            content.title = String(localized: "Maren")
+            content.body = String(localized: "打开 Maren 查看今天的提醒。")
+        } else {
+            content.title = r.title
+            content.body = r.body
+        }
         content.sound = .default
 
         var comps = Cal.current.dateComponents([.year, .month, .day, .hour], from: r.fireDate)
@@ -156,8 +179,12 @@ final class NotificationManager: ObservableObject {
 
     /// Pro:为一个药按多时段 + 周几排程。每个 (时段 × 周几) 一条重复通知。
     /// 调用前应先 `cancelAllMedicationReminders(notificationId:)` 撤掉旧排期。
-    func scheduleMedicationSlots(notificationId: String, name: String, slots: [ReminderSlot]) {
-        guard authorized, !slots.isEmpty else { return }
+    /// - Returns: 是否全部排上。iOS 对 pending 本地通知有 **64 条硬上限**,
+    ///   多药叠加(2 种药全时段全周几即 84 条)会超限,超出的通知被系统静默丢弃
+    ///   (不加也不报错)——所以排程前先统计,超限就截断并返回 false 供界面提示。
+    @discardableResult
+    func scheduleMedicationSlots(notificationId: String, name: String, slots: [ReminderSlot]) async -> Bool {
+        guard authorized, !slots.isEmpty else { return false }
         let content = { () -> UNMutableNotificationContent in
             let c = UNMutableNotificationContent()
             c.title = String(localized: "该吃药啦")
@@ -165,23 +192,57 @@ final class NotificationManager: ObservableObject {
             c.sound = .default
             return c
         }
-        for (i, slot) in slots.enumerated() where i < MedicationSlotsPolicy.maxSlots {
+        // 本次要排的通知条数。
+        let capped = Array(slots.prefix(MedicationSlotsPolicy.maxSlots))
+        var needed = 0
+        for slot in capped {
+            needed += slot.weekdays.isEmpty ? 1 : slot.weekdays.count
+        }
+        // 统计当前 pending 总数(含经期/PMS/智能/每日提醒等)。
+        let pendingCount = await center.pendingNotificationRequests().count
+        let available = 64 - pendingCount
+        if available < needed {
+            // 超限:只排得下的部分排上,多的丢弃,并告知调用方。
+            var budget = max(available, 0)
+            for (i, slot) in capped.enumerated() where budget > 0 {
+                if slot.weekdays.isEmpty {
+                    var c = DateComponents()
+                    c.hour = slot.hour; c.minute = slot.minute
+                    try? await center.add(UNNotificationRequest(
+                        identifier: "\(notificationId).s\(i)", content: content(),
+                        trigger: UNCalendarNotificationTrigger(dateMatching: c, repeats: true)))
+                    budget -= 1
+                } else {
+                    for w in slot.weekdays where budget > 0 {
+                        var c = DateComponents()
+                        c.hour = slot.hour; c.minute = slot.minute; c.weekday = w
+                        try? await center.add(UNNotificationRequest(
+                            identifier: "\(notificationId).s\(i).w\(w)", content: content(),
+                            trigger: UNCalendarNotificationTrigger(dateMatching: c, repeats: true)))
+                        budget -= 1
+                    }
+                }
+            }
+            return false
+        }
+        for (i, slot) in capped.enumerated() {
             if slot.weekdays.isEmpty {
                 var c = DateComponents()
                 c.hour = slot.hour; c.minute = slot.minute
-                center.add(UNNotificationRequest(
+                try? await center.add(UNNotificationRequest(
                     identifier: "\(notificationId).s\(i)", content: content(),
                     trigger: UNCalendarNotificationTrigger(dateMatching: c, repeats: true)))
             } else {
                 for w in slot.weekdays {
                     var c = DateComponents()
                     c.hour = slot.hour; c.minute = slot.minute; c.weekday = w
-                    center.add(UNNotificationRequest(
+                    try? await center.add(UNNotificationRequest(
                         identifier: "\(notificationId).s\(i).w\(w)", content: content(),
                         trigger: UNCalendarNotificationTrigger(dateMatching: c, repeats: true)))
                 }
             }
         }
+        return true
     }
 
     /// 撤销某个药的全部通知(单次 + 所有时段/周几)。增删改与删除药时调用。
