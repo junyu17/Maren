@@ -1,12 +1,12 @@
 import SwiftUI
 import StoreKit
 
-/// 法律文档链接。上线前把这两个 URL 换成实际托管的地址
-/// (隐私政策用 AppStore/privacy-policy.md 的托管版;使用条款用同一地址或单独页)。
+/// 法律文档链接(GitHub Pages 托管,见仓库 `docs/`)。
 /// App Store 审核要求订阅 app 在付费墙内提供 EULA / 隐私政策入口(Guideline 3.1.2 / 5.1.1)。
+/// 这两个 URL 同时填进 App Store Connect 的 Privacy Policy URL / EULA 字段。
 enum LegalLinks {
-    static let privacy = URL(string: "https://vela.app/privacy")!
-    static let terms   = URL(string: "https://vela.app/terms")!
+    static let privacy = URL(string: "https://junyu17.github.io/Maren/privacy.html")!
+    static let terms   = URL(string: "https://junyu17.github.io/Maren/terms.html")!
 }
 
 /// 付费墙:展示 Maren Premium 的价值与三个产品,处理购买与恢复。
