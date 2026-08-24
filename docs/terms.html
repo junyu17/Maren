@@ -22,7 +22,7 @@
 <div class="doc">
   <div class="wrap">
     <h1>Terms of Use</h1>
-    <p class="meta"><strong>Effective date:</strong> August 4, 2026 · <strong>Contact:</strong> billy.yu@me.com</p>
+    <p class="meta"><strong>Effective date:</strong> August 21, 2026 · <strong>Contact:</strong> billy.yu@me.com</p>
 
     <h2>1. Agreement to Terms</h2>
     <p>By downloading, installing, or using Maren ("the App"), you agree to these Terms of Use ("Terms"). If you do not agree, do not use the App.</p>
@@ -32,20 +32,22 @@
 
     <h2>3. Your data</h2>
     <ul>
-      <li>Your health entries are stored <strong>on your device</strong> by default. If you enable optional iCloud sync, they are stored in <strong>your own private iCloud account</strong> (Apple CloudKit private database); the developer has no access to your CloudKit data.</li>
+      <li>Your health entries are stored <strong>only on your device</strong> (local SwiftData store). They are <strong>never</strong> uploaded to iCloud, CloudKit, or any developer-operated server. There is no cross-device sync.</li>
+      <li>If you explicitly use Export, encrypted manual backup, Apple Health, or the paired Apple Watch companion, selected data is handed to the Apple system feature or user-selected file destination described in the Privacy Policy; it is still never sent to a developer-operated server.</li>
+      <li>Raw CSV/PDF and clinician-report files are not encrypted. Password-encrypted <code>.marenbackup</code> files require the password you choose; Maren cannot recover that password. You are responsible for safely storing exported files and passwords.</li>
       <li>The developer does <strong>not</strong> operate a server that stores your health data, does <strong>not</strong> sell, rent, or share your data, and does <strong>not</strong> use it for advertising.</li>
-      <li>You can <strong>export</strong> all your data (CSV/PDF) or <strong>permanently delete</strong> it at any time from within the App, free of charge.</li>
+      <li>You can export records, create/import an encrypted backup, or permanently delete local Maren data from within the App, free of charge. Previously exported files must be deleted from their selected destinations separately.</li>
       <li>See the <a href="privacy.html">Privacy Policy</a> for full details.</li>
     </ul>
 
     <h2>4. Accounts &amp; sign-in</h2>
-    <p>Maren has <strong>no user accounts</strong>. iCloud sync uses your existing Apple ID (managed by Apple). HealthKit integration uses your existing Apple Health authorization. We do not collect your name, email, or password.</p>
+    <p>Maren has <strong>no user accounts</strong>. HealthKit integration uses your existing Apple Health authorization. We do not collect your name, email, or password.</p>
 
     <h2>5. Purchases (Maren Premium)</h2>
     <ul>
       <li>Maren is Freemium: core tracking, basic prediction, daily quotes, and data export are <strong>free forever</strong>. An optional <strong>Maren Premium</strong> subscription / one-time purchase unlocks additional features (e.g., personal insights, advanced reminders).</li>
-      <li>Purchases are processed by <strong>Apple</strong> via StoreKit. We receive only your entitlement status (whether you have Premium), never your payment details.</li>
-      <li><strong>Subscriptions renew automatically</strong> and can be canceled anytime in your App Store account settings. A one-time (lifetime) purchase is a single payment valid indefinitely.</li>
+      <li>Purchases are processed by <strong>Apple</strong> via StoreKit. StoreKit provides the App with a verified entitlement state on your device; the developer does not collect your payment details or entitlement status on a developer server.</li>
+      <li><strong>Subscriptions renew automatically.</strong> Payment is charged to your Apple ID when you confirm the purchase, and your subscription renews unless you turn it off at least 24 hours before the end of the current period. You can manage or cancel your subscriptions at any time in your App Store account settings. A one-time (lifetime) purchase is a single payment valid indefinitely.</li>
       <li>Prices are shown in the App and on the App Store, in your local currency, and may change with notice. Restoring a previous purchase is available in Settings.</li>
     </ul>
 
@@ -53,7 +55,7 @@
     <p>You agree to use the App only for lawful personal purposes and not to misuse, reverse-engineer, or interfere with its operation. You are responsible for the accuracy of the data you enter.</p>
 
     <h2>7. Availability</h2>
-    <p>The App is provided "as is" without warranties. We do not guarantee uninterrupted or error-free operation. Features may change or be removed with notice. iCloud sync and HealthKit integration depend on Apple's services and your device configuration.</p>
+    <p>The App is provided "as is" without warranties. We do not guarantee uninterrupted or error-free operation. Features may change or be removed with notice. HealthKit integration depends on Apple's services and your device configuration.</p>
 
     <h2>8. Limitation of liability</h2>
     <p>To the maximum extent permitted by law, the developer shall not be liable for any indirect, incidental, or consequential damages, or for any loss of data arising from use of the App. Your use is at your own risk.</p>
