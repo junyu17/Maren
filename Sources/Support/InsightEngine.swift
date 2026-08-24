@@ -120,7 +120,7 @@ enum InsightEngine {
         var counts: [String: Int] = [:]
         for log in logs { for s in log.symptoms { counts[s, default: 0] += 1 } }
         guard let top = counts.max(by: { $0.value < $1.value }), top.value >= 2 else { return nil }
-        let text = String(localized: "你记录最多的症状是「\(Symptoms.label(for: top.key))」,共 \(top.value) 次。")
+        let text = String(localized: "你记录最多的追踪项是「\(Symptoms.label(for: top.key))」,共 \(top.value) 次。")
         return Insight(id: "top-symptom", icon: "list.bullet", text: text, strength: 10)
     }
 }

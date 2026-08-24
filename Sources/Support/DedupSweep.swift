@@ -1,18 +1,18 @@
 import Foundation
 import SwiftData
 
-/// CloudKit 多端同步去重 sweep。
+/// 启动去重 sweep。
 ///
-/// **问题**:CloudKit 镜像会**直接插入**远端记录,绕过 app 的「先查后写」去重。两台设备在
-/// 同步传播前各自写入同一天(dayKey),同步后就会出现两条同 dayKey 记录。单人串行使用基本
-/// 不触发;真发生时**显示层会折叠**(`CalendarView.periodByDay` 字典按天取一、`DailyLogView`
-/// 的 `logs.first`),但 DB 里会残留重复记录,久了会累积。
+/// **为什么还需要它**:健康数据只有本机一份(SwiftData 本地库),正常情况下不会重复;
+/// 但异常导入、快速重复写入或历史版本遗留都可能让同 dayKey / key 出现多条记录。
+/// **显示层会折叠**(`CalendarView.periodByDay` 字典按天取一、`DailyLogView` 的 `logs.first`),
+/// 但 DB 里会残留重复记录,久了会累积,还会让导出和清点计数不准。
 ///
-/// **本 sweep**:启动时跑一次,把同 dayKey/key 的多余记录真正删除(删除经 CloudKit 镜像同步到
-/// 其他设备,全网清理)。无重复时是 no-op(不写库)。DailyLog 做字段级合并,避免丢数据。
+/// **本 sweep**:启动时跑一次,把同 dayKey/key 的多余记录真正删除(无重复时 no-op,不写库)。
+/// DailyLog 做字段级合并,避免丢数据。
 ///
 /// 限定 dayKey/key 类模型:`PeriodDay` / `DailyLog` / `MedicationIntake`。
-/// `CustomSymptom` / `Medication` 的键是 UUID(创建即全局唯一),不会产生跨设备同键重复,不处理。
+/// `CustomSymptom` / `Medication` 的键是 UUID(创建即全局唯一),不会产生重复键,不处理。
 enum DedupSweep {
 
     /// 启动去重。在 `VelaApp.init` 容器建好后调用一次。
@@ -96,6 +96,23 @@ enum DedupSweep {
             if winner.weight == nil {
                 winner.weight = others.lazy.compactMap { $0.weight }.first
             }
+            if winner.basalBodyTemperatureCelsius == nil {
+                winner.basalBodyTemperatureCelsius = others.lazy.compactMap { $0.basalBodyTemperatureCelsius }.first
+            }
+            if winner.spotting == nil {
+                winner.spotting = others.lazy.compactMap { $0.spotting }.first
+            }
+            if winner.steps == nil {
+                winner.steps = others.lazy.compactMap { $0.steps }.first
+            }
+            if winner.exerciseMinutes == nil {
+                winner.exerciseMinutes = others.lazy.compactMap { $0.exerciseMinutes }.first
+            }
+            var importedFields = Set(winner.healthImportedFields)
+            for o in others {
+                importedFields.formUnion(o.healthImportedFields)
+            }
+            winner.healthImportedFields = importedFields.sorted()
             // 症状取并集(两端记的不同症状都保留)。
             var sym = Set(winner.symptoms)
             for o in others { sym.formUnion(o.symptoms) }

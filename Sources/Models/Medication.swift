@@ -8,7 +8,7 @@ import SwiftData
 /// - Pro:多时段 + 按周几(`proScheduleEnabled` + `scheduleSlotsJSON`),覆盖单次提醒。
 @Model
 final class Medication {
-    /// 本 app 内的稳定标识(UUID,创建时生成)。不用 `@Attribute(.unique)`(CloudKit 不支持)。
+    /// 本 app 内的稳定标识(UUID,创建时生成)。一天一条用药记录由写入路径先查后写去重。
     var id: UUID = UUID()
     var name: String = ""
     var emoji: String = "💊"
@@ -71,7 +71,7 @@ final class Medication {
 @Model
 final class MedicationIntake {
     /// 逻辑唯一键 = 药 id + 日键,防止一天重复打卡。
-    /// ⚠️ 不用 `@Attribute(.unique)`(CloudKit 不支持);去重由 `DailyLogView.toggleMed` 先查后写。
+    /// 去重由 `DailyLogView.toggleMed` 先查后写,启动时再由 `DedupSweep` 兜底。
     var key: String = ""
     var medicationId: UUID = UUID()
     var dayKey: Int = 0

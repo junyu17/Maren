@@ -1,0 +1,21 @@
+2. Devices and operating systems tested
+- iPhone Air — iOS 26.6.1
+- iPhone 12 — iOS 26.6
+
+3. Functions, audience, problem, and value
+Maren is a private period, symptom, mood, medication, and wellness tracker for adults, including people with irregular cycles or a user-selected perimenopause context. It combines calendar recording, daily logs, descriptive trends, 30/90-day perimenopause summaries, Daily Stories, education, Apple Health, and on-device global search. Search covers articles, built-in/custom Trackers, medications, daily logs, and period dates; results open the exact item/date and update immediately after edits/deletions. Maren replaces fragmented sensitive-data tracking with one clear, local-first workflow. It is not a medical device and does not diagnose, treat, guide contraception, or guarantee fertility/ovulation predictions.
+
+4. Setup and access
+No account, login, credentials, invitation, or sample file is required. Launch and complete or skip onboarding. Use Today for mood, symptoms/Trackers, notes, medications, and body observations; Calendar to display/record period days and flow; History to edit or left-swipe-delete user records; Trends for summaries; Settings > Tracking Context > Perimenopause for the optional mode; and Today > Daily Story or Settings > Library for education. Use search from Calendar, Today, Trends, Library, or Settings. Optional permissions are requested only from Apple Health, Reminders, or Privacy > App Lock. Appearance provides System/Light/Dark and text size. Delete All Data removes local data. There is no server account or public UGC/community/reporting/blocking system.
+
+5. External services, tools, and platforms
+Apple services only: SwiftData (local storage); StoreKit 2/App Store (products, payment, entitlements, restore, subscription management); HealthKit (optional selected types); UserNotifications (local reminders); LocalAuthentication (app lock); WidgetKit and App Intents/Shortcuts (quick logging); App Groups (extension handoff); WatchConnectivity (Watch); and Files/document picker (export/backup). There is no developer backend, CloudKit health-data sync, third-party login, analytics, ads, data broker, AI service, social network, or third-party payment processor.
+
+6. Regional differences
+Core functions, privacy behavior, and built-in content are consistent across supported regions. English and Simplified Chinese follow the system language. StoreKit price, currency, tax, availability, billing text, and trial eligibility may vary by Apple storefront. HealthKit and system permission wording may vary by device, OS, language, and region.
+
+7. Regulated industry / protected material
+Maren is a personal tracking and educational wellness app, not a medical device or regulated clinical service. It provides no diagnosis, treatment, prescription, clinical decision support, or medical advice. It distributes no protected third-party media catalog; educational text, Daily Stories, interface assets, and screenshots are original, commissioned, or lawfully licensed. No professional credential or third-party-content authorization is required for the stated functionality.
+
+8. In-App Purchases and locations
+Maren Premium has three products: Monthly auto-renewable subscription; Yearly auto-renewable subscription with a 7-day introductory free trial for eligible new subscribers; and Lifetime non-consumable, a one-time purchase for permanent Premium access. Premium unlocks advanced on-device insights, deeper trends, cycle comparison, correlations, advanced reminders, custom report options, extra accent themes, and unlimited custom Trackers. Open the paywall from Trends > Maren Premium, Settings > Maren Premium, Settings > Pro Advanced Reminders, or the free custom-Tracker limit. It shows localized price/period, renewal/cancellation disclosure, trial wording only when Apple reports eligibility, Restore Purchases, legal links, and Manage Subscriptions.

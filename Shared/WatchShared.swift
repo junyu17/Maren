@@ -40,4 +40,45 @@ enum WatchKeys {
     static let quickLog = "vela.quicklog"
     /// applicationContext 里放「最近若干条」的数组(会互相覆盖,靠幂等重放兜底)。
     static let quickLogBatch = "vela.quicklog.batch"
+    /// Monotonic reset marker published by the phone after a destructive local
+    /// operation (Delete All Data or a backup import).  The marker is carried
+    /// alongside snapshots and quick-log payloads so an old Watch outbox can
+    /// never be mistaken for a post-reset record.
+    static let resetEpoch = "vela.reset.epoch"
+    /// Present only on the reset command itself.  Ordinary snapshots carry the
+    /// current epoch for ordering but must not clear a newly-created outbox
+    /// every time the phone refreshes its widget snapshot.
+    static let resetCommand = "vela.reset.command"
+}
+
+/// Shared parsing/order rules for the reset marker.  The marker is sent as a
+/// property-list number by WatchConnectivity; accepting Int/NSNumber/string
+/// here keeps tests and older serialized defaults interoperable.  A malformed
+/// legacy UUID is intentionally not a generation and is ignored by the Watch.
+enum WatchResetGeneration {
+    static func decode(_ raw: Any?) -> Int64? {
+        let value: Int64?
+        if let raw = raw as? Int64 {
+            value = raw
+        } else if let raw = raw as? Int {
+            value = Int64(raw)
+        } else if let raw = raw as? NSNumber {
+            value = raw.int64Value
+        } else if let raw = raw as? String {
+            value = Int64(raw)
+        } else {
+            value = nil
+        }
+        guard let value, value > 0 else { return nil }
+        return value
+    }
+
+    /// Equal generations are safe to re-apply (the cleanup is idempotent),
+    /// while a lower generation is a late packet from an older reset and must
+    /// never roll the Watch state backwards.
+    static func shouldApply(_ incoming: Int64, current: Int64?) -> Bool {
+        guard incoming > 0 else { return false }
+        guard let current else { return true }
+        return incoming >= current
+    }
 }

@@ -5,6 +5,13 @@ import UIKit
 /// 生成 CSV / PDF 到临时文件,交给系统分享面板。纯本地,不上传任何服务器。
 enum DataExport {
 
+    // CSV source values are part of the exported data contract. Keep them
+    // locale-independent so a user's file remains stable when the device
+    // language changes (and so parsers never have to translate display text).
+    private static let marenSourceLabel = "Maren"
+    private static let appleHealthSourceLabel = "Apple 健康"
+    private static let marenAndAppleHealthSourceLabel = "Maren + Apple 健康"
+
     /// 机器可读日期,固定 ISO 格式,不随语言变化,保证导出文件可被表格软件解析。
     private static let isoDay: DateFormatter = {
         let f = DateFormatter()
@@ -12,6 +19,8 @@ enum DataExport {
         f.dateFormat = "yyyy-MM-dd"
         return f
     }()
+
+    private static let isoTimestamp = ISO8601DateFormatter()
 
     // MARK: - 入口
 
@@ -26,7 +35,11 @@ enum DataExport {
         if let u = write(String(localized: "Maren-每日记录.csv"), logCSV(logs)) { urls.append(u) }
         if let u = write(String(localized: "Maren-用药.csv"), medicationCSV(medications)) { urls.append(u) }
         if let u = write(String(localized: "Maren-用药打卡.csv"), intakeCSV(intakes, medications: medications)) { urls.append(u) }
-        if let u = write(String(localized: "Maren-自定义症状.csv"), customSymptomCSV(customSymptoms)) { urls.append(u) }
+        if let u = write(String(localized: "Maren-自定义追踪项.csv"), customSymptomCSV(customSymptoms)) { urls.append(u) }
+        let contraception = ContraceptionSettings.load()
+        if let u = write("Maren-contraception.csv", contraceptionSettingsCSV(profile: contraception)) {
+            urls.append(u)
+        }
         if let u = makePDF(periodDays: periodDays, logs: logs, medications: medications,
                            intakes: intakes, customSymptoms: customSymptoms,
                            prediction: prediction) { urls.append(u) }
@@ -38,26 +51,38 @@ enum DataExport {
     static func periodCSV(_ periodDays: [PeriodDay]) -> String {
         // 表头跟随界面语言;同时额外输出一列语言无关的 flow 代码,
         // 保证换了手机语言后导出的历史文件依然能被正确解析 / 再导入。
-        var rows = [[String(localized: "日期"),
-                     String(localized: "流量"),
-                     "flow_code"].joined(separator: ",")]
+        var rows = [csvRow([String(localized: "日期"),
+                            String(localized: "流量"),
+                            "flow_code",
+                            "imported_from_health",
+                            "source_label"])]
         for d in periodDays.sorted(by: { $0.date < $1.date }) {
-            let cells = [isoDay.string(from: d.date), d.flow.label, "\(d.flow.rawValue)"]
-            rows.append(cells.map(esc).joined(separator: ","))
+            let source = d.importedFromHealth
+                ? appleHealthSourceLabel
+                : marenSourceLabel
+            let cells = [isoDay.string(from: d.date), d.flow.label, "\(d.flow.rawValue)",
+                         d.importedFromHealth ? "true" : "false", source]
+            rows.append(csvRow(cells))
         }
         return rows.joined(separator: "\n")
     }
 
     static func logCSV(_ logs: [DailyLog]) -> String {
-        var rows = [[String(localized: "日期"),
-                     String(localized: "心情"),
-                     String(localized: "能量"),
-                     String(localized: "疼痛"),
-                     String(localized: "睡眠小时"),
-                     String(localized: "体重"),
-                     String(localized: "症状"),
-                     String(localized: "备注"),
-                     "symptom_codes"].joined(separator: ",")]
+        var rows = [csvRow([String(localized: "日期"),
+                            String(localized: "心情"),
+                            String(localized: "能量"),
+                            String(localized: "疼痛"),
+                            String(localized: "睡眠小时"),
+                            String(localized: "体重"),
+                            "steps",
+                            "exercise_minutes",
+                            String(localized: "追踪项"),
+                            String(localized: "备注"),
+                            "tracker_codes",
+                            "basal_body_temperature_celsius",
+                            "spotting",
+                            "health_imported_fields",
+                            "source_label"])]
         for log in logs.sorted(by: { $0.date < $1.date }) {
             let mood = log.mood?.label ?? ""
             // 未选的值导出为空,而不是 0 / -1 这种会被误读成「记了 0 分」的哨兵值。
@@ -65,21 +90,56 @@ enum DataExport {
             let pain = log.pain >= 0 ? "\(log.pain)" : ""
             let sleep = log.sleepHours.map { "\($0)" } ?? ""
             let weight = log.weight.map { "\($0)" } ?? ""
+            let steps = log.steps.map { "\($0)" } ?? ""
+            let exerciseMinutes = log.exerciseMinutes.map { "\($0)" } ?? ""
             let symptoms = log.symptoms.map { Symptoms.label(for: $0) }.joined(separator: " / ")
             let codes = log.symptoms.joined(separator: "|")
-            let cells = [isoDay.string(from: log.date), mood, energy, pain, sleep, weight, symptoms, log.note, codes]
-            rows.append(cells.map(esc).joined(separator: ","))
+            let basalBodyTemperature = log.basalBodyTemperatureCelsius.map { "\($0)" } ?? ""
+            let spotting = log.spotting.map { $0 ? "true" : "false" } ?? ""
+            let importedFields = log.healthImportedFields.sorted().joined(separator: "|")
+            let source = importedFields.isEmpty
+                ? marenSourceLabel
+                : marenAndAppleHealthSourceLabel
+            let cells = [isoDay.string(from: log.date), mood, energy, pain, sleep, weight,
+                         steps, exerciseMinutes,
+                         symptoms, log.note, codes, basalBodyTemperature, spotting,
+                         importedFields, source]
+            rows.append(csvRow(cells))
         }
+        return rows.joined(separator: "\n")
+    }
+
+    /// Exports one local contraception profile without making any medical or
+    /// effectiveness claim. A `.none` profile is explicitly marked as not
+    /// configured and does not expose its fallback fields as a selection.
+    static func contraceptionSettingsCSV(profile: ContraceptionSettings) -> String {
+        let value = profile.normalized
+        let configured = value.method != .none
+        let snapshot = value.snapshot
+        var rows = [csvRow(["configured", "method", "start_day_key",
+                            "reminder_enabled", "reminder_hour", "reminder_minute",
+                            "note", "updated_at"])]
+        let cells = [
+            configured ? "true" : "false",
+            configured ? snapshot.method.rawValue : "",
+            configured ? snapshot.startDayKey.map { "\($0)" } ?? "" : "",
+            configured ? (snapshot.reminderEnabled ? "true" : "false") : "",
+            configured ? "\(snapshot.reminderHour)" : "",
+            configured ? "\(snapshot.reminderMinute)" : "",
+            configured ? snapshot.note : "",
+            configured ? isoTimestamp.string(from: snapshot.updatedAt) : ""
+        ]
+        rows.append(csvRow(cells))
         return rows.joined(separator: "\n")
     }
 
     /// 用药定义 CSV(药名 / emoji / 提醒设置)。
     static func medicationCSV(_ medications: [Medication]) -> String {
-        var rows = [[String(localized: "名称"),
-                     String(localized: "图标"),
-                     String(localized: "提醒"),
-                     String(localized: "提醒时间"),
-                     String(localized: "高级排程")].joined(separator: ",")]
+        var rows = [csvRow([String(localized: "名称"),
+                            String(localized: "图标"),
+                            String(localized: "提醒"),
+                            String(localized: "提醒时间"),
+                            String(localized: "高级排程")])]
         for m in medications.sorted(by: { $0.createdAt < $1.createdAt }) {
             let reminder = m.reminderEnabled ? String(localized: "开") : String(localized: "关")
             let time = m.reminderEnabled
@@ -89,7 +149,7 @@ enum DataExport {
                 String(format: "%02d:%02d", slot.hour, slot.minute) + " " + slot.weekdaysLabel
             } : []
             let cells = [m.name, m.emoji, reminder, time, slots.joined(separator: "; ")]
-            rows.append(cells.map(esc).joined(separator: ","))
+            rows.append(csvRow(cells))
         }
         return rows.joined(separator: "\n")
     }
@@ -99,27 +159,27 @@ enum DataExport {
         // 药 id -> 药名,导出成用户可读的名称(找不到的药回退显示 UUID)。
         let nameByID = Dictionary(medications.map { ($0.id, $0.name) },
                                   uniquingKeysWith: { a, _ in a })
-        var rows = [[String(localized: "日期"),
-                     String(localized: "用药"),
-                     String(localized: "打卡时间")].joined(separator: ",")]
+        var rows = [csvRow([String(localized: "日期"),
+                            String(localized: "用药"),
+                            String(localized: "打卡时间")])]
         for i in intakes.sorted(by: { $0.takenAt < $1.takenAt }) {
             let name = nameByID[i.medicationId] ?? i.medicationId.uuidString
             let cells = [isoDay.string(from: Cal.startOfDay(i.takenAt)),
                          name,
                          DateFormatter.localizedString(from: i.takenAt, dateStyle: .short, timeStyle: .short)]
-            rows.append(cells.map(esc).joined(separator: ","))
+            rows.append(csvRow(cells))
         }
         return rows.joined(separator: "\n")
     }
 
-    /// 自定义症状 CSV(key -> 显示名 映射,供解读每日记录里的 symptom_codes)。
+    /// 自定义追踪项 CSV(key -> 显示名 映射,供解读每日记录里的 tracker_codes)。
     static func customSymptomCSV(_ symptoms: [CustomSymptom]) -> String {
-        var rows = [[String(localized: "代码"),
-                     String(localized: "名称"),
-                     String(localized: "图标")].joined(separator: ",")]
+        var rows = [csvRow([String(localized: "代码"),
+                            String(localized: "名称"),
+                            String(localized: "图标")])]
         for s in symptoms.sorted(by: { $0.createdAt < $1.createdAt }) {
             let cells = [s.key, s.label, s.emoji]
-            rows.append(cells.map(esc).joined(separator: ","))
+            rows.append(csvRow(cells))
         }
         return rows.joined(separator: "\n")
     }
@@ -197,7 +257,11 @@ enum DataExport {
                 draw("—", bodyAttrs, lineHeight: 16)
             } else {
                 for d in periodDays.sorted(by: { $0.date < $1.date }) {
-                    draw("\(isoDay.string(from: d.date))    \(d.flow.label)", bodyAttrs, lineHeight: 15)
+                    let source = d.importedFromHealth
+                        ? String(localized: "来源:Apple 健康")
+                        : String(localized: "来源:Maren")
+                    draw("\(isoDay.string(from: d.date))    \(d.flow.label)    \(source)",
+                         bodyAttrs, lineHeight: 15)
                 }
             }
             y += 10
@@ -212,10 +276,35 @@ enum DataExport {
                     if let m = log.mood { parts.append(m.label) }
                     if log.energy > 0 { parts.append(String(localized: "能量 \(log.energy)")) }
                     if log.pain >= 0 { parts.append(String(localized: "疼痛 \(log.pain)")) }
+                    if let sleep = log.sleepHours {
+                        parts.append("\(String(localized: "睡眠小时")): \(sleep)")
+                    }
+                    if let weight = log.weight {
+                        parts.append("\(String(localized: "体重")): \(weight) kg")
+                    }
+                    if let steps = log.steps {
+                        parts.append(String(localized: "Steps: \(steps)"))
+                    }
+                    if let exerciseMinutes = log.exerciseMinutes {
+                        parts.append(String(localized: "Exercise minutes: \(exerciseMinutes)"))
+                    }
+                    if let temperature = log.basalBodyTemperatureCelsius {
+                        parts.append(String(localized: "基础体温 \(temperature) °C"))
+                    }
+                    if let spotting = log.spotting {
+                        parts.append(spotting
+                                     ? String(localized: "点滴出血:有")
+                                     : String(localized: "点滴出血:无"))
+                    }
                     if !log.symptoms.isEmpty {
                         parts.append(log.symptoms.map { Symptoms.label(for: $0) }.joined(separator: "/"))
                     }
                     if !log.note.isEmpty { parts.append(log.note) }
+                    if !log.healthImportedFields.isEmpty {
+                        let fields = log.healthImportedFields.sorted().joined(separator: "|")
+                        parts.append(String(localized: "来源:Maren + Apple 健康"))
+                        parts.append(String(localized: "Apple 健康字段:\(fields)"))
+                    }
                     draw(parts.joined(separator: "    "), bodyAttrs, lineHeight: 15)
                 }
             }
@@ -250,7 +339,7 @@ enum DataExport {
             }
             y += 10
 
-            draw(String(localized: "自定义症状"), headAttrs, lineHeight: 20)
+            draw(String(localized: "自定义追踪项"), headAttrs, lineHeight: 20)
             if customSymptoms.isEmpty {
                 draw("—", bodyAttrs, lineHeight: 16)
             } else {
@@ -264,6 +353,12 @@ enum DataExport {
     }
 
     // MARK: - 工具
+
+    /// Escapes every CSV cell, including localized headers. Localized text is
+    /// user-facing and may contain commas, quotes, or line breaks.
+    private static func csvRow(_ cells: [String]) -> String {
+        cells.map(esc).joined(separator: ",")
+    }
 
     /// CSV 字段转义:含逗号 / 引号 / 换行(含 \r,Excel 会当作换行)时用双引号包裹并转义内部引号。
     private static func esc(_ s: String) -> String {
@@ -280,9 +375,15 @@ enum DataExport {
     }
 
     private static func writeData(_ name: String, _ data: Data) -> URL? {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
+        let sourceURL = URL(fileURLWithPath: name)
+        let stem = sourceURL.deletingPathExtension().lastPathComponent
+        let ext = sourceURL.pathExtension
+        let uniqueName = ext.isEmpty
+            ? "\(stem)-\(UUID().uuidString)"
+            : "\(stem)-\(UUID().uuidString).\(ext)"
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(uniqueName)
         do {
-            try data.write(to: url, options: .atomic)
+            try data.write(to: url, options: [.atomic, .completeFileProtection])
             return url
         } catch {
             return nil

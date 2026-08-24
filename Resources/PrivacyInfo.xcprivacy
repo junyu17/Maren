@@ -10,7 +10,7 @@
     <!-- 不收集任何数据类型:健康数据只存在用户本机。 -->
     <key>NSPrivacyCollectedDataTypes</key>
     <array/>
-    <!-- 唯一用到的「必须说明原因的 API」:读写 app 自己的 UserDefaults(提醒偏好、手动周期设置)。 -->
+    <!-- 必须说明原因的 API:读写 app 自己的 UserDefaults,以及用户在文稿选择器中明确授予访问权的备份文件元数据。 -->
     <key>NSPrivacyAccessedAPITypes</key>
     <array>
         <dict>
@@ -19,6 +19,14 @@
             <key>NSPrivacyAccessedAPITypeReasons</key>
             <array>
                 <string>CA92.1</string>
+            </array>
+        </dict>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>3B52.1</string>
             </array>
         </dict>
     </array>

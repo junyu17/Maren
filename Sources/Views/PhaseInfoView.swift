@@ -20,7 +20,7 @@ struct PhaseInfoView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack(spacing: 8) {
                                 Circle()
-                                    .fill(phase.tint.opacity(max(phase.fillOpacity, 0.5)))
+                                    .fill(phase.legendFill)
                                     .frame(width: 14, height: 14)
                                 Text(phase.label)
                                     .font(.headline)

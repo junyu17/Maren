@@ -3,14 +3,23 @@ import SwiftUI
 /// 层级 2 · 新建自定义症状/追踪标签。极简:一个 emoji + 一个名称。
 struct CustomSymptomEditor: View {
     @Environment(\.dismiss) private var dismiss
-    let onSave: (_ label: String, _ emoji: String) -> Void
+    let existing: CustomSymptom?
+    let onSave: (_ label: String, _ emoji: String) -> Bool
 
-    @State private var label = ""
-    @State private var emoji = "📝"
+    @State private var label: String
+    @State private var emoji: String
 
     /// 常用 emoji 备选,免得用户去调系统 emoji 键盘。
     private let choices = ["📝", "🩸", "🤕", "😴", "🔥", "💊", "🍫", "😰", "🌡️", "💪", "🧘‍♀️", "🥗", "☕️", "💧", "🤢", "😵‍💫"]
     private let columns = Array(repeating: GridItem(.flexible()), count: 6)
+
+    init(existing: CustomSymptom? = nil,
+         onSave: @escaping (_ label: String, _ emoji: String) -> Bool) {
+        self.existing = existing
+        self.onSave = onSave
+        _label = State(initialValue: existing?.label ?? "")
+        _emoji = State(initialValue: existing?.emoji ?? "📝")
+    }
 
     var body: some View {
         NavigationStack {
@@ -34,18 +43,19 @@ struct CustomSymptomEditor: View {
                     .padding(.vertical, 4)
                 }
             }
-            .navigationTitle("自定义追踪项")
+            .navigationTitle(existing == nil ? "自定义追踪项" : "编辑追踪项")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("添加") {
+                    Button(existing == nil ? "添加" : "保存") {
                         let trimmed = label.trimmingCharacters(in: .whitespacesAndNewlines)
                         guard !trimmed.isEmpty else { return }
-                        onSave(trimmed, emoji)
-                        dismiss()
+                        if onSave(trimmed, emoji) {
+                            dismiss()
+                        }
                     }
                     .disabled(label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }

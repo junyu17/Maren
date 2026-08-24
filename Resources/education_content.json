@@ -1,0 +1,386 @@
+[
+  {
+    "id": "edu-period-basics",
+    "category": "menstrualHealth",
+    "title": {
+      "zh": "月经与周期基础",
+      "en": "Period & Cycle Basics"
+    },
+    "summary": {
+      "zh": "了解月经周期如何计算，以及可以记录哪些日期。",
+      "en": "Learn how to count a menstrual cycle and which dates to record."
+    },
+    "body": {
+      "zh": "月经周期从一次出血的第一天算到下一次出血的第一天。记录每次出血的首日和持续天数，方便回顾自己的周期模式。",
+      "en": "A menstrual cycle is counted from the first day of bleeding to the first day of the next period. Logging each start date and duration can help you review your own pattern."
+    },
+    "trackerTags": ["cramps", "heavyFlow"],
+    "phaseTags": ["menstrual", "any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-first-period",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/your-first-period"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。需要个体化建议时，请咨询医疗专业人员。",
+      "en": "This content is for general information only and is not medical advice. Consult a healthcare professional for individualized guidance."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-bleeding-records",
+    "category": "menstrualHealth",
+    "title": {
+      "zh": "出血记录与就医参考",
+      "en": "Bleeding Records & Visit Notes"
+    },
+    "summary": {
+      "zh": "记录出血日期、持续时间和变化，为就诊讨论准备信息。",
+      "en": "Record bleeding dates, duration, and changes to prepare for a visit."
+    },
+    "body": {
+      "zh": "记录经量变化、周期外出血及伴随不适；就诊时可把这些记录与用药和既往情况一起告诉医生。",
+      "en": "Log changes in flow, bleeding between periods, and related symptoms; share these notes with your doctor along with medicines and relevant history."
+    },
+    "trackerTags": ["heavyFlow"],
+    "phaseTags": ["menstrual", "any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-abnormal-bleeding",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/abnormal-uterine-bleeding"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。出血变化请与医疗专业人员讨论。",
+      "en": "This content is for general information only and is not medical advice. Discuss bleeding changes with a healthcare professional."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-discharge-tracking",
+    "category": "menstrualHealth",
+    "title": {
+      "zh": "分泌物追踪",
+      "en": "Discharge Tracking"
+    },
+    "summary": {
+      "zh": "了解分泌物在周期中的正常变化，并记录自己的观察。",
+      "en": "Learn how discharge can vary across the cycle and record your observations."
+    },
+    "body": {
+      "zh": "正常分泌物的量和组成会随月经周期变化。记录颜色、质地及不适等观察，必要时带给医生参考。",
+      "en": "The amount and makeup of normal discharge can change throughout the menstrual cycle. Record observations such as color, texture, and discomfort to discuss with a doctor if needed."
+    },
+    "trackerTags": ["wateryDischarge"],
+    "phaseTags": ["follicular", "ovulatory", "any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-vulvovaginal",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/vulvovaginal-health"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。让医疗专业人员评估异常或令人担忧的变化。",
+      "en": "This content is for general information only and is not medical advice. Ask a healthcare professional to assess unusual or concerning changes."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-sleep-activity",
+    "category": "general",
+    "title": {
+      "zh": "月经追踪方法",
+      "en": "Period Tracking Methods"
+    },
+    "summary": {
+      "zh": "用简单的日期记录回顾周期变化。",
+      "en": "Use simple date entries to review cycle changes."
+    },
+    "body": {
+      "zh": "在日历上标记出血首日和之后的出血日期，再记录持续天数。持续记录能帮助你在就诊时更清楚地描述自己的周期。",
+      "en": "Mark the first day of bleeding and following bleeding days on a calendar, then record the duration. Consistent notes can help you describe your cycle more clearly during a visit."
+    },
+    "trackerTags": ["cramps", "heavyFlow"],
+    "phaseTags": ["any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-first-period",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/your-first-period"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。记录不能替代医疗记录或专业建议。",
+      "en": "This content is for general information only and is not medical advice. Tracking does not replace medical records or professional guidance."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-contraception-recording",
+    "category": "menstrualHealth",
+    "title": {
+      "zh": "避孕方式记录",
+      "en": "Contraception Method Notes"
+    },
+    "summary": {
+      "zh": "记录避孕方式和想与医生讨论的问题。",
+      "en": "Record your contraception method and questions for your clinician."
+    },
+    "body": {
+      "zh": "Maren 支持记录正在使用的避孕方式、开始日期和提醒事项。选择或调整方式时，可与医疗专业人员进行知情讨论。",
+      "en": "Maren can store the method you use, its start date, and reminder notes. Discuss choices or changes with a healthcare professional."
+    },
+    "trackerTags": ["contraceptionMethod"],
+    "phaseTags": ["any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "cdc-contraception",
+        "name": "CDC",
+        "url": "https://www.cdc.gov/contraception/about/index.html"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。避孕方式相关问题请咨询医疗专业人员。",
+      "en": "This content is for general information only and is not medical advice. Consult a healthcare professional with questions about contraception."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-ovulation-test",
+    "category": "cyclePhases",
+    "title": {
+      "zh": "周期阶段记录",
+      "en": "Cycle Phase Notes"
+    },
+    "summary": {
+      "zh": "记录周期中的日期和观察，不让应用替你解读结果。",
+      "en": "Record cycle dates and observations without asking the app to interpret them."
+    },
+    "body": {
+      "zh": "你可以在 Maren 中记录周期日期和自己观察到的身体感受。应用仅保存你输入的内容，不对医疗结果作出判断或解读。",
+      "en": "You can record cycle dates and your own observations in Maren. The app stores what you enter and does not make medical judgments or interpret results."
+    },
+    "trackerTags": ["cramps"],
+    "phaseTags": ["follicular", "ovulatory", "luteal", "any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-first-period",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/your-first-period"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。应用不会替代医疗专业人员解读记录。",
+      "en": "This content is for general information only and is not medical advice. The app does not replace a healthcare professional's interpretation of your records."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-pregnancy-test",
+    "category": "menstrualHealth",
+    "title": {
+      "zh": "经期变化记录",
+      "en": "Period Change Notes"
+    },
+    "summary": {
+      "zh": "记录周期变得不规律时的日期和变化，便于和医生沟通。",
+      "en": "Record dates and changes when your periods become irregular to support a conversation with your doctor."
+    },
+    "body": {
+      "zh": "如果原本规律的周期持续变得不规律，或出血频率和持续时间出现明显变化，记录日期和细节，并在就诊时告诉医生。",
+      "en": "If regular periods stay irregular, or the frequency or duration of bleeding changes noticeably, log the dates and details and tell your doctor at a visit."
+    },
+    "trackerTags": ["irregularCycle"],
+    "phaseTags": ["any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-first-period",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/your-first-period"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。周期变化请与医疗专业人员讨论。",
+      "en": "This content is for general information only and is not medical advice. Discuss cycle changes with a healthcare professional."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-perimenopause-overview",
+    "category": "perimenopause",
+    "title": {
+      "zh": "围绝经期概述",
+      "en": "Perimenopause Overview"
+    },
+    "summary": {
+      "zh": "了解围绝经期可能出现的周期变化。",
+      "en": "Learn about cycle changes that may occur during perimenopause."
+    },
+    "body": {
+      "zh": "围绝经期是绝经前的过渡阶段。月经周期可能变长、变短或跳过，流量也可能改变；如有变化，可与医疗专业人员讨论。",
+      "en": "Perimenopause is the transition before menopause. Periods may become longer, shorter, or skipped, and flow may change; discuss changes with a healthcare professional."
+    },
+    "trackerTags": ["irregularCycle", "hotFlashes"],
+    "phaseTags": ["any"],
+    "audienceTags": ["perimenopause"],
+    "sources": [
+      {
+        "id": "acog-menopause-years",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/the-menopause-years"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。围绝经期问题请咨询医疗专业人员。",
+      "en": "This content is for general information only and is not medical advice. Consult a healthcare professional with questions about perimenopause."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-perimenopause-symptoms",
+    "category": "perimenopause",
+    "title": {
+      "zh": "围绝经期症状趋势",
+      "en": "Perimenopause Symptom Trends"
+    },
+    "summary": {
+      "zh": "记录围绝经期常见感受的时间和频率。",
+      "en": "Record the timing and frequency of common perimenopause symptoms."
+    },
+    "body": {
+      "zh": "潮热、盗汗、睡眠问题和阴道干燥等情况可能出现。记录出现日期和频率，便于与医生讨论。",
+      "en": "Hot flashes, night sweats, sleep problems, and vaginal dryness may occur. Logging dates and frequency can support a discussion with your doctor."
+    },
+    "trackerTags": ["hotFlashes", "nightSweats", "vaginalDryness"],
+    "phaseTags": ["any"],
+    "audienceTags": ["perimenopause"],
+    "sources": [
+      {
+        "id": "acog-menopause-years",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/the-menopause-years"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。令人担忧的症状请咨询医疗专业人员。",
+      "en": "This content is for general information only and is not medical advice. Consult a healthcare professional about concerning symptoms."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-perimenopause-bleeding",
+    "category": "perimenopause",
+    "title": {
+      "zh": "绝经后出血",
+      "en": "Bleeding After Menopause"
+    },
+    "summary": {
+      "zh": "了解绝经后出血为何需要及时沟通。",
+      "en": "Learn why bleeding after menopause should be discussed promptly."
+    },
+    "body": {
+      "zh": "绝经后再次出血，或围绝经期出血模式明显变化时，记录日期、持续时间和经量，并及时联系医生。",
+      "en": "If bleeding occurs after menopause or the bleeding pattern changes noticeably during perimenopause, record the date, duration, and flow, and contact a doctor promptly."
+    },
+    "trackerTags": ["heavyFlow", "irregularCycle"],
+    "phaseTags": ["any"],
+    "audienceTags": ["perimenopause"],
+    "sources": [
+      {
+        "id": "acog-perimenopause-bleeding",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/perimenopausal-bleeding-and-bleeding-after-menopause"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。绝经后出血请及时联系医疗专业人员。",
+      "en": "This content is for general information only and is not medical advice. Contact a healthcare professional promptly about bleeding after menopause."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-tracking-privacy-1",
+    "category": "general",
+    "title": {
+      "zh": "就诊前整理周期记录",
+      "en": "Organizing Cycle Notes for a Visit"
+    },
+    "summary": {
+      "zh": "整理周期记录，让就诊讨论更有条理。",
+      "en": "Organize cycle notes to make a visit discussion clearer."
+    },
+    "body": {
+      "zh": "就诊前整理出血首日、持续天数、周期长度和想咨询的问题。把记录带给医生，按时间顺序说明你的观察。",
+      "en": "Before a visit, gather bleeding start dates, duration, cycle length, and questions. Bring the notes and describe your observations in time order."
+    },
+    "trackerTags": ["cramps", "heavyFlow"],
+    "phaseTags": ["any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-first-period",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/your-first-period"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。就诊时请听取医疗专业人员的意见。",
+      "en": "This content is for general information only and is not medical advice. Follow your healthcare professional's guidance during visits."
+    },
+    "isPro": false
+  },
+  {
+    "id": "edu-tracking-privacy-2",
+    "category": "general",
+    "title": {
+      "zh": "预约前的症状与用药清单",
+      "en": "Symptom and Medication Notes for a Visit"
+    },
+    "summary": {
+      "zh": "提前整理症状、用药和既往情况，方便与医生沟通。",
+      "en": "Prepare symptoms, medicines, and relevant history for a conversation with your doctor."
+    },
+    "body": {
+      "zh": "记下症状开始时间、出现频率、出血变化、正在使用的药物和想询问的问题。就诊时可将这些记录交给医生参考。",
+      "en": "Note when symptoms began, how often they occur, bleeding changes, current medicines, and questions. Share these notes with your doctor during the visit."
+    },
+    "trackerTags": ["heavyFlow", "irregularCycle"],
+    "phaseTags": ["any"],
+    "audienceTags": ["all"],
+    "sources": [
+      {
+        "id": "acog-abnormal-bleeding",
+        "name": "ACOG",
+        "url": "https://www.acog.org/womens-health/faqs/abnormal-uterine-bleeding"
+      }
+    ],
+    "reviewedAt": "2026-08-21",
+    "nonMedicalAdvice": {
+      "zh": "本内容仅供一般信息参考，不构成医疗建议。个体化问题请咨询医疗专业人员。",
+      "en": "This content is for general information only and is not medical advice. Consult a healthcare professional about individual concerns."
+    },
+    "isPro": false
+  }
+]

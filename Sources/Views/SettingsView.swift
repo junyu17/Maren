@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import WidgetKit
+import AppIntents
 
 /// 设置:提醒通知(F8)+ 隐私说明(强化「本地优先」卖点)。
 struct SettingsView: View {
@@ -12,17 +13,23 @@ struct SettingsView: View {
     @State private var showDeleteConfirm = false
     @State private var healthSyncEnabled = HealthKitBridge.syncEnabled
     @State private var healthConnecting = false
-    @State private var healthAuthDenied = false
+    @State private var healthSelectedTypes: Set<HealthKitBridge.SyncType> = HealthKitBridge.selectedTypes
+    @State private var showHealthAlert = false
+    @State private var healthAlertTitle = ""
+    @State private var healthAlertMessage = ""
     @State private var showPCOS = false
     @ObservedObject private var store = Store.shared
     @State private var showPaywall = false
     @State private var showRestoreAlert = false
     @State private var restoreMsg = ""
-    @AppStorage(CloudSync.storageKey) private var cloudSyncEnabled = false
-    @State private var showSyncRestart = false
+    @State private var showSampleExperience = false
+    @State private var showBackupManager = false
     @AppStorage("lock.enabled") private var lockEnabled = false
     @AppStorage(AppTheme.storageKey) private var themeRaw = AppTheme.rose.rawValue
+    @AppStorage(AppAppearanceMode.storageKey) private var appearanceRaw = AppAppearanceMode.system.rawValue
+    @AppStorage(AppTextSizePreference.storageKey) private var textSizeRaw = AppTextSizePreference.standard.rawValue
     @AppStorage(NotificationManager.hideSensitiveKey) private var hideSensitiveNotifs = false
+    @AppStorage(LifeStage.userDefaultsKey) private var lifeStageRaw = LifeStage.defaultValue.rawValue
 
     // 提醒偏好放在 View 层(@AppStorage 会驱动界面刷新)。
     @AppStorage("notif.dailyEnabled") private var dailyEnabled: Bool = false
@@ -44,30 +51,104 @@ struct SettingsView: View {
             enabled: manualEnabled, cycleLength: manualCycleLength, periodLength: manualPeriodLength))
     }
 
-    /// 连接 Apple 健康:请求授权 → 导出已有经期 → 导入「健康」里 Maren 还没有的经期。
+    private var healthTypeSummary: String {
+        HealthKitBridge.SyncType.localizedTitleList(for: HealthKitBridge.SyncType.allCases)
+    }
+
+    private var lifeStageSelection: Binding<LifeStage> {
+        Binding(
+            get: { LifeStage(rawValue: lifeStageRaw) ?? .cycleTracking },
+            set: { lifeStageRaw = $0.rawValue }
+        )
+    }
+
+    private func healthTypeBinding(_ type: HealthKitBridge.SyncType) -> Binding<Bool> {
+        Binding(
+            get: { healthSelectedTypes.contains(type) },
+            set: { enabled in
+                if enabled {
+                    healthSelectedTypes.insert(type)
+                } else {
+                    healthSelectedTypes.remove(type)
+                }
+            }
+        )
+    }
+
+    /// 连接 Apple 健康:请求所选类型 → 导入 → 本地保存 → 写回本地手动记录。
     @MainActor
     private func connectHealth() async {
-        healthConnecting = true
-        defer { healthConnecting = false }
-        guard await HealthKitBridge.requestAuthorization() else {
-            healthAuthDenied = true
+        guard !healthSelectedTypes.isEmpty else {
+            presentHealthAlert(
+                title: String(localized: "请选择要同步的类型"),
+                message: String(localized: "至少选择一种 Apple 健康类型后再继续。")
+            )
             return
         }
+
+        healthConnecting = true
+        defer { healthConnecting = false }
+        let selected = healthSelectedTypes
+        HealthKitBridge.selectedTypes = selected
+
+        do {
+            try await HealthKitBridge.requestAuthorization(for: selected)
+            let payload = try await HealthKitBridge.fetchRecentImports()
+            mergeHealthPayload(payload)
+            try context.save()
+        } catch {
+            context.rollback()
+            presentHealthAlert(
+                title: String(localized: "无法完成 Apple 健康同步"),
+                message: "\(String(localized: "未能完成所选类型的请求或读取,本机数据未改动。Apple 健康可能不会向 Maren 暴露读权限是否被拒绝,请在「健康」App 中检查。"))\n\(error.localizedDescription)"
+            )
+            return
+        }
+
+        // 只有本地保存成功后才开启自动同步,并以刚落库的数据做写回。
         HealthKitBridge.syncEnabled = true
         healthSyncEnabled = true
-        // 导出:把 Maren 已有经期写回「健康」(幂等,重复连接不会累积重复样本)。
-        await HealthKitBridge.exportAll(periodDays)
-        // 导入:「健康」里有、但 Maren 没有的经期,插进来。
-        // 注意:existing 必须在循环内同步更新,否则同一天多条样本会全部插入(DB 重复)。
-        var existing = Set(periodDays.map { $0.dayKey })
-        let fromHealth = await HealthKitBridge.readRecentPeriodDays()
-        for (date, flow) in fromHealth {
-            let key = DayKey.from(date)
-            guard !existing.contains(key) else { continue }
-            context.insert(PeriodDay(date: date, flow: flow))
-            existing.insert(key)
+        let actual: (periodDays: [PeriodDay], logs: [DailyLog])
+        do {
+            actual = try fetchActualData()
+            WidgetSync.refresh(periodDays: actual.periodDays, logs: actual.logs)
+            UserContentDeletion.rescheduleReminders(
+                notificationManager: notifs,
+                periodDays: actual.periodDays,
+                logs: actual.logs,
+                dailyEnabled: dailyEnabled,
+                dailyHour: dailyHour,
+                periodEnabled: periodEnabled,
+                periodAdvanceDays: periodAdvanceDays,
+                smartEnabled: smartEnabled,
+                pmsEnabled: pmsEnabled,
+                storePremium: store.premium,
+                manualCycle: ManualCycle.current
+            )
+            let affectedKeys = Set(actual.periodDays.map(\.dayKey))
+                .union(actual.logs.map(\.dayKey))
+            LocalDataChangeCenter.shared.post(
+                kind: .healthImported,
+                affectedDayKeys: affectedKeys
+            )
+        } catch {
+            presentHealthAlert(
+                title: String(localized: "本机数据已保存,但刷新失败"),
+                message: error.localizedDescription
+            )
+            return
         }
-        try? context.save()
+
+        do {
+            let periodsToExport = selected.contains(.menstrualFlow) ? actual.periodDays : []
+            try await HealthKitBridge.exportAll(periodDays: periodsToExport, logs: actual.logs)
+        } catch {
+            presentHealthAlert(
+                title: String(localized: "Apple Health 写回失败"),
+                message: "\(String(localized: "本机数据已保存,Apple 健康同步已启用,但未能写回所选的手动记录。请稍后重试。"))\n\(error.localizedDescription)"
+            )
+        }
+
     }
 
     var body: some View {
@@ -140,11 +221,47 @@ struct SettingsView: View {
                 .onChange(of: manualPeriodLength) { _, _ in reschedule() }
 
                 Section {
+                    Picker(String(localized: "记录视图"), selection: lifeStageSelection) {
+                        ForEach(LifeStage.allCases) { stage in
+                            Text(stage.label).tag(stage)
+                        }
+                    }
+                    .frame(minHeight: 44)
+                } header: {
+                    Text(String(localized: "记录视图"))
+                } footer: {
+                    Text(String(localized: "这是你主动选择的记录视图,仅保存在本机;不会根据记录自动判断。"))
+                }
+
+                Section {
+                    Picker(String(localized: "显示模式"), selection: $appearanceRaw) {
+                        ForEach(AppAppearanceMode.allCases, id: \.rawValue) { mode in
+                            Text(mode.label).tag(mode.rawValue)
+                        }
+                    }
+                    .accessibilityLabel(String(localized: "显示模式"))
+
+                    Picker(String(localized: "文字大小"), selection: $textSizeRaw) {
+                        ForEach(AppTextSizePreference.allCases, id: \.rawValue) { pref in
+                            Text(pref.label).tag(pref.rawValue)
+                        }
+                    }
+                    .accessibilityLabel(String(localized: "文字大小"))
+                } header: {
+                    Text("外观")
+                } footer: {
+                    Text("显示模式和文字大小仅影响 Maren,不影响系统设置。")
+                }
+
+                Section {
                     HStack(spacing: 14) {
                         ForEach(AppTheme.allCases) { t in
                             let locked = !store.premium && t != .rose
                             Button {
-                                if locked { showPaywall = true } else { themeRaw = t.rawValue }
+                                if locked { showPaywall = true } else {
+                                    themeRaw = t.rawValue
+                                    WidgetSync.refresh(periodDays: periodDays, logs: allLogs)
+                                }
                             } label: {
                                 Circle()
                                     .fill(t.accent)
@@ -177,7 +294,7 @@ struct SettingsView: View {
                     if store.premium {
                         Text("5 套配色随心换。")
                     } else {
-                        Text("默认玫瑰色。升级 Pro 解锁全部 5 套配色。")
+                        Text("默认玫瑰色。升级 Premium 解锁全部 5 套配色。")
                     }
                 }
 
@@ -192,15 +309,88 @@ struct SettingsView: View {
                     } label: {
                         Label("自定义追踪项", systemImage: "slider.horizontal.3")
                     }
-                    // 科普/教育内容保持免费:向 PCOS 人群收「读一页说明」的费用既招骂又无价值;
-                    // PCOS 的真正付费价值由洞察 / 趋势 / 无限自定义项承载(那些才是 Pro)。
+                    NavigationLink {
+                        ContraceptionManagerView { profile in
+                            Task { @MainActor in
+                                if profile.method.supportsDailyReminder && profile.reminderEnabled {
+                                    await notifs.requestAuthorization()
+                                }
+                                notifs.schedule(profile: profile)
+                            }
+                        }
+                    } label: {
+                        Label(String(localized: "避孕记录"), systemImage: "calendar.badge.clock")
+                    }
+                    NavigationLink {
+                        EducationLibraryView()
+                    } label: {
+                        Label(String(localized: "知识库"), systemImage: "books.vertical")
+                    }
+                    NavigationLink {
+                        LocalSearchView()
+                    } label: {
+                        Label(String(localized: "全局搜索"), systemImage: "magnifyingglass")
+                    }
+                    NavigationLink {
+                        UserContentHistoryView()
+                    } label: {
+                        Label(String(localized: "记录与内容管理"), systemImage: "list.bullet.rectangle")
+                    }
                     Button {
                         showPCOS = true
                     } label: {
                         Label("关于 PCOS", systemImage: "heart.text.square")
                     }
+                    Button {
+                        showSampleExperience = true
+                    } label: {
+                        Label("样本体验", systemImage: "sparkles.rectangle.stack")
+                    }
                 } header: {
                     Text("追踪与提醒")
+                } footer: {
+                    Text("样本体验:浏览示例数据,了解 Maren 的各项功能。不影响你的任何真实记录。")
+                }
+
+                Section {
+                    Button {
+                        showBackupManager = true
+                    } label: {
+                        Label("手动加密备份", systemImage: "lock.doc")
+                    }
+                } header: {
+                    Text("数据备份")
+                } footer: {
+                    Text("使用你设置的密码加密全部本机记录。密码无法恢复;备份文件由你选择保存位置。")
+                }
+
+                // MARK: - 快速记录
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("快速记录", systemImage: "bolt.fill")
+                            .font(.subheadline.weight(.semibold))
+                        Text(String(localized: "无需打开 App 即可记录经期和心情:"))
+                            .font(.subheadline).foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label(String(localized: "中型交互小组件:长按主屏幕 → ＋ → Maren → 中型"), systemImage: "square.grid.2x2.fill")
+                                .font(.caption).foregroundStyle(.primary)
+                            Label(String(localized: "两个 Maren 系统快捷指令:\"记录经期\"与\"记录心情\""), systemImage: "shortcuts")
+                                .font(.caption).foregroundStyle(.primary)
+                            Label(String(localized: "将任一快捷指令分配给 iPhone 操作按钮(设置 → 操作按钮)"), systemImage: "iphone.gen3.radiowaves.left.and.right")
+                                .font(.caption).foregroundStyle(.primary)
+                        }
+                        Text(String(localized: "点击/按下后,条目先入队列;下次打开 Maren 时自动保存到日历。"))
+                            .font(.caption).foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        ShortcutsLink()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .accessibilityLabel(String(localized: "Open Shortcuts app to manage Maren shortcuts"))
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text("快速记录")
+                } footer: {
+                    Text("所有快速记录均在本地排队,打开 Maren 时落库;不联网、不外传。")
                 }
 
                 Section {
@@ -271,9 +461,9 @@ struct SettingsView: View {
                     }
                 } footer: {
                     if periodEnabled && store.premium {
-                        Text("在预测经期前 \(periodAdvanceDays) 天提醒你。")
+                        Text(String(localized: "在预测经期前 \(periodAdvanceDays) 天提醒你。"))
                     } else {
-                        Text("在预测经期前 2 天提醒你。升级 Pro 可自定义 1–5 天。")
+                        Text("在预测经期前 2 天提醒你。升级 Premium 可自定义 1–5 天。")
                     }
                 }
                 .disabled(!notifs.authorized)
@@ -301,7 +491,7 @@ struct SettingsView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     } header: {
-                        Text("Pro · 高级提醒")
+                        Text("Premium · 高级提醒")
                     } footer: {
                         Text("PMS:经期前几天给你一条「对自己好点」的提醒。智能提醒:进入黄体期时,根据你自己的记录提醒你(如「焦虑常在黄体期升高」)。")
                     }
@@ -314,7 +504,7 @@ struct SettingsView: View {
                             HStack(spacing: 10) {
                                 Image(systemName: "bell.badge.fill").foregroundStyle(FlowLevel.medium.tint)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("高级提醒(Pro)").font(.subheadline.weight(.semibold))
+                                    Text("高级提醒").font(.subheadline.weight(.semibold))
                                     Text("多时段用药、经期提前天数自定义、PMS 关怀、按阶段智能提醒。")
                                         .font(.caption).foregroundStyle(.secondary)
                                 }
@@ -323,16 +513,32 @@ struct SettingsView: View {
                             }
                         }
                     } header: {
-                        Text("Pro · 高级提醒")
+                        Text("Premium · 高级提醒")
                     }
                 }
 
                 if HealthKitBridge.isAvailable {
                     Section {
+                        ForEach(HealthKitBridge.SyncType.allCases) { type in
+                            Toggle(isOn: healthTypeBinding(type)) {
+                                HStack(spacing: 8) {
+                                    Text(type.title)
+                                    if !type.isWritable {
+                                        Text(String(localized: "只读"))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        }
                         if healthSyncEnabled {
-                            Label("已连接 Apple 健康", systemImage: "heart.fill")
+                            Label("Apple 健康同步已启用", systemImage: "heart.fill")
                                 .foregroundStyle(.pink)
-                            Button("断开") {
+                            Button("重新请求并同步") {
+                                Task { await connectHealth() }
+                            }
+                            .disabled(healthConnecting || healthSelectedTypes.isEmpty)
+                            Button("停止自动同步") {
                                 healthSyncEnabled = false
                                 HealthKitBridge.syncEnabled = false
                             }
@@ -341,35 +547,16 @@ struct SettingsView: View {
                             Button {
                                 Task { await connectHealth() }
                             } label: {
-                                Label(healthConnecting ? String(localized: "连接中…") : String(localized: "连接 Apple 健康"),
+                                Label(healthConnecting ? String(localized: "请求中…") : String(localized: "请求所选类型并同步"),
                                       systemImage: "heart.text.square")
                             }
-                            .disabled(healthConnecting)
+                            .disabled(healthConnecting || healthSelectedTypes.isEmpty)
                         }
                     } header: {
                         Text("Apple 健康")
                     } footer: {
-                        Text("双向同步经期:导入「健康」里最近 180 天的经期记录(含其他 App 记的),并把你在 Maren 记的经期写回「健康」。数据仅在本机之间流转,不经过任何服务器;Maren 删除记录时只会删除本 App 写入的样本,不会动你在其他 App 的记录。")
+                        Text("支持类型:\(healthTypeSummary)。睡眠、步数和锻炼时间为只读;每个选中的类型都会在请求时一并申请。Apple 健康不会向 Maren 暴露读权限是否被拒绝,请在「健康」App 中管理权限。数据只在本机与 Apple 健康之间流转,不经过开发者服务器。停止自动同步只会停止后续自动读写,不会替你撤销 Apple 健康权限或删除数据。")
                     }
-                }
-
-                Section {
-                    if CloudSync.isConfigured {
-                        Toggle("iCloud 同步", isOn: $cloudSyncEnabled)
-                            .onChange(of: cloudSyncEnabled) { _, _ in showSyncRestart = true }
-                    } else {
-                        // 未登录 iCloud 或无 entitlement:不展示开关,直接说明不可用。
-                        HStack(spacing: 10) {
-                            Image(systemName: "icloud.slash").foregroundStyle(.secondary)
-                            Text("iCloud 同步当前不可用").foregroundStyle(.secondary)
-                        }
-                    }
-                } header: {
-                    Text("同步")
-                } footer: {
-                    Text(cloudSyncEnabled
-                         ? "已开启:数据同步到你自己的 iCloud 私有库(我们的服务器无法访问),可在登录同一 Apple ID 的设备间同步。⚠️ 切换需重启 Maren 才生效。"
-                         : "开启后,数据存到你自己的 iCloud 私有库,可在你登录同一 Apple ID 的设备间同步。我们的服务器永不接触。⚠️ 关闭同步不会删除 iCloud 云端已有的副本,数据仍保留在你的 iCloud 中。开启或关闭需重启 Maren 生效。")
                 }
 
                 Section {
@@ -380,7 +567,7 @@ struct SettingsView: View {
                         Image(systemName: "lock.shield.fill").foregroundStyle(FlowLevel.medium.tint)
                         VStack(alignment: .leading, spacing: 2) {
                             Text("你的数据永远属于你").font(.subheadline.weight(.semibold))
-                            Text("健康数据只存在这台设备上。我们的服务器永不接触,也绝不共享给第三方或用于广告。")
+                            Text("Maren 本地记录只存在这台设备上;使用 Apple 健康或配对 Apple Watch 时,相关数据由 Apple 功能按你的选择处理。我们的服务器永不接触,也绝不用于广告。")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
@@ -398,7 +585,7 @@ struct SettingsView: View {
                         Label("删除所有数据", systemImage: "trash")
                     }
                 } footer: {
-                    Text("永久删除本机上的全部经期、每日记录、自定义症状、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。")
+                    Text("永久删除本机上的全部经期、每日记录、自定义追踪项、用药与打卡历史,无法撤销。删除前建议先在「日历」页导出一份备份。")
                 }
             }
             .confirmationDialog("确定要删除所有数据吗?",
@@ -409,30 +596,27 @@ struct SettingsView: View {
                 }
                 Button("取消", role: .cancel) {}
             } message: {
-                Text("这会清空 \(periodDays.count) 条经期记录、\(allLogs.count) 条每日记录,以及全部自定义症状、用药与打卡历史,且无法恢复。")
+                Text(String(localized: "这会永久清空 \(periodDays.count) 条经期记录、\(allLogs.count) 条每日记录、全部自定义追踪项及其历史、用药定义与打卡历史,取消 Maren 的本机提醒,同时清除设置中的记录视图/周期参数、Widget 与 Apple Watch 快照和待处理快速记录。Maren 不会删除 Apple 健康中来自其他来源的数据;由 Maren 写入的样本会在本机删除后另行尝试清理。此操作无法恢复。"))
             }
             .navigationTitle("设置")
             // 给底部留出空间,避免最后一行被浮动标签栏遮住。
             .contentMargins(.bottom, 56, for: .scrollContent)
             .sheet(isPresented: $showPCOS) { PCOSInfoView() }
             .sheet(isPresented: $showPaywall) { PaywallView() }
+            .sheet(isPresented: $showSampleExperience) { SampleExperienceView() }
+            .sheet(isPresented: $showBackupManager) { BackupManagerView() }
             .alert("恢复购买", isPresented: $showRestoreAlert) {
                 Button("好") {}
             } message: { Text(restoreMsg) }
-            .alert("需要重启 Maren", isPresented: $showSyncRestart) {
-                Button("好") {}
+            .alert(healthAlertTitle, isPresented: $showHealthAlert) {
+                Button("好", role: .cancel) {}
             } message: {
-                Text("iCloud 同步设置将在下次打开 Maren 时生效。")
-            }
-            .alert("无法连接 Apple 健康", isPresented: $healthAuthDenied) {
-                Button("好") {}
-            } message: {
-                Text("未能获得「健康」App 的经期读写授权。你可以在 系统设置 → 隐私与安全性 → 健康 → Maren 中检查授权。")
+                Text(healthAlertMessage)
             }
             .onAppear {
                 notifs.refreshAuthorization()
-                // 重新校验 iCloud 账户状态(用户在系统里登录/退出后,开关可用性会变化)。
-                Task { await CloudSync.refreshConfiguredStatus() }
+                healthSyncEnabled = HealthKitBridge.syncEnabled
+                healthSelectedTypes = HealthKitBridge.selectedTypes
             }
         }
     }
@@ -444,27 +628,238 @@ struct SettingsView: View {
         // Pro 高级提醒:免费层强制以 false 传入,确保不残留旧排期。
         notifs.schedulePMSReminder(enabled: store.premium && pmsEnabled, nextPeriodStart: prediction.nextPeriodStart)
         notifs.scheduleSmartReminders(enabled: store.premium && smartEnabled, prediction: prediction, logs: allLogs)
+
+        // Manual cycle settings are not SwiftData rows, so refresh the
+        // derived Widget/Watch snapshot explicitly after every change. The
+        // analysis screens observe the same @AppStorage keys and recompute in
+        // the same render pass.
+        do {
+            let actual = try fetchActualData()
+            WidgetSync.refresh(periodDays: actual.periodDays, logs: actual.logs)
+        } catch {
+            presentHealthAlert(
+                title: String(localized: "周期设置已保存,但刷新失败"),
+                message: "\(String(localized: "提醒设置已经更新,但未能刷新 Widget 和 Apple Watch。请重新打开 Maren。"))\n\(error.localizedDescription)"
+            )
+        }
+    }
+
+    private func mergeHealthPayload(_ payload: HealthKitBridge.ImportPayload) {
+        var periodsByKey = Dictionary(uniqueKeysWithValues: periodDays.map { ($0.dayKey, $0) })
+        for imported in payload.periods {
+            if let existing = periodsByKey[imported.dayKey] {
+                // 手动记录优先;只有原本来自 Health 的记录才允许被新的导入更新。
+                guard existing.importedFromHealth else { continue }
+                existing.flow = imported.flow
+                existing.updatedAt = Date()
+            } else {
+                let importedDay = PeriodDay(date: DayKey.date(from: imported.dayKey), flow: imported.flow)
+                importedDay.importedFromHealth = true
+                context.insert(importedDay)
+                periodsByKey[imported.dayKey] = importedDay
+            }
+        }
+
+        var logsByKey = Dictionary(uniqueKeysWithValues: allLogs.map { ($0.dayKey, $0) })
+        for imported in payload.daily {
+            let hasActualValue = imported.sleepHours != nil
+                || imported.weight != nil
+                || imported.basalBodyTemperatureCelsius != nil
+                || imported.spotting != nil
+                || imported.steps != nil
+                || imported.exerciseMinutes != nil
+            guard hasActualValue else { continue }
+
+            if let existing = logsByKey[imported.dayKey] {
+                var markers = Set(existing.healthImportedFields)
+                var importedFields = Set(markers.compactMap(HealthKitPlanners.FieldKey.init(rawValue:)))
+                var didUpdate = false
+
+                if let value = imported.sleepHours,
+                   HealthKitPlanners.shouldImportField(
+                       localValueIsRecorded: existing.sleepHours != nil,
+                       importedFields: importedFields,
+                       field: .sleep
+                   ) {
+                    existing.sleepHours = value
+                    markers.insert(HealthKitPlanners.FieldKey.sleep.rawValue)
+                    importedFields.insert(.sleep)
+                    didUpdate = true
+                }
+                if let value = imported.weight,
+                   HealthKitPlanners.shouldImportField(
+                       localValueIsRecorded: existing.weight != nil,
+                       importedFields: importedFields,
+                       field: .weight
+                   ) {
+                    existing.weight = value
+                    markers.insert(HealthKitPlanners.FieldKey.weight.rawValue)
+                    importedFields.insert(.weight)
+                    didUpdate = true
+                }
+                if let value = imported.basalBodyTemperatureCelsius,
+                   HealthKitPlanners.shouldImportField(
+                       localValueIsRecorded: existing.basalBodyTemperatureCelsius != nil,
+                       importedFields: importedFields,
+                       field: .basalBodyTemperature
+                   ) {
+                    existing.basalBodyTemperatureCelsius = value
+                    markers.insert(HealthKitPlanners.FieldKey.basalBodyTemperature.rawValue)
+                    importedFields.insert(.basalBodyTemperature)
+                    didUpdate = true
+                }
+                if let value = imported.spotting,
+                   HealthKitPlanners.shouldImportField(
+                       localValueIsRecorded: existing.spotting != nil,
+                       importedFields: importedFields,
+                       field: .spotting
+                   ) {
+                    existing.spotting = value
+                    markers.insert(HealthKitPlanners.FieldKey.spotting.rawValue)
+                    importedFields.insert(.spotting)
+                    didUpdate = true
+                }
+                if let value = imported.steps,
+                   HealthKitPlanners.shouldImportField(
+                       localValueIsRecorded: existing.steps != nil,
+                       importedFields: importedFields,
+                       field: .steps
+                   ) {
+                    existing.steps = value
+                    markers.insert(HealthKitPlanners.FieldKey.steps.rawValue)
+                    importedFields.insert(.steps)
+                    didUpdate = true
+                }
+                if let value = imported.exerciseMinutes,
+                   HealthKitPlanners.shouldImportField(
+                       localValueIsRecorded: existing.exerciseMinutes != nil,
+                       importedFields: importedFields,
+                       field: .exercise
+                   ) {
+                    existing.exerciseMinutes = value
+                    markers.insert(HealthKitPlanners.FieldKey.exercise.rawValue)
+                    importedFields.insert(.exercise)
+                    didUpdate = true
+                }
+
+                if didUpdate {
+                    existing.healthImportedFields = markers.sorted()
+                    existing.updatedAt = Date()
+                }
+            } else {
+                let importedLog = DailyLog(
+                    date: DayKey.date(from: imported.dayKey),
+                    sleepHours: imported.sleepHours,
+                    weight: imported.weight,
+                    steps: imported.steps,
+                    exerciseMinutes: imported.exerciseMinutes,
+                    basalBodyTemperatureCelsius: imported.basalBodyTemperatureCelsius,
+                    spotting: imported.spotting
+                )
+                var markers = Set<String>()
+                if imported.sleepHours != nil {
+                    markers.insert(HealthKitPlanners.FieldKey.sleep.rawValue)
+                }
+                if imported.weight != nil {
+                    markers.insert(HealthKitPlanners.FieldKey.weight.rawValue)
+                }
+                if imported.basalBodyTemperatureCelsius != nil {
+                    markers.insert(HealthKitPlanners.FieldKey.basalBodyTemperature.rawValue)
+                }
+                if imported.spotting != nil {
+                    markers.insert(HealthKitPlanners.FieldKey.spotting.rawValue)
+                }
+                if imported.steps != nil {
+                    markers.insert(HealthKitPlanners.FieldKey.steps.rawValue)
+                }
+                if imported.exerciseMinutes != nil {
+                    markers.insert(HealthKitPlanners.FieldKey.exercise.rawValue)
+                }
+                importedLog.healthImportedFields = markers.sorted()
+                context.insert(importedLog)
+                logsByKey[imported.dayKey] = importedLog
+            }
+        }
+    }
+
+    private func fetchActualData() throws -> (periodDays: [PeriodDay], logs: [DailyLog]) {
+        let actualPeriodDays = try context.fetch(
+            FetchDescriptor<PeriodDay>(sortBy: [SortDescriptor(\PeriodDay.dayKey)])
+        )
+        let actualLogs = try context.fetch(
+            FetchDescriptor<DailyLog>(sortBy: [SortDescriptor(\DailyLog.dayKey)])
+        )
+        return (actualPeriodDays, actualLogs)
+    }
+
+    private func presentHealthAlert(title: String, message: String) {
+        healthAlertTitle = title
+        healthAlertMessage = message
+        showHealthAlert = true
     }
 
     /// 一键清空本机全部健康数据。「你的数据永远属于你」也包含「随时能全部带走或抹掉」。
     /// 必须删掉全部五个模型,否则用药历史/自定义症状会残留,违反隐私承诺。
     private func deleteAllData() async {
-        // 若已连接 Apple Health,先把 Maren 写入的经期样本从「健康」里删掉,
-        // 否则删除后数据仍可在健康 App 看到,且重新连接时会被重新导入「复活」。
-        if HealthKitBridge.syncEnabled, HealthKitBridge.isAvailable {
-            for p in periodDays {
-                await HealthKitBridge.deletePeriodDay(p.date)
-            }
+        let medicationNotificationIds: [String]
+        do {
+            let periods = try context.fetch(FetchDescriptor<PeriodDay>())
+            let logs = try context.fetch(FetchDescriptor<DailyLog>())
+            let meds = try context.fetch(FetchDescriptor<Medication>())
+            let intakes = try context.fetch(FetchDescriptor<MedicationIntake>())
+            let customSymptoms = try context.fetch(FetchDescriptor<CustomSymptom>())
+            medicationNotificationIds = meds.map(\.notificationId)
+
+            for period in periods { context.delete(period) }
+            for log in logs { context.delete(log) }
+            for medication in meds { context.delete(medication) }
+            for intake in intakes { context.delete(intake) }
+            for customSymptom in customSymptoms { context.delete(customSymptom) }
+            try context.save()
+        } catch {
+            context.rollback()
+            presentHealthAlert(
+                title: String(localized: "删除失败"),
+                message: "\(String(localized: "本机数据没有删除,原有记录未改动。"))\n\(error.localizedDescription)"
+            )
+            return
         }
-        for p in periodDays { context.delete(p) }
-        for l in allLogs { context.delete(l) }
-        // 用药相关:先撤掉已排期的本地通知,再删库。
-        let meds = (try? context.fetch(FetchDescriptor<Medication>())) ?? []
-        for m in meds { NotificationManager.shared.cancelAllMedicationReminders(notificationId: m.notificationId) }
-        meds.forEach { context.delete($0) }
-        (try? context.fetch(FetchDescriptor<MedicationIntake>()))?.forEach { context.delete($0) }
-        (try? context.fetch(FetchDescriptor<CustomSymptom>()))?.forEach { context.delete($0) }
-        try? context.save()
+
+        // Reset local preferences only after the model deletion has been
+        // durably saved. The notification is cancelled independently so an
+        // old contraception reminder cannot survive the data wipe.
+        ContraceptionSettings.reset()
+        LifeStage.save(.defaultValue)
+        lifeStageRaw = LifeStage.defaultValue.rawValue
+        UserDefaults.standard.removeObject(forKey: "education.bookmarks")
+        UserDefaults.standard.removeObject(forKey: "education.dailyStoryHistory")
+        notifs.cancelContraceptionDailyReminder()
+
+        // The five local models are now durably deleted.  Persist a fresh
+        // reset epoch/cutoff before any derived refresh, clear the iPhone
+        // queue, cancel our own outstanding WC user-info transfers, and send
+        // the epoch to the Watch so it can clear its private outbox/recent
+        // cache/App Group queue.  The receiver-side cutoff remains the final
+        // compatibility barrier for older Watch builds.
+        let watchReset = PhoneConnectivity.shared.resetWatchState()
+        if !watchReset.cleanupSucceeded {
+            presentHealthAlert(
+                title: String(localized: "本机数据已删除"),
+                message: String(localized: "快速记录的清理将在下次打开 Maren 时重试。已删除的本机记录不会恢复。")
+            )
+        }
+
+        // Disable automatic Health imports immediately after local deletion,
+        // before attempting the best-effort HealthKit sample cleanup.  This
+        // prevents a later background sync from resurrecting deleted records.
+        HealthKitBridge.syncEnabled = false
+        healthSyncEnabled = false
+
+        // 本地保存成功后,再撤掉已排期的本地通知。
+        for notificationId in medicationNotificationIds {
+            NotificationManager.shared.cancelAllMedicationReminders(notificationId: notificationId)
+        }
+        notifs.cancelAllAppNotifications()
         // 自定义症状快照也要刷新,否则导出/洞察仍用旧显示名。
         CustomSymptomStore.refresh(context)
         // 数据没了,已排期的提醒也必须撤掉,否则会基于旧预测继续弹。
@@ -481,6 +876,28 @@ struct SettingsView: View {
         WidgetSnapshotStore.write(.placeholder)
         WidgetCenter.shared.reloadAllTimelines()
         PhoneConnectivity.shared.push(.placeholder)
+
+        // Local deletion is already complete; update active screens before
+        // the best-effort HealthKit cleanup potentially takes time.
+        LocalDataChangeCenter.shared.post(kind: .storeReset)
+
+        // 本机数据已成功删除后,才清理本 app 写入的 HealthKit 样本。
+        if HealthKitBridge.isAvailable {
+            do {
+                let result = try await HealthKitBridge.deleteAllMarenSamples()
+                if !result.isComplete {
+                    presentHealthAlert(
+                        title: String(localized: "本机数据已删除,Apple Health 部分清理"),
+                        message: result.userFacingIssueDescription
+                    )
+                }
+            } catch {
+                presentHealthAlert(
+                    title: String(localized: "本机数据已删除,但 Apple Health 清理失败"),
+                    message: "\(String(localized: "本机记录已经删除,但未能删除 Apple Health 中由 Maren 写入的样本。你可以在稍后重试,其他来源的 Health 数据不会被删除。"))\n\(error.localizedDescription)"
+                )
+            }
+        }
     }
 
     private func hourLabel(_ h: Int) -> String {

@@ -7,11 +7,17 @@ struct CalendarView: View {
     @Query(sort: \PeriodDay.dayKey) private var periodDays: [PeriodDay]
     @Query(sort: \DailyLog.dayKey) private var logs: [DailyLog]
 
-    @State private var visibleMonth: Date = Cal.startOfDay(Date())
+    @State private var visibleMonth: Date
     @State private var selectedDay: Date?
     @State private var exportURLs: [URL]?
     @State private var showExportFailed = false
+    @State private var exportFailureMessage = ""
+    @State private var showExportSecurityWarning = false
+    @State private var showPeriodAlert = false
+    @State private var periodAlertTitle = ""
+    @State private var periodAlertMessage = ""
     @State private var showPhaseInfo = false
+    @State private var showClinicalReport = false
 
     /// 跟随用户地区的星期简写与起始日(中国=周一开头,美国=周日开头)。
     private var weekdaySymbols: [String] { Cal.orderedWeekdaySymbols }
@@ -26,6 +32,17 @@ struct CalendarView: View {
     @AppStorage(ManualCycle.Keys.cycleLength) private var manualCycleLength = ManualCycle.defaultCycleLength
     @AppStorage(ManualCycle.Keys.periodLength) private var manualPeriodLength = ManualCycle.defaultPeriodLength
     @AppStorage("notif.periodEnabled") private var periodReminderEnabled = false
+
+    init(focusedDate: Date? = nil) {
+        let normalizedDate = focusedDate.map(Cal.startOfDay)
+        _selectedDay = State(initialValue: normalizedDate)
+        if let normalizedDate {
+            let components = Cal.current.dateComponents([.year, .month], from: normalizedDate)
+            _visibleMonth = State(initialValue: Cal.current.date(from: components) ?? normalizedDate)
+        } else {
+            _visibleMonth = State(initialValue: Cal.startOfDay(Date()))
+        }
+    }
 
     private var manual: ManualCycle {
         ManualCycle(enabled: manualEnabled, cycleLength: manualCycleLength, periodLength: manualPeriodLength)
@@ -72,24 +89,30 @@ struct CalendarView: View {
             .onAppear { WidgetSync.refresh(periodDays: periodDays, logs: logs) }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        let meds = (try? context.fetch(FetchDescriptor<Medication>())) ?? []
-                        let intakes = (try? context.fetch(FetchDescriptor<MedicationIntake>())) ?? []
-                        let customs = (try? context.fetch(FetchDescriptor<CustomSymptom>())) ?? []
-                        let urls = DataExport.makeExportFiles(
-                            periodDays: periodDays, logs: logs,
-                            medications: meds, intakes: intakes, customSymptoms: customs,
-                            prediction: prediction)
-                        if urls.isEmpty {
-                            // 生成失败(如临时目录写入失败)时给反馈,而不是点了没反应。
-                            showExportFailed = true
-                        } else {
-                            exportURLs = urls
+                    NavigationLink {
+                        LocalSearchView()
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .accessibilityLabel(Text("全局搜索"))
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            showExportSecurityWarning = true
+                        } label: {
+                            Label(String(localized: "导出原始数据"), systemImage: "square.and.arrow.up")
+                        }
+                        .disabled(periodDays.isEmpty && logs.isEmpty)
+
+                        Button {
+                            showClinicalReport = true
+                        } label: {
+                            Label(String(localized: "临床就诊报告"), systemImage: "doc.text")
                         }
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
-                    .disabled(periodDays.isEmpty && logs.isEmpty)
                     .accessibilityLabel("导出数据")
                 }
             }
@@ -97,10 +120,15 @@ struct CalendarView: View {
                 get: { exportURLs.map { ExportBox(urls: $0) } },
                 set: { exportURLs = $0?.urls }
             )) { box in
-                ShareSheet(items: box.urls)
+                ShareSheet(items: box.urls, temporaryURLs: box.urls)
             }
             .sheet(isPresented: $showPhaseInfo) {
                 PhaseInfoView()
+            }
+            .sheet(isPresented: $showClinicalReport) {
+                NavigationStack {
+                    ClinicalReportView()
+                }
             }
             .sheet(item: Binding(
                 get: { selectedDay.map { DayBox(date: $0) } },
@@ -116,9 +144,58 @@ struct CalendarView: View {
             .alert("导出失败", isPresented: $showExportFailed) {
                 Button("好") {}
             } message: {
-                Text("未能生成导出文件,请检查设备存储空间后重试。")
+                Text(exportFailureMessage)
+            }
+            .alert(String(localized: "导出前请注意"), isPresented: $showExportSecurityWarning) {
+                Button(String(localized: "继续导出")) { generateRawExport() }
+                Button(String(localized: "取消"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "原始 CSV/PDF 导出不会加密,也不会设置密码。继续前请确认你会安全分享和存储这些文件。"))
+            }
+            .alert(periodAlertTitle, isPresented: $showPeriodAlert) {
+                Button("好", role: .cancel) {}
+            } message: {
+                Text(periodAlertMessage)
+            }
+            .onDisappear {
+                if let urls = exportURLs {
+                    ShareSheet.cleanupTemporaryURLs(urls)
+                    exportURLs = nil
+                }
             }
         }
+    }
+
+    private func generateRawExport() {
+        if let oldURLs = exportURLs {
+            ShareSheet.cleanupTemporaryURLs(oldURLs)
+            exportURLs = nil
+        }
+
+        let meds: [Medication]
+        let intakes: [MedicationIntake]
+        let customs: [CustomSymptom]
+        do {
+            meds = try context.fetch(FetchDescriptor<Medication>())
+            intakes = try context.fetch(FetchDescriptor<MedicationIntake>())
+            customs = try context.fetch(FetchDescriptor<CustomSymptom>())
+        } catch {
+            exportFailureMessage = String(localized: "无法读取本地记录,导出未开始,请重试。")
+            showExportFailed = true
+            return
+        }
+
+        let urls = DataExport.makeExportFiles(
+            periodDays: periodDays, logs: logs,
+            medications: meds, intakes: intakes, customSymptoms: customs,
+            prediction: prediction)
+        guard urls.count == 6 else {
+            ShareSheet.cleanupTemporaryURLs(urls)
+            exportFailureMessage = String(localized: "未能生成完整导出文件,请检查设备存储空间后重试。")
+            showExportFailed = true
+            return
+        }
+        exportURLs = urls
     }
 
     // MARK: - 子视图
@@ -128,7 +205,10 @@ struct CalendarView: View {
             Button {
                 withAnimation { visibleMonth = Cal.addMonths(-1, to: visibleMonth) }
             } label: {
-                Image(systemName: "chevron.left").font(.headline).frame(width: 44, height: 44)
+                Image(systemName: "chevron.left")
+                    .font(.headline)
+                    .foregroundStyle(MarenDesign.accentTint(opacity: 0.8))
+                    .frame(width: 44, height: 44)
             }
             .accessibilityLabel("上个月")
             Spacer()
@@ -138,7 +218,10 @@ struct CalendarView: View {
             Button {
                 withAnimation { visibleMonth = Cal.addMonths(1, to: visibleMonth) }
             } label: {
-                Image(systemName: "chevron.right").font(.headline).frame(width: 44, height: 44)
+                Image(systemName: "chevron.right")
+                    .font(.headline)
+                    .foregroundStyle(MarenDesign.accentTint(opacity: 0.8))
+                    .frame(width: 44, height: 44)
             }
             .accessibilityLabel("下个月")
         }
@@ -146,11 +229,15 @@ struct CalendarView: View {
 
     private var weekdayRow: some View {
         HStack {
-            ForEach(weekdaySymbols, id: \.self) { s in
+            ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, s in
                 Text(s)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    // Keep the weekday labels aligned with the 44 pt date
+                    // targets below, including when Dynamic Type is large.
+                    .frame(maxWidth: .infinity, minHeight: 44)
             }
         }
     }
@@ -162,7 +249,7 @@ struct CalendarView: View {
         let today = Date()
         return LazyVGrid(columns: columns, spacing: 6) {
             ForEach(0..<grid.leadingBlanks, id: \.self) { _ in
-                Color.clear.frame(height: 44)
+                Color.clear.frame(minHeight: 44)
             }
             ForEach(grid.days, id: \.self) { day in
                 DayCell(
@@ -198,7 +285,7 @@ struct CalendarView: View {
                 }
                 ForEach([CyclePhase.follicular, .ovulatory, .luteal]) { ph in
                     HStack(spacing: 4) {
-                        Circle().fill(ph.tint.opacity(max(ph.fillOpacity, 0.5))).frame(width: 10, height: 10)
+                        Circle().fill(ph.legendFill).frame(width: 10, height: 10)
                         Text(ph.label).font(.caption2).foregroundStyle(.secondary)
                     }
                 }
@@ -209,6 +296,7 @@ struct CalendarView: View {
             } label: {
                 Label("了解各阶段", systemImage: "info.circle")
                     .font(.caption2)
+                    .foregroundStyle(AppTheme.current.accent)
             }
             .padding(.top, 2)
         }
@@ -226,11 +314,7 @@ struct CalendarView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground).opacity(0.6),
-                    in: RoundedRectangle(cornerRadius: 10))
+        .marenOutlineCard(cornerRadius: MarenDesign.radiusS)
     }
 
     /// F2 预测卡片:诚实呈现「下次经期 + 置信区间 + 规律度」,不吹精准、不涉排卵/避孕。
@@ -246,7 +330,7 @@ struct CalendarView: View {
                     Text(p.isManual ? String(localized: "手动设置") : String(localized: "把握度 \(p.confidence.label)"))
                         .font(.caption2)
                         .padding(.horizontal, 8).padding(.vertical, 3)
-                        .background(Color(.tertiarySystemFill), in: Capsule())
+                        .background(MarenDesign.elevatedSurface, in: Capsule())
                 }
             }
 
@@ -279,9 +363,7 @@ struct CalendarView: View {
                     .font(.caption2).foregroundStyle(.tertiary)
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(FlowLevel.spotting.tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 14))
+        .marenAccentCard(cornerRadius: MarenDesign.radiusM)
     }
 
     private func metric(_ title: LocalizedStringKey, _ value: String) -> some View {
@@ -314,60 +396,213 @@ struct CalendarView: View {
         }.count
         return HStack {
             Image(systemName: "drop.fill").foregroundStyle(FlowLevel.medium.tint)
-            Text("本月记录经期 \(count) 天")
+            Text(String(localized: "本月记录经期 \(count) 天"))
                 .font(.subheadline)
             Spacer()
         }
-        .padding()
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+        .marenCard(cornerRadius: MarenDesign.radiusM, shadowed: false)
     }
 
     // MARK: - 数据操作
 
     private func upsertPeriod(on date: Date, flow: FlowLevel) {
         let key = Cal.startOfDay(date)
+        let dayKey = DayKey.from(key)
         let day: PeriodDay
-        if let existing = periodByDay[key] {
+        // Query-backed dictionaries update on the next SwiftUI transaction.
+        // Fetch the key from SwiftData at mutation time so two quick taps
+        // cannot both observe "missing" and insert duplicate PeriodDay rows.
+        let existing: PeriodDay?
+        do {
+            existing = try context.fetch(
+                FetchDescriptor<PeriodDay>(
+                    predicate: #Predicate { $0.dayKey == dayKey },
+                    sortBy: [SortDescriptor(\PeriodDay.updatedAt, order: .reverse)]
+                )
+            ).first
+        } catch {
+            presentPeriodAlert(
+                title: String(localized: "保存失败"),
+                message: "\(String(localized: "暂时无法读取这一天的经期记录,未写入新数据。"))\n\(error.localizedDescription)"
+            )
+            return
+        }
+        if let existing {
             existing.flow = flow
             existing.updatedAt = Date()
+            existing.importedFromHealth = false
             day = existing
         } else {
             let new = PeriodDay(date: key, flow: flow)
             context.insert(new)
             day = new
         }
-        try? context.save()
-        selectedDay = nil
-        refreshPeriodReminder()
-        // 已连接 Apple 健康时,把这天写回「健康」。
-        // 幂等写入;并判断是否为连续经期段的第一天,让健康侧正确识别周期起点。
-        if HealthKitBridge.syncEnabled {
-            let isCycleStart: Bool
-            if let prevDate = Cal.current.date(byAdding: .day, value: -1, to: key) {
-                isCycleStart = periodByDay[Cal.startOfDay(prevDate)] == nil
-            } else {
-                isCycleStart = true
+        guard savePeriodContext() else { return }
+
+        do {
+            let actual = try fetchActualData()
+            guard let actualDay = actual.periodDays.first(where: { $0.dayKey == day.dayKey }) else {
+                presentPeriodAlert(
+                    title: String(localized: "已保存,但刷新失败"),
+                    message: String(localized: "经期已保存,但未能读取刚保存的记录。")
+                )
+                return
             }
-            Task { await HealthKitBridge.writePeriodDay(day, isCycleStart: isCycleStart) }
+            selectedDay = nil
+            refreshPeriodReminder(periodDays: actual.periodDays, logs: actual.logs)
+
+            guard HealthKitBridge.syncEnabled,
+                  HealthKitBridge.selectedTypes.contains(.menstrualFlow) else { return }
+
+            // HealthKit stores cycle-start metadata on every sample. Updating
+            // one local day can therefore also require rewriting its next
+            // local day. Imported days are excluded because they are never
+            // written back to HealthKit.
+            let resync = periodDaysToResync(
+                around: actualDay.dayKey,
+                periodDays: actual.periodDays,
+                deleting: false
+            )
+            Task { @MainActor in
+                do {
+                    try await syncPeriodDaysToHealth(
+                        resync.targets,
+                        allLocalDays: resync.allLocalDays
+                    )
+                } catch {
+                    presentPeriodAlert(
+                        title: String(localized: "Apple Health 同步失败"),
+                        message: "\(String(localized: "经期已保存,但未能同步到 Apple Health。"))\n\(error.localizedDescription)"
+                    )
+                }
+            }
+        } catch {
+            presentPeriodAlert(
+                title: String(localized: "已保存,但刷新失败"),
+                message: "\(String(localized: "经期已保存,但未能刷新提醒和小组件。"))\n\(error.localizedDescription)"
+            )
         }
     }
 
     private func clearPeriod(on date: Date) {
         let key = Cal.startOfDay(date)
-        if let existing = periodByDay[key] {
-            context.delete(existing)
-            try? context.save()
+        guard let existing = periodByDay[key] else { return }
+        let defaults = UserDefaults.standard
+        Task { @MainActor in
+            do {
+                try await UserContentDeletion.deletePeriodDay(
+                    existing,
+                    context: context,
+                    notificationManager: NotificationManager.shared,
+                    dailyEnabled: defaults.bool(forKey: "notif.dailyEnabled"),
+                    dailyHour: defaults.object(forKey: "notif.dailyHour") as? Int ?? 21,
+                    periodEnabled: defaults.bool(forKey: "notif.periodEnabled"),
+                    periodAdvanceDays: defaults.object(forKey: ProReminderSettings.Keys.periodAdvanceDays) as? Int ?? 2,
+                    smartEnabled: defaults.bool(forKey: ProReminderSettings.Keys.smartEnabled),
+                    pmsEnabled: defaults.bool(forKey: ProReminderSettings.Keys.pmsEnabled),
+                    storePremium: Store.shared.premium,
+                    manualCycle: manual
+                )
+                selectedDay = nil
+            } catch let deletionError as DeletionError {
+                selectedDay = nil
+                switch deletionError {
+                case .healthKitSyncFailed(let underlying):
+                    presentPeriodAlert(
+                        title: String(localized: "Apple Health 同步失败"),
+                        message: "\(String(localized: "经期已删除,但未能完整同步 Apple Health。"))\n\(underlying.localizedDescription)"
+                    )
+                case .derivedRefreshFailed(let underlying):
+                    presentPeriodAlert(
+                        title: String(localized: "经期已删除"),
+                        message: "\(String(localized: "本机记录已删除,但未能刷新提醒和小组件。"))\n\(underlying.localizedDescription)"
+                    )
+                }
+            } catch {
+                presentPeriodAlert(
+                    title: String(localized: "删除失败"),
+                    message: "\(String(localized: "这条经期记录没有删除,原有数据未改动。"))\n\(error.localizedDescription)"
+                )
+            }
         }
-        selectedDay = nil
-        refreshPeriodReminder()
-        if HealthKitBridge.syncEnabled {
-            Task { await HealthKitBridge.deletePeriodDay(key) }
+    }
+
+    /// Returns the local period days whose cycle-start metadata can change
+    /// after an upsert or deletion, together with the complete local list used
+    /// for the continuity calculation.
+    private func periodDaysToResync(
+        around changedDayKey: Int,
+        periodDays: [PeriodDay],
+        deleting: Bool
+    ) -> (targets: [PeriodDay], allLocalDays: [PeriodDay]) {
+        let localDays = periodDays
+            .filter { !$0.importedFromHealth }
+            .sorted { $0.dayKey < $1.dayKey }
+
+        let keys = HealthKitPlanners.periodDayKeysToResync(
+            afterChanging: changedDayKey,
+            existingDayKeys: localDays.map(\.dayKey),
+            deleting: deleting
+        )
+        return (localDays.filter { keys.contains($0.dayKey) }, localDays)
+    }
+
+    /// Rewrites every requested sample while preserving and returning the
+    /// first HealthKit error. A neighbor correction must still be attempted
+    /// if an earlier sample fails.
+    private func syncPeriodDaysToHealth(
+        _ targetDays: [PeriodDay],
+        allLocalDays: [PeriodDay]
+    ) async throws {
+        guard !targetDays.isEmpty else { return }
+        let flags = HealthKitPlanners.cycleStartFlags(
+            for: allLocalDays.map(\.dayKey),
+            calendar: Cal.gregorian
+        )
+        let writes = targetDays.map { day in
+            HealthKitBridge.PeriodWriteSnapshot(
+                date: day.date,
+                flowRaw: day.flowRaw,
+                isCycleStart: flags[day.dayKey] ?? true
+            )
         }
+        try await HealthKitBridge.syncPeriodRevision(deleteDate: nil, writes: writes)
+    }
+
+    @discardableResult
+    private func savePeriodContext() -> Bool {
+        do {
+            try context.save()
+            return true
+        } catch {
+            context.rollback()
+            presentPeriodAlert(
+                title: String(localized: "保存失败"),
+                message: "\(String(localized: "这次经期记录没有保存,原有数据未改动。"))\n\(error.localizedDescription)"
+            )
+            return false
+        }
+    }
+
+    private func fetchActualData() throws -> (periodDays: [PeriodDay], logs: [DailyLog]) {
+        let actualPeriodDays = try context.fetch(
+            FetchDescriptor<PeriodDay>(sortBy: [SortDescriptor(\PeriodDay.dayKey)])
+        )
+        let actualLogs = try context.fetch(
+            FetchDescriptor<DailyLog>(sortBy: [SortDescriptor(\DailyLog.dayKey)])
+        )
+        return (actualPeriodDays, actualLogs)
+    }
+
+    private func presentPeriodAlert(title: String, message: String) {
+        periodAlertTitle = title
+        periodAlertMessage = message
+        showPeriodAlert = true
     }
 
     /// 经期数据一变,预测就变,已排期的提醒必须跟着重排。
     /// 否则提醒会停留在旧预测上(一次性触发后就再也不响)。
-    private func refreshPeriodReminder() {
+    private func refreshPeriodReminder(periodDays: [PeriodDay], logs: [DailyLog]) {
         let p = CyclePredictor.predict(from: periodDays, manual: manual)
         let next = p.nextPeriodStart
         let advance = Store.shared.premium ? ProReminderSettings.periodAdvanceDays : 2
@@ -427,7 +662,7 @@ private struct DayCell: View {
     var body: some View {
         ZStack {
             if showsPhaseTint {
-                Circle().fill(phase.tint.opacity(phase.fillOpacity))
+                Circle().fill(phase.cellFill)
             }
             if let period {
                 Circle().fill(period.flow.tint)
@@ -441,10 +676,12 @@ private struct DayCell: View {
             }
             Text(dayNumber)
                 .font(.callout)
-                .foregroundStyle(period != nil ? .white : (isPredicted ? FlowLevel.medium.tint : .primary))
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+                .foregroundStyle(period?.flow.foreground ?? (isPredicted ? FlowLevel.medium.tint : .primary))
                 .fontWeight(isToday ? .bold : .regular)
         }
-        .frame(height: 44)
+        .frame(minHeight: 44)
         .contentShape(Rectangle())
         // 颜色是唯一的视觉编码,必须给 VoiceOver 一份等价的文字描述,
         // 否则整张日历对视障用户完全不可读。
@@ -516,7 +753,7 @@ private struct PeriodDayEditor: View {
                     Text(existing == nil ? "标记为经期" : "保存").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(FlowLevel.medium.tint)
+                .tint(AppTheme.current.accent)
             }
             .padding(.top, 4)
 

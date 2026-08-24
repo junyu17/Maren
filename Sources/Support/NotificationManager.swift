@@ -1,6 +1,101 @@
 import Foundation
 import UserNotifications
 
+/// Metadata policy for the shared free/Premium period reminder identifier.
+/// A missing or malformed marker is cancelled once instead of being guessed
+/// repeatedly from mutable settings.
+enum PremiumPeriodReminderPolicy {
+    static let leadDaysUserInfoKey = "vela.period.leadDays"
+    static let freeLeadDays = 2
+
+    enum Action: Equatable {
+        case keep
+        case rebuild
+        case cancelLegacy
+    }
+
+    static func leadDays(from userInfo: [AnyHashable: Any]) -> Int? {
+        let raw = userInfo[leadDaysUserInfoKey]
+        let value: Int?
+        if let raw = raw as? Int {
+            value = raw
+        } else if let raw = raw as? NSNumber {
+            value = raw.intValue
+        } else if let raw = raw as? String {
+            value = Int(raw)
+        } else {
+            value = nil
+        }
+        guard let value, (1...5).contains(value) else { return nil }
+        return value
+    }
+
+    static func action(leadDays: Int?) -> Action {
+        guard let leadDays else { return .cancelLegacy }
+        return leadDays == freeLeadDays ? .keep : .rebuild
+    }
+
+    static func action(from userInfo: [AnyHashable: Any]) -> Action {
+        action(leadDays: leadDays(from: userInfo))
+    }
+}
+
+/// Pure identifier-level policy for moving scheduled reminders back to the
+/// free tier.  StoreKit does not know about SwiftData, so the downgrade
+/// boundary is deliberately expressed in terms of notification requests.
+/// This also keeps the entitlement transition straightforward to unit test.
+struct PremiumReminderDowngradePlan: Equatable {
+    static let periodIdentifier = "vela.period.upcoming"
+    static let pmsIdentifier = "vela.pms.selfcare"
+    static let smartIdentifier = "vela.smart.luteal"
+    static let dailyIdentifier = "vela.daily.log"
+
+    let idsToCancel: [String]
+    let medicationIDsToRebuild: [String]
+    let rebuildPeriod: Bool
+
+    static func make(pendingIdentifiers: [String]) -> Self {
+        let pending = Set(pendingIdentifiers)
+        var idsToCancel = [pmsIdentifier, smartIdentifier]
+        var medicationIDs = Set<String>()
+
+        for identifier in pending {
+            if let medicationID = medicationBaseID(fromPremiumIdentifier: identifier) {
+                idsToCancel.append(identifier)
+                medicationIDs.insert(medicationID)
+            }
+        }
+
+        // The same period request is used by both tiers.  A Premium request
+        // may use a custom lead time, so rebuild it at the free two-day lead.
+        let rebuildPeriod = pending.contains(periodIdentifier)
+        if rebuildPeriod { idsToCancel.append(periodIdentifier) }
+
+        return Self(
+            idsToCancel: Array(Set(idsToCancel)).sorted(),
+            medicationIDsToRebuild: medicationIDs.sorted(),
+            rebuildPeriod: rebuildPeriod)
+    }
+
+    /// `vela.med.<UUID>.s0` / `vela.med.<UUID>.s0.w2` are Premium slots;
+    /// the unsuffixed `vela.med.<UUID>` identifier is the free daily reminder.
+    static func medicationBaseID(fromPremiumIdentifier identifier: String) -> String? {
+        let parts = identifier.split(separator: ".", omittingEmptySubsequences: true)
+        guard parts.count == 4 || parts.count == 5,
+              parts[0] == "vela", parts[1] == "med",
+              !parts[2].isEmpty,
+              parts[3].first == "s",
+              let slotIndex = Int(parts[3].dropFirst()),
+              (0..<MedicationSlotsPolicy.maxSlots).contains(slotIndex) else { return nil }
+        if parts.count == 5 {
+            guard parts[4].first == "w",
+                  let weekday = Int(parts[4].dropFirst()),
+                  (1...7).contains(weekday) else { return nil }
+        }
+        return parts.prefix(3).joined(separator: ".")
+    }
+}
+
 /// F8 + Pro 高级提醒:本地通知。全部走系统本地通知,**不联网、无推送服务器**,符合本地优先。
 ///
 /// 分层:
@@ -10,6 +105,11 @@ import UserNotifications
 @MainActor
 final class NotificationManager: ObservableObject {
     static let shared = NotificationManager()
+
+    /// Stable identifier for the single local contraception reminder. Keep
+    /// this independent from the profile so edits can always cancel the old
+    /// request before scheduling a replacement.
+    static let contraceptionDailyReminderID = "vela.contraception.daily"
 
     @Published var authorized: Bool = false
     /// 用户明确拒绝过通知权限。此时再调 requestAuthorization 系统不会再弹窗,
@@ -70,6 +170,45 @@ final class NotificationManager: ObservableObject {
         center.add(UNNotificationRequest(identifier: dailyId, content: content, trigger: trigger))
     }
 
+    // MARK: - Contraception daily reminder
+
+    /// Rebuilds the one daily reminder from a locally stored profile. This
+    /// method never requests authorization; callers can use the existing
+    /// settings flow when the user needs to grant notification access.
+    func schedule(profile: ContraceptionSettings) {
+        cancelContraceptionDailyReminder()
+
+        let normalized = profile.normalized
+        guard authorized,
+              normalized.method.supportsDailyReminder,
+              normalized.reminderEnabled else { return }
+
+        var components = DateComponents()
+        components.hour = normalized.reminderHour
+        components.minute = normalized.reminderMinute
+
+        let content = UNMutableNotificationContent()
+        // Keep the lock-screen text generic: it must not reveal the profile's
+        // method or any other sensitive health detail.
+        content.title = String(localized: "Maren")
+        content.body = String(localized: "Open Maren to view your reminder.")
+        content.sound = .default
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        center.add(UNNotificationRequest(
+            identifier: Self.contraceptionDailyReminderID,
+            content: content,
+            trigger: trigger))
+    }
+
+    /// Cancels the contraception reminder from both pending and delivered
+    /// notification lists so profile deletion can always target it.
+    func cancelContraceptionDailyReminder() {
+        let ids = [Self.contraceptionDailyReminderID]
+        center.removePendingNotificationRequests(withIdentifiers: ids)
+        center.removeDeliveredNotifications(withIdentifiers: ids)
+    }
+
     // MARK: - 免费 · 经期临近提醒(提前天数 Pro 可自定义)
 
     /// 经期临近提醒:在预测经期首日前 `advanceDays` 天。
@@ -91,6 +230,7 @@ final class NotificationManager: ObservableObject {
             content.title = String(localized: "经期可能快来了")
             content.body = String(localized: "预测你的经期约在 \(days) 天后,可以提前做点准备。")
         }
+        content.userInfo = [PremiumPeriodReminderPolicy.leadDaysUserInfoKey: days]
         content.sound = .default
 
         var comps = cal.dateComponents([.year, .month, .day], from: fireDate)
@@ -154,6 +294,99 @@ final class NotificationManager: ObservableObject {
         comps.minute = 0
         let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
         center.add(UNNotificationRequest(identifier: smartId, content: content, trigger: trigger))
+    }
+
+    // MARK: - Premium downgrade
+
+    /// Remove Premium-only requests after StoreKit reports a downgrade while
+    /// preserving free daily/period reminders.  Medication slots are rebuilt
+    /// as one free daily reminder from the existing slot request, so this
+    /// method does not need SwiftData or a view to be alive.
+    func reconcileAfterPremiumDowngrade() async {
+        let requests = await center.pendingNotificationRequests()
+        let plan = PremiumReminderDowngradePlan.make(
+            pendingIdentifiers: requests.map(\.identifier))
+        let requestsByID = Dictionary(uniqueKeysWithValues: requests.map { ($0.identifier, $0) })
+        let periodSource = requestsByID[periodId]
+        let periodAction = periodSource.map {
+            PremiumPeriodReminderPolicy.action(from: $0.content.userInfo)
+        }
+        var idsToCancel = plan.idsToCancel
+        // A request explicitly marked with the free lead is already safe.
+        // Keep it byte-for-byte so repeated reconciliation cannot move it.
+        if periodAction == .keep {
+            idsToCancel.removeAll { $0 == periodId }
+        }
+
+        center.removePendingNotificationRequests(withIdentifiers: idsToCancel)
+
+        for medicationID in plan.medicationIDsToRebuild {
+            guard requestsByID[medicationID] == nil,
+                  let source = requests
+                    .filter({ PremiumReminderDowngradePlan.medicationBaseID(fromPremiumIdentifier: $0.identifier) == medicationID })
+                    .sorted(by: { $0.identifier < $1.identifier })
+                    .first else { continue }
+            await rebuildFreeMedicationReminder(from: source, identifier: medicationID)
+        }
+
+        if plan.rebuildPeriod,
+           periodAction == .rebuild,
+           let source = periodSource,
+           let oldLead = PremiumPeriodReminderPolicy.leadDays(from: source.content.userInfo) {
+            await rebuildFreePeriodReminder(from: source, oldLead: oldLead)
+        }
+    }
+
+    private func rebuildFreeMedicationReminder(from source: UNNotificationRequest,
+                                               identifier: String) async {
+        guard let trigger = source.trigger as? UNCalendarNotificationTrigger,
+              trigger.dateComponents.hour != nil else { return }
+
+        var components = DateComponents()
+        components.hour = trigger.dateComponents.hour
+        components.minute = trigger.dateComponents.minute ?? 0
+
+        let content = UNMutableNotificationContent()
+        content.title = source.content.title
+        content.body = source.content.body
+        content.sound = source.content.sound
+        try? await center.add(UNNotificationRequest(
+            identifier: identifier,
+            content: content,
+            trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: true)))
+    }
+
+    private func rebuildFreePeriodReminder(from source: UNNotificationRequest,
+                                           oldLead: Int) async {
+        guard let trigger = source.trigger as? UNCalendarNotificationTrigger,
+              let originalFireDate = Cal.current.date(from: trigger.dateComponents) else { return }
+
+        // The pending request was scheduled at next-period minus the verified
+        // lead marker. Recover that date, then apply the free tier's fixed
+        // two-day lead.
+        guard let nextPeriodStart = Cal.current.date(
+            byAdding: .day, value: oldLead, to: Cal.startOfDay(originalFireDate)),
+              let freeFireDate = Cal.current.date(
+                byAdding: .day, value: -2, to: nextPeriodStart),
+              freeFireDate > Date() else { return }
+
+        var components = Cal.current.dateComponents([.year, .month, .day], from: freeFireDate)
+        components.hour = 10
+        let content = UNMutableNotificationContent()
+        if Self.hideSensitiveContent {
+            content.title = String(localized: "Maren")
+            content.body = String(localized: "打开 Maren 查看今天的提醒。")
+        } else {
+            content.title = String(localized: "经期可能快来了")
+            content.body = String(localized: "预测你的经期约在 2 天后,可以提前做点准备。")
+        }
+        content.userInfo = [PremiumPeriodReminderPolicy.leadDaysUserInfoKey:
+                            PremiumPeriodReminderPolicy.freeLeadDays]
+        content.sound = .default
+        try? await center.add(UNNotificationRequest(
+            identifier: periodId,
+            content: content,
+            trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)))
     }
 
     // MARK: - 用药提醒(免费单次 + Pro 多时段)
@@ -256,10 +489,19 @@ final class NotificationManager: ObservableObject {
             for w in 1...7 { ids.append("\(notificationId).s\(i).w\(w)") }
         }
         center.removePendingNotificationRequests(withIdentifiers: ids)
+        center.removeDeliveredNotifications(withIdentifiers: ids)
     }
 
     /// 撤销某个药的单次提醒(保留兼容;删除药时用 cancelAll 更彻底)。
     func cancelMedicationReminder(id: String) {
         center.removePendingNotificationRequests(withIdentifiers: [id])
+        center.removeDeliveredNotifications(withIdentifiers: [id])
+    }
+
+    /// Used after the user deletes all local data. Every notification owned by
+    /// this app is removed from both the schedule and Notification Center.
+    func cancelAllAppNotifications() {
+        center.removeAllPendingNotificationRequests()
+        center.removeAllDeliveredNotifications()
     }
 }

@@ -11,7 +11,7 @@
 
 ## 铁律(开发中不可违反)
 
-1. **本地优先(local-first)**:健康数据只存**用户设备 + 用户自己的 iCloud(CloudKit 私有库)**。我们的服务器**永不接触**用户健康数据。这既是卖点,也是隐私政策成立的前提。
+1. **本地优先(local-first)**:健康数据只存**用户设备本地(SwiftData 本地库)**,**不进入 iCloud/CloudKit**。我们的服务器**永不接触**用户健康数据。这既是卖点,也是隐私政策成立的前提。
 2. **用户录入的数据永久免费、可导出**,绝不锁进付费墙。
 3. **绝不定位成避孕/安全期/排卵保证工具** —— 文案只用「追踪 + 趋势洞察」,规避医疗责任。避免出现 "safe days"、"birth control"、"guaranteed"、"prevent pregnancy" 等词。
    - ✅ **已拍板,勿再提问(2026-07-23 Billy 决定)**:日历**展示完整四阶段(经期/卵泡期/排卵期/黄体期)并多色标注是允许的**,已实装。红线是**定位与话术**,不是阶段展示本身。详见立项书 §3.4。
@@ -21,8 +21,8 @@
 ## 技术栈
 
 - Swift + SwiftUI,iOS 17+
-- 本地存储:SwiftData
-- 同步:CloudKit 私有库(可选开关,默认本地)
+- 本地存储:SwiftData(**仅本机,不接 CloudKit/iCloud**)
+- 同步:无跨设备同步(2026-08-14 已移除 CloudKit 选项 —— App Review Guideline 5.1.3(ii) 禁止把个人健康信息存入 iCloud)
 - 健康数据:HealthKit(可选授权)
 - 预测:设备端自适应统计模型 —— **不写死「第 14 天排卵」**,学用户真实周期,支持 15–120 天长/不规律周期(PCOS 友好),呈现置信区间而非假装精准
 - 每日一句:本地 JSON 词库 + 按周期阶段匹配
@@ -48,13 +48,13 @@
 - F3 情绪+症状每日记录(3 秒打卡,极简、不卡)
 - F4 每日激励一句话(按周期阶段智能匹配,离线)
 - F5 数据永久免费 + 一键导出(CSV/PDF)
-- F6 隐私优先架构(本地 + 用户自己 iCloud,服务器零接触)
+- F6 隐私优先架构(纯本地,服务器零接触)
 - F7 趋势图表
 - F8 提醒通知
 
-V2(付费解锁):AI 洞察(设备端优先)、PCOS 专项、CloudKit 多设备同步、Face ID 锁、主题、Apple Health 双向同步、Apple Watch。
+扩展功能:Apple Health 双向同步、Face ID 锁、Apple Watch 与 PCOS 科普保持免费;Premium 付费解锁设备端个性化洞察、深度趋势、高级提醒、额外主题和无限自定义追踪项。
 
-> 实现现状更新(2026-07-28):上表所列 V2 项多已免费实装(CloudKit 同步、Apple Health 双向同步、Face ID 锁、主题、PCOS 信息页均已上线,高级提醒为 Pro 付费);付费墙当前只锁「洞察」「高级提醒」「高级图表」等 Pro 功能。产品决策以此处与《高级提醒-Pro-实现记录.md》为准。
+> 实现现状更新(2026-08-14):上表所列 V2 项多已实装(Apple Health 双向同步、Face ID 锁、主题、PCOS 信息页均已上线,高级提醒为 Pro 付费);CloudKit 多设备同步**已按 App Review 5.1.3(ii) 移除**(个人健康信息不得入 iCloud),健康数据纯本地,无跨设备同步。付费墙当前只锁「洞察」「高级提醒」「高级图表」等 Pro 功能。产品决策以此处与《高级提醒-Pro-实现记录.md》为准。
 
 ## 定价
 
@@ -63,13 +63,13 @@ Premium:$3.99/月 · $29.99/年 · 终身买断 $69.99。刻意比 Flo($10/月)�
 
 ## 成本基线
 
-上线 MVP ~$99–200(Apple Developer $99/年是主要开销)。后端≈$0(本地优先 + CloudKit)。
+上线 MVP ~$99–200(Apple Developer $99/年是主要开销)。后端≈$0(本地优先,无 CloudKit)。
 
 ## 命名与标识(已定型,2026-07-27)
 
 - **品牌名 = Maren**(旧代号 Vela 已弃用为商店名;Vela 在 App Store 被占)。含义「属于海的」,帆船图标沿用。
 - **App Store Connect 列表标题 = `Maren: Period & Mood`**(该字段要求全局唯一,故用「品牌+描述」;这是 App Store Connect 手填项,不在代码里)。手机图标下显示名 `CFBundleDisplayName = Maren`(无需唯一)。
-- **Bundle IDs**:主 app `cd.cc.vela`、Widget `cd.cc.vela.widget`、Watch `cd.cc.vela.watchkitapp`;App Group `group.cd.cc.vela`;CloudKit 容器 `iCloud.cd.cc.vela`。
+- **Bundle IDs**:主 app `cd.cc.vela`、Widget `cd.cc.vela.widget`、Watch `cd.cc.vela.watchkitapp`;App Group `group.cd.cc.vela`。
 - **内部标识符仍叫 Vela**(Xcode target/scheme/工程名、Swift 类型如 `VelaApp`/`VelaWidget`、源文件名)——只是代号,不面向用户,勿为改名而大改(会牵连证书/scheme/命令)。构建仍用 `-scheme Vela`。
 - ⚠️ **App Store 名称是否可用只有 App Store Connect 的 Name 输入框权威**,网页搜索查不到已预留/未上架的名字——别再用搜索"确认"可用性。
 

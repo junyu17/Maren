@@ -1,50 +1,52 @@
 import WidgetKit
 import SwiftUI
+import AppIntents
 
 // MARK: - 时间线
 
 struct VelaEntry: TimelineEntry {
     let date: Date
     let snapshot: WidgetSnapshot
+    /// 当天待处理的快速操作数(来自 App Group 队列)。
+    let pendingCount: Int
 }
 
 struct VelaProvider: TimelineProvider {
     func placeholder(in context: Context) -> VelaEntry {
-        VelaEntry(date: Date(), snapshot: .placeholder)
+        VelaEntry(date: Date(), snapshot: .placeholder, pendingCount: 0)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (VelaEntry) -> Void) {
-        completion(VelaEntry(date: Date(), snapshot: WidgetSnapshotStore.read()))
+        let s = WidgetSnapshotStore.read()
+        let pending = QuickActionQueue.pendingTodayCount(
+            for: WidgetSnapshotStore.appGroup, todayKey: QuickActionQueue.todayKey())
+        completion(VelaEntry(date: Date(), snapshot: s, pendingCount: pending))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<VelaEntry>) -> Void) {
-        let entry = VelaEntry(date: Date(), snapshot: WidgetSnapshotStore.read())
-        // 主 app 数据变化时会主动 reload;这里再兜底每 2 小时刷新一次。
-        let next = Calendar.current.date(byAdding: .hour, value: 2, to: Date()) ?? Date()
+        let s = WidgetSnapshotStore.read()
+        let pending = QuickActionQueue.pendingTodayCount(
+            for: WidgetSnapshotStore.appGroup, todayKey: QuickActionQueue.todayKey())
+        let entry = VelaEntry(date: Date(), snapshot: s, pendingCount: pending)
+        let next = Calendar.current.date(byAdding: .hour, value: 1, to: Date()) ?? Date()
         completion(Timeline(entries: [entry], policy: .after(next)))
     }
 }
 
-// MARK: - 配色(小组件自带一份,避免依赖主 app 代码)
+// MARK: - 配色
 
 private func widgetAccent(_ raw: String) -> Color {
-    switch raw {
-    case "teal":   return Color(red: 0.20, green: 0.62, blue: 0.56)
-    case "violet": return Color(red: 0.45, green: 0.35, blue: 0.80)
-    case "amber":  return Color(red: 0.90, green: 0.55, blue: 0.20)
-    case "ink":    return Color(red: 0.24, green: 0.34, blue: 0.52)
-    default:       return Color(red: 0.82, green: 0.36, blue: 0.42) // rose
-    }
+    let palette = VelaPalette.theme(for: raw)
+    return VelaPalette.dynamicColor(light: palette.light, dark: palette.dark)
 }
 
-/// 周期阶段配色(与主 app `CyclePhase.tint` 一致)。key = `CyclePhase.rawValue`。
 private func phaseColor(_ key: String?) -> Color {
     switch key ?? "" {
     case "menstrual":  return Color(red: 0.90, green: 0.40, blue: 0.46)
     case "follicular": return Color(red: 0.34, green: 0.70, blue: 0.62)
     case "ovulatory":  return Color(red: 0.38, green: 0.26, blue: 0.74)
     case "luteal":     return Color(red: 0.95, green: 0.66, blue: 0.36)
-    default:           return .secondary // unknown / 数据不足
+    default:           return .secondary
     }
 }
 
@@ -55,33 +57,27 @@ struct VelaWidgetView: View {
     var entry: VelaEntry
 
     var body: some View {
+        switch family {
+        case .systemMedium:
+            mediumView
+        case .accessoryCircular:
+            circularView
+        case .accessoryRectangular:
+            rectangularView
+        case .accessoryInline:
+            inlineView
+        default:
+            smallView
+        }
+    }
+
+    // MARK: - Small (2×2)
+
+    private var smallView: some View {
         let s = entry.snapshot
         let accent = widgetAccent(s.themeRaw)
         let phaseClr = phaseColor(s.phaseKey)
-
-        Group {
-            if family == .systemMedium {
-                // 2×4:左 = 阶段/提示/下次经期,右 = 鼓励语 + 点开记录
-                HStack(alignment: .top, spacing: 12) {
-                    coreBlock(s, accent: accent, phaseClr: phaseClr)
-                    Divider()
-                    mediumExtra(s, accent: accent)
-                }
-            } else {
-                // 2×2:阶段/提示/下次经期(单列)
-                coreBlock(s, accent: accent, phaseClr: phaseClr)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .containerBackground(.fill.tertiary, for: .widget)
-        // 点开 widget -> 主 app。中尺寸进「今天」直接记录;小尺寸进「日历」。
-        .widgetURL(URL(string: family == .systemMedium ? "maren://today" : "maren://calendar"))
-    }
-
-    /// 核心块:今天所处周期 + 该注意什么 + 下次经期。2×2 与 2×4 左列共用。
-    @ViewBuilder
-    private func coreBlock(_ s: WidgetSnapshot, accent: Color, phaseClr: Color) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
+        return VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 5) {
                 Image(systemName: "sailboat.fill").font(.caption2)
                 Text("Maren").font(.caption2.weight(.bold))
@@ -95,40 +91,168 @@ struct VelaWidgetView: View {
                     Text(label).font(.caption.weight(.semibold)).foregroundStyle(phaseClr)
                 }
             }
-
             if let tip = s.phaseTip, !tip.isEmpty {
-                Text(tip)
-                    .font(.caption2).foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
+                Text(tip).font(.caption2).foregroundStyle(.secondary)
+                    .lineLimit(2).fixedSize(horizontal: false, vertical: true)
             }
-
             Spacer(minLength: 2)
-
-            Text(s.title)
-                .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
-            Text(s.value)
-                .font(.title2.bold()).foregroundStyle(accent)
+            Text(s.title).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+            Text(s.value).font(.title2.bold()).foregroundStyle(accent)
                 .minimumScaleFactor(0.6).lineLimit(1)
+            pendingBadge
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(.fill.tertiary, for: .widget)
+        .widgetURL(URL(string: "maren://calendar"))
+        .privacySensitive()
     }
 
-    /// 2×4 右列:鼓励一句话 + 点开记录今天的提示。
+    // MARK: - Medium (2×4)
+
+    private var mediumView: some View {
+        let s = entry.snapshot
+        let accent = widgetAccent(s.themeRaw)
+        let phaseClr = phaseColor(s.phaseKey)
+        return HStack(alignment: .top, spacing: 12) {
+            // 左列:阶段 + 下次经期
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 5) {
+                    Image(systemName: "sailboat.fill").font(.caption2)
+                    Text("Maren").font(.caption2.weight(.bold))
+                    Spacer(minLength: 0)
+                }
+                .foregroundStyle(accent)
+                if let label = s.phaseLabel, !label.isEmpty {
+                    HStack(spacing: 4) {
+                        Circle().fill(phaseClr).frame(width: 8, height: 8)
+                        Text(label).font(.caption.weight(.semibold)).foregroundStyle(phaseClr)
+                    }
+                }
+                if let tip = s.phaseTip, !tip.isEmpty {
+                    Text(tip).font(.caption2).foregroundStyle(.secondary)
+                        .lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 2)
+                Text(s.title).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
+                Text(s.value).font(.title2.bold()).foregroundStyle(accent)
+                    .minimumScaleFactor(0.6).lineLimit(1)
+                pendingBadge
+            }
+            .privacySensitive()
+            Divider()
+            // 右列:快速操作按钮(标签明确写入实际记录的值,无隐藏默认值)
+            VStack(alignment: .leading, spacing: 8) {
+                if !s.note.isEmpty {
+                    Text(s.note).font(.caption).italic().foregroundStyle(.primary.opacity(0.85))
+                        .lineLimit(3).fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                // 记经期按钮——标签明确写「中量」(medium flow),消除歧义
+                Button(intent: LogPeriodIntent()) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "drop.fill").font(.caption2)
+                        Text(String(localized: "经期 · 中量")).font(.caption2.weight(.medium))
+                    }
+                    .foregroundStyle(accent)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "Log medium period flow"))
+                .accessibilityHint(String(localized: "Queues a medium flow period entry to save when Maren opens."))
+                // 记心情按钮——标签明确写「不错」(good mood),消除歧义
+                Button(intent: LogMoodIntent()) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "face.smiling").font(.caption2)
+                        Text(String(localized: "心情 · 不错")).font(.caption2.weight(.medium))
+                    }
+                    .foregroundStyle(accent)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "Log good mood"))
+                .accessibilityHint(String(localized: "Queues a good mood entry to save when Maren opens."))
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(.fill.tertiary, for: .widget)
+        .privacySensitive()
+    }
+
+    // MARK: - Accessory Circular (Watch Complication)
+
+    private var circularView: some View {
+        let s = entry.snapshot
+        let accent = widgetAccent(s.themeRaw)
+        return ZStack {
+            if let label = s.phaseLabel, !label.isEmpty {
+                Text(label.prefix(1))
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(accent)
+            } else {
+                Image(systemName: "sailboat.fill")
+                    .font(.system(size: 15))
+                    .foregroundStyle(accent)
+            }
+        }
+        .containerBackground(.fill.tertiary, for: .widget)
+        .privacySensitive()
+    }
+
+    // MARK: - Accessory Rectangular (Watch Smart Stack)
+
+    private var rectangularView: some View {
+        let s = entry.snapshot
+        let accent = widgetAccent(s.themeRaw)
+        return VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 4) {
+                Image(systemName: "sailboat.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(accent)
+                Text("Maren").font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(accent)
+                Spacer(minLength: 0)
+            }
+            if let label = s.phaseLabel, !label.isEmpty {
+                Text(label).font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(accent)
+            }
+            Text(s.value).font(.system(size: 14, weight: .bold))
+                .foregroundStyle(accent)
+        }
+        .containerBackground(.fill.tertiary, for: .widget)
+        .privacySensitive()
+    }
+
+    // MARK: - Accessory Inline
+
+    private var inlineView: some View {
+        let s = entry.snapshot
+        let accent = widgetAccent(s.themeRaw)
+        return HStack(spacing: 4) {
+            Image(systemName: "sailboat.fill")
+                .foregroundStyle(accent)
+            if let label = s.phaseLabel, !label.isEmpty {
+                Text("\(label) · \(s.value)")
+            } else {
+                Text("Maren · \(s.value)")
+            }
+        }
+        .foregroundStyle(accent)
+        .containerBackground(.fill.tertiary, for: .widget)
+        .privacySensitive()
+    }
+
+    // MARK: - 待处理标记
+
     @ViewBuilder
-    private func mediumExtra(_ s: WidgetSnapshot, accent: Color) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            if !s.note.isEmpty {
-                Text(s.note)
-                    .font(.caption).italic().foregroundStyle(.primary.opacity(0.85))
-                    .lineLimit(4)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer(minLength: 0)
+    private var pendingBadge: some View {
+        if entry.pendingCount > 0 {
             HStack(spacing: 3) {
-                Image(systemName: "square.and.pencil").font(.caption2)
-                Text("点开记录今天").font(.caption2.weight(.medium))
+                Image(systemName: "clock.badge.questionmark")
+                    .font(.system(size: 9))
+                Text(String(localized: "待保存(\(entry.pendingCount))"))
+                    .font(.system(size: 9, weight: .medium))
             }
-            .foregroundStyle(accent)
+            .foregroundStyle(.orange)
+            .accessibilityLabel(String(localized: "\(entry.pendingCount) pending, will save when Maren is open"))
         }
     }
 }
@@ -141,8 +265,11 @@ struct VelaWidget: Widget {
             VelaWidgetView(entry: entry)
         }
         .configurationDisplayName("Maren")
-        .description(Text("查看今天所处周期、注意事项与下次经期;大尺寸可点开记录今天。"))
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .description(String(localized: "查看周期、阶段与下次经期;中尺寸可快速记录经期和心情。"))
+        .supportedFamilies([
+            .systemSmall, .systemMedium,
+            .accessoryCircular, .accessoryRectangular, .accessoryInline,
+        ])
     }
 }
 

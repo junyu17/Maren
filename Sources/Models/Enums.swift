@@ -23,12 +23,14 @@ enum FlowLevel: Int, Codable, CaseIterable, Identifiable {
     var dots: Int { rawValue + 1 }
 
     var tint: Color {
-        switch self {
-        case .spotting: return Color(red: 0.95, green: 0.72, blue: 0.72)
-        case .light:    return Color(red: 0.90, green: 0.55, blue: 0.58)
-        case .medium:   return Color(red: 0.82, green: 0.36, blue: 0.42)
-        case .heavy:    return Color(red: 0.66, green: 0.20, blue: 0.28)
-        }
+        VelaPalette.color(VelaPalette.flow(rawValue))
+    }
+
+    /// Ink chosen for the flow fill, rather than always using white.  The
+    /// lightest two dots are intentionally pale and need dark numerals in the
+    /// calendar to remain readable in both appearances.
+    var foreground: Color {
+        VelaPalette.color(VelaPalette.flowForeground(rawValue))
     }
 }
 

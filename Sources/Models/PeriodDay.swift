@@ -8,14 +8,16 @@ final class PeriodDay {
     /// 逻辑唯一键:yyyymmdd 整数(见 `DayKey`)。
     /// 用整数而不是 Date:跨时区 / 夏令时后,「本地零点」的时间戳会变,
     /// 会造成同一天重复记录或记录消失;整数日键只描述「哪一天」,永远稳定。
-    /// ⚠️ 不用 `@Attribute(.unique)`:CloudKit 不支持唯一约束。同 dayKey 的去重
-    /// 由写入路径手动完成(`CalendarView.upsertPeriod` / `QuickLogApplier`,先查后写)。
+    /// 同 dayKey 只应存在一条;去重由写入路径手动完成(`CalendarView.upsertPeriod` /
+    /// `QuickLogApplier`,先查后写),启动时再有 `DedupSweep` 兜底折叠。
     var dayKey: Int = 0
     /// 存原始值,SwiftData 对基础类型最稳。
     var flowRaw: Int = FlowLevel.medium.rawValue
     var createdAt: Date = Date.now
     /// 最近一次修改时刻(用于手表记录的时间戳比较,防止旧值覆盖新值)。
     var updatedAt: Date = Date.now
+    /// 该条记录是否由 Apple Health 导入。手动编辑后应置为 false。
+    var importedFromHealth: Bool = false
 
     /// 该日在当前时区下的零点。派生属性,不入库,仅供显示与日期运算。
     var date: Date { DayKey.date(from: dayKey) }
@@ -30,5 +32,6 @@ final class PeriodDay {
         self.flowRaw = flow.rawValue
         self.createdAt = Date()
         self.updatedAt = self.createdAt
+        self.importedFromHealth = false
     }
 }

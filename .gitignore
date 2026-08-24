@@ -12,6 +12,12 @@ DerivedData/
 *.xcscmblueprint
 *.xccheckout
 build/
+tmp/
+
+# 本地 App Store 归档与提审验证产物（体积大，且可能包含签名描述文件）
+AppStore/Builds/
+AppStore/Review-Response-*/Evidence/
+*.xcresult/
 
 # Swift Package Manager
 .build/

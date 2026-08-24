@@ -9,22 +9,102 @@ enum LegalLinks {
     static let terms   = URL(string: "https://junyu17.github.io/Maren/terms.html")!
 }
 
-/// 付费墙:展示 Maren Premium 的价值与三个产品,处理购买与恢复。
-/// 价格 / 周期文案全部取自 StoreKit(随用户地区 storefront 变化),不写死。
+/// Product presentation is deliberately independent of StoreKit so its most
+/// important purchase promises can be tested without constructing `Product`.
+enum PaywallPlanKind: Equatable {
+    case yearly
+    case monthly
+    case lifetime
+}
+
+enum PaywallCTA: Equatable {
+    case startTrial(days: Int)
+    case subscribe
+    case purchase
+}
+
+enum PaywallBillingDisclosure: Equatable {
+    case automaticRenewal(trialDays: Int?, postTrialPrice: String?)
+    case oneTime
+}
+
+struct PaywallProductPresentation: Equatable {
+    let kind: PaywallPlanKind
+    let displayName: String
+    let displayPrice: String
+    let cta: PaywallCTA
+    let billingDisclosure: PaywallBillingDisclosure
+
+    var trialDays: Int? {
+        guard case .startTrial(let days) = cta else { return nil }
+        return days
+    }
+}
+
+/// Pure presentation policy for the three products exposed by the paywall.
+/// StoreKit remains the source of truth for names, prices, and trial metadata;
+/// this policy only decides which wording is legal for that metadata.
+enum PaywallPurchaseStrategy {
+    static func presentation(
+        productID: String,
+        displayName: String,
+        displayPrice: String,
+        eligibleTrialDays: Int?
+    ) -> PaywallProductPresentation? {
+        switch productID {
+        case Store.ProductID.yearly:
+            let hasSevenDayTrial = eligibleTrialDays == 7
+            return PaywallProductPresentation(
+                kind: .yearly,
+                displayName: displayName,
+                displayPrice: displayPrice,
+                cta: hasSevenDayTrial ? .startTrial(days: 7) : .subscribe,
+                billingDisclosure: .automaticRenewal(
+                    trialDays: hasSevenDayTrial ? 7 : nil,
+                    postTrialPrice: hasSevenDayTrial ? displayPrice : nil
+                )
+            )
+        case Store.ProductID.monthly:
+            return PaywallProductPresentation(
+                kind: .monthly,
+                displayName: displayName,
+                displayPrice: displayPrice,
+                cta: .subscribe,
+                billingDisclosure: .automaticRenewal(trialDays: nil, postTrialPrice: nil)
+            )
+        case Store.ProductID.lifetime:
+            return PaywallProductPresentation(
+                kind: .lifetime,
+                displayName: displayName,
+                displayPrice: displayPrice,
+                cta: .purchase,
+                billingDisclosure: .oneTime
+            )
+        default:
+            return nil
+        }
+    }
+}
+
 struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var store = Store.shared
+    @State private var selectedProductID: String?
     @State private var showResultAlert = false
     @State private var resultMsg = ""
+
+    private var accent: Color { AppTheme.current.accent }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 22) {
-                    header
-                    featureList
-                    Divider()
-                    productList
+                VStack(spacing: 28) {
+                    heroSection
+                    benefitsSection
+                    freeSection
+                    planSection
+                    purchaseButton
                     restoreButton
                     legalText
                 }
@@ -37,25 +117,46 @@ struct PaywallView: View {
                     Button("关闭") { dismiss() }
                 }
             }
-            .task { if store.products.isEmpty { await store.loadProducts() } }
+            .task {
+                if store.products.isEmpty { await store.loadProducts() }
+                await store.refreshTrialEligibility()
+                if selectedProductID == nil { selectDefaultProduct() }
+            }
             .alert("提示", isPresented: $showResultAlert) {
                 Button("好") {}
             } message: { Text(resultMsg) }
-            // 购买成功 -> premium 翻 true -> 自动关闭付费墙,被锁功能随即解锁。
             .onChange(of: store.premium) { _, isPremium in
                 if isPremium { dismiss() }
+            }
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active else { return }
+                Task { @MainActor in
+                    await store.refreshTrialEligibility()
+                }
             }
         }
     }
 
-    private var header: some View {
+    private func selectDefaultProduct() {
+        if let yearly = store.products.first(where: { $0.id == Store.ProductID.yearly }) {
+            selectedProductID = yearly.id
+        } else if let first = store.products.first {
+            selectedProductID = first.id
+        }
+    }
+
+    // MARK: - Hero
+
+    private var heroSection: some View {
         VStack(spacing: 10) {
             Image(systemName: "sparkles")
                 .font(.system(size: 44))
-                .foregroundStyle(FlowLevel.medium.tint)
-            Text("Maren Premium")
-                .font(.title2.weight(.bold))
-            Text("让 Maren 在本机发现属于你的规律。数据从不离开你的设备。")
+                .foregroundStyle(accent)
+            Text("更懂自己的身体节律，不交出健康数据")
+                .font(.title3.weight(.semibold))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("你的每日记录会变成趋势、提醒和可分享的摘要；所有分析在设备端完成。")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -64,97 +165,274 @@ struct PaywallView: View {
         .padding(.top, 8)
     }
 
-    private var featureList: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            featureRow("wand.and.stars",
-                        title: String(localized: "个性化洞察"),
-                        body: String(localized: "心情与周期的关联、最常出现的症状、周期稳定度--由你的记录在本机计算。"))
-            featureRow("bell.badge.fill",
-                        title: String(localized: "高级提醒"),
-                        body: String(localized: "多时段用药提醒、经期提前天数自定义、PMS 关怀、按阶段智能提醒--更懂你的节奏。"))
-            featureRow("chart.xyaxis.line",
-                        title: String(localized: "深度趋势"),
-                        body: String(localized: "心情、症状与体重的走势分析,看懂身体的规律。"))
-            featureRow("heart.text.square",
-                        title: String(localized: "PCOS 专项支持"),
-                        body: String(localized: "为不规律 / PCOS 周期而设的追踪与洞察。"))
-            featureRow("paintpalette",
-                        title: String(localized: "主题与无限自定义追踪项"),
-                        body: String(localized: "5 套配色,想追踪什么就加什么,不限数量。"))
-            featureRow("lock.shield.fill",
-                        title: String(localized: "支持独立开发"),
-                        body: String(localized: "直接支持一个不卖你数据的独立开发者。你的记录和导出永远免费。"))
+    // MARK: - Benefits
+
+    private var benefitsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            benefitGroup(
+                icon: "chart.xyaxis.line",
+                title: String(localized: "看懂规律"),
+                items: [
+                    String(localized: "心情与周期的关联趋势"),
+                    String(localized: "最常记录的追踪项排行"),
+                    String(localized: "周期规律度观察"),
+                ]
+            )
+            benefitGroup(
+                icon: "bell.badge.fill",
+                title: String(localized: "提前准备"),
+                items: [
+                    String(localized: "多时段用药提醒"),
+                    String(localized: "经期提前天数自定义"),
+                    String(localized: "PMS 关怀与按阶段智能提醒"),
+                ]
+            )
+            benefitGroup(
+                icon: "doc.text.fill",
+                title: String(localized: "带更清晰的记录去看诊"),
+                items: [
+                    String(localized: "自定义日期范围生成结构化 PDF"),
+                    String(localized: "免费版固定近 6 个月范围"),
+                ]
+            )
+            benefitGroup(
+                icon: "paintpalette",
+                title: String(localized: "按你的方式追踪"),
+                items: [
+                    String(localized: "5 套配色主题"),
+                    String(localized: "无限自定义追踪项"),
+                ]
+            )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func featureRow(_ icon: String, title: String, body: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(FlowLevel.medium.tint)
-                .frame(width: 28)
-            VStack(alignment: .leading, spacing: 3) {
+    private func benefitGroup(icon: String, title: String, items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label {
                 Text(title).font(.subheadline.weight(.semibold))
-                Text(body).font(.caption).foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: icon)
+                    .foregroundStyle(FlowLevel.medium.tint)
             }
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(items, id: \.self) { item in
+                    Text("· " + item)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(.leading, 24)
         }
     }
 
-    @ViewBuilder
-    private var productList: some View {
+    // MARK: - Free Tier Trust
+
+    private var freeSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label {
+                Text("免费版始终包含").font(.subheadline.weight(.semibold))
+            } icon: {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(freeFeatures, id: \.self) { feature in
+                    Text("· " + feature)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(.leading, 24)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.green.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    private var freeFeatures: [String] {
+        [
+            String(localized: "经期与周期日历"),
+            String(localized: "每日心情 / 症状打卡"),
+            String(localized: "基础提醒通知"),
+            String(localized: "数据导出、备份与删除"),
+        ]
+    }
+
+    // MARK: - Plan Selector
+
+    private var planSection: some View {
         VStack(spacing: 10) {
             if store.products.isEmpty {
                 if store.purchasing {
                     ProgressView()
                 } else {
-                    Text("暂时无法加载产品。请确认网络;若在本地测试,请在 Xcode 配置 StoreKit Configuration 文件。")
+                    Text("暂时无法加载产品。请确认网络；若在本地测试，请在 Xcode 配置 StoreKit Configuration 文件。")
                         .font(.caption).foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             } else {
                 ForEach(store.products, id: \.id) { product in
-                    productRow(product)
+                    planCard(product)
                 }
             }
         }
     }
 
-    private func productRow(_ product: Product) -> some View {
-        Button {
-            Task {
-                let ok = await store.purchase(product)
-                if !ok, let err = store.lastError {
-                    resultMsg = err
-                    showResultAlert = true
-                }
+    private func planCard(_ product: Product) -> some View {
+        let isSelected = selectedProductID == product.id
+        let isYearly = product.id == Store.ProductID.yearly
+        let isLifetime = product.id == Store.ProductID.lifetime
+        let presentation = presentation(for: product)
+        let hasTrial = presentation?.trialDays != nil
+
+        return Button {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                selectedProductID = product.id
             }
         } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(product.displayName).font(.subheadline.weight(.semibold))
-                    Text(product.description).font(.caption2).foregroundStyle(.white.opacity(0.85))
-                        .lineLimit(1)
+            HStack(alignment: .top) {
+                Image(systemName: isSelected ? "circle.fill" : "circle")
+                    .font(.system(size: 18))
+                    .foregroundStyle(isSelected ? accent : .secondary)
+                    .frame(width: 24)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(product.displayName)
+                            .font(.subheadline.weight(.semibold))
+                        if isYearly {
+                            Text("最划算")
+                                .font(.caption2.weight(.medium))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(accent.opacity(0.15), in: Capsule())
+                        }
+                    }
+                    if hasTrial {
+                        Text(String(localized: "7 天免费试用"))
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.green)
+                    } else if isLifetime {
+                        Text(String(localized: "一次性付款，永久有效"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else if let sub = product.subscription {
+                        let period = periodText(sub.subscriptionPeriod)
+                        Text(String(localized: "订阅生效后每 \(period) 续费"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+
                 Spacer()
-                Text(priceText(product))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    if isYearly, let monthlyEquivalent = monthlyEquivalentText(for: product) {
+                        Text(monthlyEquivalent)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    if let savings = savingsText(for: product) {
+                        Text(savings)
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.green)
+                    }
+                    Text(planPriceText(product))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(isSelected ? .primary : .secondary)
+                }
             }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 14)
-            .frame(maxWidth: .infinity)
-            .background(FlowLevel.medium.tint, in: RoundedRectangle(cornerRadius: 12))
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(isSelected ? accent : Color.secondary.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+            )
+            .background(isSelected ? accent.opacity(0.04) : Color.clear, in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
         .disabled(store.purchasing)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(planAccessibilityLabel(product, presentation: presentation))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    // MARK: - Purchase Button
+
+    private var purchaseButton: some View {
+        Button {
+            Task { await performPurchase() }
+        } label: {
+            HStack {
+                if store.purchasing {
+                    ProgressView()
+                        .tint(.white)
+                }
+                Text(purchaseButtonTitle)
+                    .font(.body.weight(.semibold))
+            }
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: 50)
+            .background(accent, in: RoundedRectangle(cornerRadius: 14))
+        }
+        .disabled(store.purchasing || selectedProductID == nil)
         .opacity(store.purchasing ? 0.6 : 1)
     }
 
-    /// 取 StoreKit 的本地化价格 + 周期文案。
-    private func priceText(_ product: Product) -> String {
+    private var purchaseButtonTitle: String {
+        guard let id = selectedProductID,
+              let product = store.products.first(where: { $0.id == id }) else {
+            return String(localized: "选择方案")
+        }
+        guard let presentation = presentation(for: product) else {
+            return String(localized: "选择方案")
+        }
+        switch presentation.cta {
+        case .startTrial(let days):
+            return String(localized: "开始 \(days) 天免费试用")
+        case .subscribe:
+            return String(localized: "订阅 \(presentation.displayName)")
+        case .purchase:
+            return String(localized: "购买并永久解锁")
+        }
+    }
+
+    private func performPurchase() async {
+        guard let id = selectedProductID,
+              let product = store.products.first(where: { $0.id == id }) else { return }
+        let ok = await store.purchase(product)
+        if !ok, let err = store.lastError {
+            resultMsg = err
+            showResultAlert = true
+        }
+    }
+
+    // MARK: - Restore
+
+    private var restoreButton: some View {
+        Button {
+            Task {
+                await store.restore()
+                resultMsg = store.premium
+                    ? String(localized: "已恢复你的 Premium 权益。")
+                    : (store.lastError ?? String(localized: "没有找到可恢复的购买。"))
+                showResultAlert = true
+            }
+        } label: {
+            Text("恢复购买").font(.subheadline).foregroundStyle(.secondary)
+        }
+        .disabled(store.purchasing)
+    }
+
+    // MARK: - Pricing Helpers
+
+    private func planPriceText(_ product: Product) -> String {
         let price = product.displayPrice
         if let sub = product.subscription {
             return "\(price) / \(periodText(sub.subscriptionPeriod))"
@@ -172,35 +450,149 @@ struct PaywallView: View {
         }
     }
 
-    private var restoreButton: some View {
-        Button {
-            Task {
-                await store.restore()
-                resultMsg = store.premium
-                    ? String(localized: "已恢复你的 Premium 权益。")
-                    : String(localized: "没有找到可恢复的购买。")
-                showResultAlert = true
-            }
-        } label: {
-            Text("恢复购买").font(.subheadline).foregroundStyle(.secondary)
-        }
-        .disabled(store.purchasing)
+    private func monthlyEquivalentText(for product: Product) -> String? {
+        guard product.id == Store.ProductID.yearly else { return nil }
+        let price = PaywallPricing.monthlyEquivalent(yearlyPrice: product.price)
+            .formatted(product.priceFormatStyle)
+        return String(localized: "约 \(price) / 月")
     }
+
+    private func savingsText(for product: Product) -> String? {
+        guard product.id == Store.ProductID.yearly,
+              let monthly = store.products.first(where: { $0.id == Store.ProductID.monthly }),
+              let percentage = PaywallPricing.savingsPercentage(
+                yearlyPrice: product.price,
+                monthlyPrice: monthly.price
+              ) else { return nil }
+        return String(localized: "节省 \(percentage)%")
+    }
+
+    // MARK: - Accessibility
+
+    private func planAccessibilityLabel(_ product: Product, presentation: PaywallProductPresentation?) -> String {
+        var parts = [product.displayName, planPriceText(product)]
+        if case .some(.startTrial(let days)) = presentation?.cta {
+            parts.append(String(localized: "\(days) 天免费试用"))
+        }
+        if case .some(.purchase) = presentation?.cta {
+            parts.append(String(localized: "一次性付款，永久有效"))
+        }
+        if product.id == selectedProductID {
+            parts.append(String(localized: "已选中"))
+        }
+        return parts.joined(separator: ", ")
+    }
+
+    // MARK: - Legal
 
     private var legalText: some View {
         VStack(spacing: 6) {
-            Text("订阅会自动续期,可在 App Store 账户设置中随时取消。买断为一次性付款,永久有效。所有交易由 Apple 处理,我们不接触你的支付信息。")
+            if let selectedProduct,
+               let presentation = presentation(for: selectedProduct) {
+                disclosureText(
+                    for: presentation.billingDisclosure,
+                    price: selectedProduct.displayPrice
+                )
+            }
+            legalLinks
+        }
+    }
+
+    @ViewBuilder
+    private func disclosureText(
+        for disclosure: PaywallBillingDisclosure,
+        price: String
+    ) -> some View {
+        switch disclosure {
+            case .automaticRenewal(let trialDays, let postTrialPrice):
+                if let trialDays, let postTrialPrice {
+                Text("开始 \(trialDays) 天免费试用时不会立即收费。试用结束后将按 \(postTrialPrice) / 年自动续费；你可以在试用结束前取消，避免产生费用。")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Text("确认订阅时将按 \(price) 收费。订阅会自动续期，除非在当前订阅期结束至少 24 小时前取消；账户会在当前订阅期结束前 24 小时内按所选方案收取续订费用。你可以在 App Store 账户设置中管理或取消订阅。")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        case .oneTime:
+            Text("确认购买时将按 \(price) 向你的 Apple ID 收费。一次性付款，永久有效，无续费。所有交易由 Apple 处理，我们不接触你的支付信息。")
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            // 审核要求(Guideline 3.1.2 / 5.1.1):付费墙内提供隐私政策与使用条款入口。
-            HStack(spacing: 16) {
-                Link("隐私政策", destination: LegalLinks.privacy)
-                Link("使用条款", destination: LegalLinks.terms)
-            }
-            .font(.caption2)
-            .foregroundStyle(.blue)
         }
+    }
+
+    private var legalLinks: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 16) {
+                legalLinkItems
+            }
+            VStack(spacing: 6) {
+                legalLinkItems
+            }
+        }
+        .font(.caption2)
+        .foregroundStyle(.blue)
+        .multilineTextAlignment(.center)
+    }
+
+    private var legalLinkItems: some View {
+        Group {
+            Link("隐私政策", destination: LegalLinks.privacy)
+            Link("使用条款", destination: LegalLinks.terms)
+            Link("管理订阅", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
+        }
+    }
+
+    private var selectedProduct: Product? {
+        guard let selectedProductID else { return nil }
+        return store.products.first { $0.id == selectedProductID }
+    }
+
+    private func presentation(for product: Product) -> PaywallProductPresentation? {
+        let eligibleTrialDays: Int? = product.id == Store.ProductID.yearly
+            && store.hasEligibleSevenDayTrial(product)
+            ? store.freeTrialDays(for: product)
+            : nil
+        return PaywallPurchaseStrategy.presentation(
+            productID: product.id,
+            displayName: product.displayName,
+            displayPrice: product.displayPrice,
+            eligibleTrialDays: eligibleTrialDays
+        )
+    }
+}
+
+/// StoreKit 价格展示的纯计算，不依赖固定币种或 storefront。
+enum PaywallPricing {
+    static func monthlyEquivalent(yearlyPrice: Decimal) -> Decimal {
+        NSDecimalNumber(decimal: yearlyPrice)
+            .dividing(by: NSDecimalNumber(value: 12))
+            .decimalValue
+    }
+
+    static func savingsPercentage(yearlyPrice: Decimal, monthlyPrice: Decimal) -> Int? {
+        guard yearlyPrice >= 0, monthlyPrice > 0 else { return nil }
+        let annualizedMonthly = monthlyPrice * Decimal(12)
+        guard annualizedMonthly > yearlyPrice else { return nil }
+        let savings = annualizedMonthly - yearlyPrice
+        let fraction = NSDecimalNumber(decimal: savings)
+            .dividing(by: NSDecimalNumber(decimal: annualizedMonthly))
+        return fraction
+            .multiplying(by: NSDecimalNumber(value: 100))
+            .rounding(accordingToBehavior: NSDecimalNumberHandler(
+                roundingMode: .plain,
+                scale: 0,
+                raiseOnExactness: false,
+                raiseOnOverflow: false,
+                raiseOnUnderflow: false,
+                raiseOnDivideByZero: false
+            ))
+            .intValue
     }
 }

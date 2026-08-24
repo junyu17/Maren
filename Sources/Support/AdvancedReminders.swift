@@ -5,7 +5,7 @@ import Foundation
 /// Pro 高级提醒:用药「一天多次 / 按周几」排程里的单个时间点。
 ///
 /// 存储方式:编码成 JSON 存在 `Medication.scheduleSlotsJSON`(SwiftData 单字段,
-/// 避免为每个时段建关系表,CloudKit 同步也更简单)。
+/// 避免为每个时段建关系表)。
 struct ReminderSlot: Codable, Identifiable, Equatable, Hashable {
     var id: UUID
     var hour: Int      // 0...23
@@ -109,7 +109,7 @@ enum SmartReminderEngine {
         let body: String
         if let sym = topSymptomInLuteal(phased) {
             // 如:你的「焦虑」常在黄体期升高,这几天注意休息。
-            body = String(localized: "你的「\(sym)」常在黄体期升高,这几天注意休息。")
+            body = String(localized: "「\(sym)」在你的黄体期出现得更多,这几天多留意自己。")
         } else if moodLowerInLuteal(phased) {
             body = String(localized: "你的心情在黄体期通常偏低,这几天多关照自己。")
         } else {

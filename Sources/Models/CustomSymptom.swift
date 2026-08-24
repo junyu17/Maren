@@ -5,7 +5,7 @@ import SwiftData
 /// DailyLog.symptoms 里存的是 key;自定义项的 key 形如 "c:<uuid>",内置项用原有英文 key。
 @Model
 final class CustomSymptom {
-    /// 逻辑唯一键:`c:<uuid>`,UUID 保证全局唯一(无需 DB 唯一约束,CloudKit 不支持)。
+    /// 逻辑唯一键:`c:<uuid>`,UUID 保证全局唯一,天然不会有键冲突。
     var key: String = ""
     var label: String = ""
     var emoji: String = ""
@@ -31,7 +31,7 @@ enum CustomSymptomStore {
     static func refresh(_ context: ModelContext) {
         let items = (try? context.fetch(FetchDescriptor<CustomSymptom>())) ?? []
         // 用 reduce 后写赢而不是 Dictionary(uniqueKeysWithValues:):
-        // 后者在 DB 出现重复 key(异常导入/CloudKit 合并/未来版本)时会直接崩溃,
+        // 后者在 DB 出现重复 key(异常导入 / 数据恢复 / 未来版本)时会直接崩溃,
         // 而 CustomSymptomStore.refresh 在启动即触发,crash 会让 app 打不开。
         var map: [String: SymptomTag] = [:]
         for item in items {

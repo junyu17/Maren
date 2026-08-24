@@ -5,6 +5,78 @@ import SwiftData
 /// 手表不存库,所有写入都在这里统一走与 UI 相同的 upsert 逻辑,保证行为一致。
 enum QuickLogApplier {
 
+    /// The receiver-side replay barrier for WatchConnectivity payloads.
+    ///
+    /// Watch keeps an outbox and a recent application-context snapshot on the
+    /// other device.  The phone cannot delete those values directly, so a
+    /// successful local "Delete All Data" records a local cutoff and rejects
+    /// every payload that was sent at or before that instant.  This key is
+    /// intentionally kept here (rather than in the backup schema) so it is
+    /// device state, not user data that can be imported into another device.
+    static let deleteReplayCutoffKey = "vela.delete.replay.cutoff"
+
+    /// UserDefaults may quantize a persisted Date/Double by a tiny amount.
+    /// Keep the same one-microsecond bound used by read-back validation; this
+    /// only covers persistence quantization and does not widen the replay window.
+    static let deleteReplayPersistenceTolerance: TimeInterval = 0.000_001
+
+    /// Returns the last successful local-delete cutoff, or nil when no valid
+    /// cutoff has been recorded.  Older/broken defaults must fail open rather
+    /// than making every future Watch record disappear.
+    static func deleteReplayCutoff(from defaults: UserDefaults = .standard) -> Date? {
+        let raw = defaults.object(forKey: deleteReplayCutoffKey)
+        let seconds: Double
+        if let date = raw as? Date {
+            seconds = date.timeIntervalSince1970
+        } else if let number = raw as? NSNumber {
+            seconds = number.doubleValue
+        } else {
+            return nil
+        }
+
+        // A finite, non-negative Unix timestamp is the only representation we
+        // write.  Treat malformed values as absent; do not throw or reject a
+        // valid log because a previous app version left bad defaults behind.
+        guard seconds.isFinite, seconds >= 0 else { return nil }
+        return Date(timeIntervalSince1970: seconds)
+    }
+
+    /// Persist a cutoff after local model deletion has succeeded.  Read-back
+    /// verification makes the call testable and prevents callers from
+    /// assuming a malformed value was stored as a barrier.
+    @discardableResult
+    static func persistDeleteReplayCutoff(
+        at cutoff: Date = Date(),
+        in defaults: UserDefaults = .standard
+    ) -> Bool {
+        let seconds = cutoff.timeIntervalSince1970
+        guard seconds.isFinite, seconds >= 0 else { return false }
+        defaults.set(seconds, forKey: deleteReplayCutoffKey)
+        guard let stored = deleteReplayCutoff(from: defaults) else { return false }
+        return abs(stored.timeIntervalSince1970 - seconds) < deleteReplayPersistenceTolerance
+    }
+
+    /// Whether a decoded Watch payload is older than the last successful
+    /// local deletion.  Invalid/missing cutoff values are treated as no
+    /// barrier.  The payload's own validation remains separate so callers can
+    /// acknowledge malformed queue entries without persisting them.
+    static func isBlockedByDeleteReplay(
+        _ log: QuickLog,
+        defaults: UserDefaults = .standard
+    ) -> Bool {
+        guard let cutoff = deleteReplayCutoff(from: defaults) else { return false }
+        // UserDefaults persistence can move the stored cutoff by less than the
+        // validation tolerance; reject only that quantization-sized interval.
+        return log.sentAt.timeIntervalSince(cutoff) <= deleteReplayPersistenceTolerance
+    }
+
+    /// Exposed for the Widget queue consumer: malformed or replay-blocked
+    /// entries are safe to discard even if a different, new entry fails to
+    /// save and therefore remains pending.
+    static func shouldDiscard(_ log: QuickLog, defaults: UserDefaults = .standard) -> Bool {
+        !isValid(log) || isBlockedByDeleteReplay(log, defaults: defaults)
+    }
+
     /// 跨时区校正:手表的 dayKey 是**手表时区的今天**;手机与手表跨日期变更线时
     /// (如北京 +8 与纽约 -5),直接沿用会落到手机日历的另一天。
     /// 用 QuickLog 自带的发送端时区偏移,把 dayKey 转成发送端当天的绝对时刻,
@@ -31,20 +103,54 @@ enum QuickLogApplier {
         return DayKey.from(absDate)
     }
 
+    struct ApplyResult: Equatable {
+        let success: Bool
+        let affectedDayKeys: Set<Int>
+
+        static let empty = ApplyResult(success: true, affectedDayKeys: [])
+    }
+
+    /// 应用日志并持久化。返回 context.save() 是否成功。
     @MainActor
-    static func apply(_ logs: [QuickLog], context: ModelContext) {
-        guard !logs.isEmpty else { return }
-        for log in logs {
-            // 防御:手表消息只来自本机已配对的 WatchConnectivity 会话,
-            // 但 dayKey 非法/时间戳离谱时仍应拒绝,避免插入垃圾记录。
-            guard isValid(log) else { continue }
-            switch log.kind {
-            case "period": applyPeriod(log, context: context)
-            case "mood":   applyMood(log, context: context)
-            default:       break
-            }
+    @discardableResult
+    static func apply(
+        _ logs: [QuickLog],
+        context: ModelContext,
+        defaults: UserDefaults = .standard
+    ) -> Bool {
+        applyWithKeys(logs, context: context, defaults: defaults).success
+    }
+
+    /// Applies logs and returns both success status and affected day keys.
+    @MainActor
+    static func applyWithKeys(
+        _ logs: [QuickLog],
+        context: ModelContext,
+        defaults: UserDefaults = .standard
+    ) -> ApplyResult {
+        guard !logs.isEmpty else { return .empty }
+        let acceptedLogs = logs.filter {
+            isValid($0) && !isBlockedByDeleteReplay($0, defaults: defaults)
         }
-        try? context.save()
+        guard !acceptedLogs.isEmpty else { return .empty }
+        var affectedKeys = Set<Int>()
+        do {
+            for log in acceptedLogs {
+                let changed: Bool
+                switch log.kind {
+                case "period": changed = try applyPeriod(log, context: context)
+                case "mood":   changed = try applyMood(log, context: context)
+                default:        changed = false
+                }
+                if changed { affectedKeys.insert(localDayKey(for: log)) }
+            }
+            guard !affectedKeys.isEmpty else { return .empty }
+            try context.save()
+            return ApplyResult(success: true, affectedDayKeys: affectedKeys)
+        } catch {
+            context.rollback()
+            return ApplyResult(success: false, affectedDayKeys: [])
+        }
     }
 
     /// 校验一条手表记录的基本合理性:
@@ -68,40 +174,54 @@ enum QuickLogApplier {
         guard log.sentAt.timeIntervalSinceNow <= 48 * 3600 else { return false }
         // raw 值范围:越界会 fallback 成默认值,可能覆盖手机端正确记录。
         switch log.kind {
-        case "period": return (log.flowRaw ?? 0) >= 0 && (log.flowRaw ?? 0) <= 3
-        case "mood":   return (log.moodRaw ?? 0) >= 1 && (log.moodRaw ?? 0) <= 5
+        case "period": return log.flowRaw != nil && (0...3).contains(log.flowRaw!)
+        case "mood":   return log.moodRaw != nil && (1...5).contains(log.moodRaw!)
         default:       return false
         }
     }
 
-    private static func applyPeriod(_ log: QuickLog, context: ModelContext) {
+    private static func applyPeriod(_ log: QuickLog, context: ModelContext) throws -> Bool {
         let key = localDayKey(for: log)
-        let existing = (try? context.fetch(
-            FetchDescriptor<PeriodDay>(predicate: #Predicate { $0.dayKey == key })))?.first
-        let flow = FlowLevel(rawValue: log.flowRaw ?? 2) ?? .medium
+        let existing = try context.fetch(
+            FetchDescriptor<PeriodDay>(predicate: #Predicate { $0.dayKey == key })).first
+        guard let flowRaw = log.flowRaw else { return false }
+        let flow = FlowLevel(rawValue: flowRaw) ?? .medium
         if let existing {
             // 只在手表发送时刻比现有记录更新时才覆盖,防止 batch 重放旧值覆盖新值。
-            guard log.sentAt > existing.updatedAt else { return }
+            guard log.sentAt > existing.updatedAt else { return false }
             existing.flow = flow
-            existing.updatedAt = Date()
+            existing.importedFromHealth = false
+            // `updatedAt` is also the durable source timestamp used by the
+            // receiver.  Using the phone receive time here makes an older
+            // item at the start of an offline Watch batch hide every newer
+            // item that follows it (all of their `sentAt` values are in the
+            // past by the time the batch arrives).
+            existing.updatedAt = log.sentAt
         } else {
-            context.insert(PeriodDay(date: DayKey.date(from: key), flow: flow))
+            let period = PeriodDay(date: DayKey.date(from: key), flow: flow)
+            period.updatedAt = log.sentAt
+            context.insert(period)
         }
+        return true
     }
 
-    private static func applyMood(_ log: QuickLog, context: ModelContext) {
+    private static func applyMood(_ log: QuickLog, context: ModelContext) throws -> Bool {
         let key = localDayKey(for: log)
-        let existing = (try? context.fetch(
-            FetchDescriptor<DailyLog>(predicate: #Predicate { $0.dayKey == key })))?.first
-        let mood = Mood(rawValue: log.moodRaw ?? 0)
+        let existing = try context.fetch(
+            FetchDescriptor<DailyLog>(predicate: #Predicate { $0.dayKey == key })).first
+        guard let moodRaw = log.moodRaw else { return false }
+        let mood = Mood(rawValue: moodRaw)
         if let existing {
             // 只在手表发送时刻比现有记录更新时才覆盖,防止 batch 重放旧值覆盖新值
             // (用户之后在手机端改过的值不应被更早的手表记录覆盖)。
-            guard log.sentAt > existing.updatedAt else { return }
+            guard log.sentAt > existing.updatedAt else { return false }
             existing.mood = mood
-            existing.updatedAt = Date()
+            existing.updatedAt = log.sentAt
         } else {
-            context.insert(DailyLog(date: DayKey.date(from: key), mood: mood))
+            let dailyLog = DailyLog(date: DayKey.date(from: key), mood: mood)
+            dailyLog.updatedAt = log.sentAt
+            context.insert(dailyLog)
         }
+        return true
     }
 }

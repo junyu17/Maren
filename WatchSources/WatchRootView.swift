@@ -3,9 +3,13 @@ import SwiftUI
 /// 层级 4 · 手表主界面。极简三段:一眼看 → 记经期 → 记心情。
 struct WatchRootView: View {
     @EnvironmentObject private var conn: WatchConnectivityManager
+    @Environment(\.colorScheme) private var colorScheme
     @State private var justSaved = false
 
-    private var accent: Color { watchAccent(conn.snapshot.themeRaw) }
+    private var accent: Color {
+        let palette = VelaPalette.theme(for: conn.snapshot.themeRaw)
+        return VelaPalette.color(light: palette.light, dark: palette.dark, colorScheme: colorScheme)
+    }
 
     /// 手表按自己所在时区算「今天」,与手机的 DayKey 编码一致(固定公历,不跟随日历偏好)。
     private var todayKey: Int {
@@ -37,17 +41,18 @@ struct WatchRootView: View {
 
                     // 记经期
                     Text("记录经期").font(.caption2).foregroundStyle(.secondary)
-                    HStack(spacing: 6) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 40), spacing: 6)], spacing: 6) {
                         ForEach(0..<4) { raw in
                             Button {
                                 conn.send(.period(flowRaw: raw, dayKey: todayKey))
                                 flash()
                             } label: {
                                 Circle()
-                                    .fill(flowColor(raw))
-                                    .frame(height: 26)
+                                    .fill(VelaPalette.color(VelaPalette.flow(raw)))
+                                    .frame(minWidth: 40, minHeight: 40)
                             }
                             .buttonStyle(.plain)
+                            .frame(minWidth: 40, minHeight: 44)
                             .accessibilityLabel(flowName(raw))
                         }
                     }
@@ -56,20 +61,23 @@ struct WatchRootView: View {
 
                     // 记心情
                     Text("今天心情").font(.caption2).foregroundStyle(.secondary)
-                    HStack(spacing: 4) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 40), spacing: 6)], spacing: 6) {
                         ForEach([(5, "😄"), (4, "🙂"), (3, "😐"), (2, "😕"), (1, "😣")], id: \.0) { item in
                             Button {
                                 conn.send(.mood(moodRaw: item.0, dayKey: todayKey))
                                 flash()
                             } label: {
-                                Text(item.1).font(.title3)
+                                Text(item.1)
+                                    .font(.title3)
+                                    .frame(minWidth: 40, minHeight: 44)
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel(moodName(item.0))
                         }
                     }
 
                     Text("记录会同步回 iPhone")
-                        .font(.system(size: 10)).foregroundStyle(.tertiary)
+                        .font(.caption2).foregroundStyle(.tertiary)
                         .padding(.top, 2)
                 }
                 .padding(.horizontal, 4)
@@ -87,31 +95,21 @@ struct WatchRootView: View {
     }
 }
 
-// 手表侧自带一份配色,避免依赖主 app 代码。
-private func watchAccent(_ raw: String) -> Color {
-    switch raw {
-    case "teal":   return Color(red: 0.20, green: 0.62, blue: 0.56)
-    case "violet": return Color(red: 0.45, green: 0.35, blue: 0.80)
-    case "amber":  return Color(red: 0.90, green: 0.55, blue: 0.20)
-    case "ink":    return Color(red: 0.34, green: 0.48, blue: 0.72)
-    default:       return Color(red: 0.90, green: 0.45, blue: 0.52)
-    }
-}
-
-private func flowColor(_ raw: Int) -> Color {
-    switch raw {
-    case 0: return Color(red: 0.95, green: 0.72, blue: 0.72)
-    case 1: return Color(red: 0.90, green: 0.55, blue: 0.58)
-    case 2: return Color(red: 0.82, green: 0.36, blue: 0.42)
-    default: return Color(red: 0.66, green: 0.20, blue: 0.28)
-    }
-}
-
 private func flowName(_ raw: Int) -> String {
     switch raw {
     case 0: return String(localized: "点滴")
     case 1: return String(localized: "少量")
     case 2: return String(localized: "中量")
     default: return String(localized: "大量")
+    }
+}
+
+private func moodName(_ raw: Int) -> String {
+    switch raw {
+    case 5: return String(localized: "很好")
+    case 4: return String(localized: "不错")
+    case 3: return String(localized: "一般")
+    case 2: return String(localized: "低落")
+    default: return String(localized: "很糟")
     }
 }

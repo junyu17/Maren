@@ -1,5 +1,15 @@
 import SwiftUI
 
+extension View {
+    func tabBarMinimizeOnScrollIfAvailable() -> some View {
+        if #available(iOS 26.0, *) {
+            return self.tabBarMinimizeBehavior(.onScrollDown)
+        } else {
+            return self
+        }
+    }
+}
+
 struct RootView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
@@ -42,6 +52,8 @@ struct RootView: View {
                     if lockEnabled { lock.lock() }
                 case .active:
                     if lockEnabled && !lock.unlocked { lock.authenticate() }
+                    // 切回前台时排空小组件队列,确保快速操作不遗漏。
+                    WidgetQuickDrain.drainIfNeeded(context: context)
                 default: break
                 }
             }
@@ -74,6 +86,9 @@ struct RootView: View {
                 .tag(3)
         }
         .tint(theme.accent)
+        .toolbarBackground(.visible, for: .tabBar)
+        .toolbarBackground(.ultraThinMaterial, for: .tabBar)
+        .tabBarMinimizeOnScrollIfAvailable()
         .onAppear {
             showStoreAlert = storeFailed
             // 把自定义症状快照加载进静态注册表,供导出/洞察等非 View 场景解析显示名。

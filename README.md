@@ -12,9 +12,9 @@ Maren is a privacy-first period, mood & symptom tracker for iPhone. Your health 
 
 Most period apps trap your history behind subscriptions, get caught selling data, or predict poorly for irregular cycles. Maren is the opposite:
 
-- **Local-first.** Entries live on your device. Optional iCloud sync uses *your own* private iCloud — even we can't access it.
+- **Local-first.** All health entries live only on your device — never in iCloud, never on any server. Even we can't see them.
 - **No selling, no ads, no trackers.** No third-party advertising or tracking SDKs. Ever.
-- **Free forever for tracking.** Logging, basic prediction, daily quotes, and data export (CSV/PDF) are always free.
+- **Free forever for tracking.** Logging, basic prediction, daily quotes, raw export, fixed clinician reports, and password-encrypted manual backup are always free.
 - **Honest prediction.** Learns *your* cycle (no "day 14" assumption); shows a confidence range instead of fake precision. Supports 15–120 day cycles.
 - **Not a contraceptive.** A tracking & insight tool — not a medical device, no fertility/ovulation guarantees.
 
@@ -24,14 +24,15 @@ Most period apps trap your history behind subscriptions, get caught selling data
 - 3-second daily mood / symptom / sleep / weight check-in (custom symptoms too)
 - On-device personal insights (Premium)
 - Smart reminders: period, PMS self-care, phase-aware; medication multi-time & weekday scheduling (Premium)
-- Optional Apple Health two-way sync · optional iCloud sync · Apple Watch quick-log · home-screen widgets
+- Optional granular Apple Health sync (sleep is read-only) · Apple Watch quick-log · App Shortcuts · interactive widgets/Smart Stack
+- Cycle comparison · correlation explorer · clinician PDF · password-encrypted manual backup
 - Face ID lock · themes · full data export & delete
 
 ## Pricing
 
 | Tier | Price |
 |---|---|
-| Free | $0 forever — all tracking, basic prediction, daily quote, export, Face ID, Apple Health, iCloud sync |
+| Free | $0 forever — tracking, basic prediction, sample experience, raw export, fixed clinician report, encrypted backup, Face ID, Apple Health, quick actions |
 | Premium Monthly | $3.99 / month |
 | Premium Yearly | $29.99 / year (best value) |
 | Premium Lifetime | $69.99 one-time, forever |
@@ -40,7 +41,7 @@ In-app products: `cd.cc.vela.premium.yearly` / `.monthly` / `.lifetime` (StoreKi
 
 ## Tech stack
 
-Swift · SwiftUI · SwiftData · CloudKit (private DB, optional) · HealthKit · StoreKit 2 · WidgetKit · WatchConnectivity. iOS 17+. Project generated with [XcodeGen](https://github.com/yonaskolb/XcodeGen) from `project.yml`.
+Swift · SwiftUI · SwiftData (local-only) · HealthKit · StoreKit 2 · App Intents · WidgetKit · WatchConnectivity · CryptoKit/CommonCrypto. iOS 17+. Project generated with [XcodeGen](https://github.com/yonaskolb/XcodeGen) from `project.yml`.
 
 ## Build
 

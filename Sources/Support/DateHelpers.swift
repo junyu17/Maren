@@ -10,7 +10,7 @@ enum DayKey {
     /// 取该时刻在**当前时区**下所属的日历日,编码为 yyyymmdd。
     /// 必须固定用公历(Calendar(identifier: .gregorian)):dayKey 的注释契约是「yyyymmdd 公历日期」,
     /// 若跟随用户日历偏好(日本历/泰历/伊斯兰历等),同一数值会被解析成不同日期,
-    /// CloudKit 同步到另一台设备或用户切换日历后,记录会错位/消失。
+    /// 用户切换日历后,记录会错位/消失。
     static func from(_ date: Date) -> Int {
         let c = Cal.gregorian.dateComponents([.year, .month, .day], from: date)
         return (c.year ?? 1970) * 10_000 + (c.month ?? 1) * 100 + (c.day ?? 1)

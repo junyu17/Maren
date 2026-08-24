@@ -8,7 +8,14 @@ struct MedicationManagerView: View {
     @State private var editing: Medication?
     @State private var showAdd = false
     @State private var showSlotsCapped = false
+    @State private var showDeleteError = false
+    @State private var deleteErrorMessage = ""
+    @State private var mutationErrorTitle = ""
     @ObservedObject private var store = Store.shared
+
+    init(focusedMedication: Medication? = nil) {
+        _editing = State(initialValue: focusedMedication)
+    }
 
     var body: some View {
         List {
@@ -49,6 +56,11 @@ struct MedicationManagerView: View {
         } message: {
             Text("iOS 最多同时安排 64 条本地提醒。本次的部分提醒时段因超限未能排上,建议减少时段数量或选择更少的周几。")
         }
+        .alert(mutationErrorTitle, isPresented: $showDeleteError) {
+            Button("好", role: .cancel) {}
+        } message: {
+            Text(deleteErrorMessage)
+        }
     }
 
     private func summary(_ med: Medication) -> String {
@@ -68,17 +80,19 @@ struct MedicationManagerView: View {
         return f.string(from: d)
     }
 
-    private func save(_ draft: MedicationEditor.Draft) {
+    @discardableResult
+    private func save(_ draft: MedicationEditor.Draft) -> Bool {
         let med: Medication
+        let oldNotificationId: String?
         if let existing = draft.existing {
             med = existing
-            // 先撤掉旧排期(单次 + 旧多时段),再改字段重排,避免残留。
-            NotificationManager.shared.cancelAllMedicationReminders(notificationId: med.notificationId)
+            oldNotificationId = med.notificationId
             med.name = draft.name
             med.emoji = draft.emoji
         } else {
             med = Medication(name: draft.name, emoji: draft.emoji)
             context.insert(med)
+            oldNotificationId = nil
         }
         let usePro = draft.proScheduleEnabled && store.premium && !draft.slots.isEmpty
         med.proScheduleEnabled = usePro
@@ -91,11 +105,23 @@ struct MedicationManagerView: View {
             med.reminderHour = draft.hour
             med.reminderMinute = draft.minute
         }
-        try? context.save()
-        // 重排:Pro 走多时段,否则走单次。
+
+        // Save first; only cancel/schedule after durable save succeeds.
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            mutationErrorTitle = String(localized: "保存失败")
+            deleteErrorMessage = error.localizedDescription
+            showDeleteError = true
+            return false
+        }
+
+        // Save succeeded: cancel old notifications, then schedule new ones.
+        if let oldId = oldNotificationId {
+            NotificationManager.shared.cancelAllMedicationReminders(notificationId: oldId)
+        }
         if usePro {
-            // 系统对 pending 本地通知有 64 条硬上限,多药叠加会超限导致静默丢弃;
-            // 返回 false 时提示用户减少时段/周几。
             Task {
                 let ok = await NotificationManager.shared.scheduleMedicationSlots(
                     notificationId: med.notificationId, name: med.name, slots: med.slots)
@@ -106,22 +132,26 @@ struct MedicationManagerView: View {
                 id: med.notificationId, name: med.name,
                 enabled: true, hour: med.reminderHour, minute: med.reminderMinute)
         }
+        LocalDataChangeCenter.shared.post(kind: .medicationChanged)
+        return true
     }
 
     private func delete(_ offsets: IndexSet) {
-        for i in offsets {
-            let med = meds[i]
-            NotificationManager.shared.cancelAllMedicationReminders(notificationId: med.notificationId)
-            // Medication 与 MedicationIntake 以 UUID 关联(SwiftData 无级联),
-            // 必须手动清掉该药的全部打卡记录,否则孤儿数据永久残留并随 CloudKit 同步。
-            let medId = med.id
-            let intakes = (try? context.fetch(
-                FetchDescriptor<MedicationIntake>(
-                    predicate: #Predicate { $0.medicationId == medId }))) ?? []
-            intakes.forEach { context.delete($0) }
-            context.delete(med)
+        let toDelete = offsets.map { meds[$0] }
+        for med in toDelete {
+            do {
+                try UserContentDeletion.deleteMedication(
+                    med,
+                    context: context,
+                    notificationManager: NotificationManager.shared
+                )
+            } catch {
+                mutationErrorTitle = String(localized: "删除失败")
+                deleteErrorMessage = error.localizedDescription
+                showDeleteError = true
+                return
+            }
         }
-        try? context.save()
     }
 }
 
@@ -141,7 +171,7 @@ struct MedicationEditor: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var store = Store.shared
     let med: Medication?
-    let onSave: (Draft) -> Void
+    let onSave: (Draft) -> Bool
 
     @State private var name: String
     @State private var emoji: String
@@ -152,7 +182,7 @@ struct MedicationEditor: View {
 
     private let choices = ["💊", "🟡", "🔵", "🧴", "💉", "🌿", "🩹", "☀️"]
 
-    init(med: Medication?, onSave: @escaping (Draft) -> Void) {
+    init(med: Medication?, onSave: @escaping (Draft) -> Bool) {
         self.med = med
         self.onSave = onSave
         _name = State(initialValue: med?.name ?? "")
@@ -212,13 +242,14 @@ struct MedicationEditor: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("保存") {
                         let c = Cal.current.dateComponents([.hour, .minute], from: time)
-                        onSave(Draft(existing: med,
-                                     name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-                                     emoji: emoji, reminderEnabled: reminderEnabled,
-                                     hour: c.hour ?? 9, minute: c.minute ?? 0,
-                                     proScheduleEnabled: proScheduleEnabled,
-                                     slots: slots))
-                        dismiss()
+                        if onSave(Draft(existing: med,
+                                        name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+                                        emoji: emoji, reminderEnabled: reminderEnabled,
+                                        hour: c.hour ?? 9, minute: c.minute ?? 0,
+                                        proScheduleEnabled: proScheduleEnabled,
+                                        slots: slots)) {
+                            dismiss()
+                        }
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
@@ -250,7 +281,7 @@ struct MedicationEditor: View {
                 Label("添加时段", systemImage: "plus")
             }
         } else {
-            Text("已达 \(MedicationSlotsPolicy.maxSlots) 个时段上限。")
+            Text(String(localized: "已达 \(MedicationSlotsPolicy.maxSlots) 个时段上限。"))
                 .font(.caption).foregroundStyle(.secondary)
         }
     }
@@ -267,7 +298,7 @@ struct WeekdayPicker: View {
     private let symbols = Cal.current.shortWeekdaySymbols // [Sun, Mon, ...] 下标 0-6;weekday 1=Sunday
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             ForEach(1...7, id: \.self) { w in
                 let idx = w - 1
                 let on = weekdays.contains(w)
@@ -277,12 +308,17 @@ struct WeekdayPicker: View {
                 } label: {
                     Text(symbols.indices.contains(idx) ? symbols[idx] : "\(w)")
                         .font(.caption.weight(.medium))
-                        .frame(width: 34, height: 30)
-                        .foregroundStyle(on ? .white : .primary)
-                        .background(on ? FlowLevel.medium.tint : Color.secondary.opacity(0.12),
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        // A 44 pt minimum makes every weekday reachable with
+                        // a finger and gives AX text room to grow.
+                        .frame(minWidth: 40, minHeight: 44)
+                        .foregroundStyle(on ? AppTheme.current.onAccent : .primary)
+                        .background(on ? AppTheme.current.accent : Color.secondary.opacity(0.12),
                                     in: RoundedRectangle(cornerRadius: 8))
                 }
                 .buttonStyle(.plain)
+                .contentShape(RoundedRectangle(cornerRadius: 8))
                 .accessibilityLabel(symbols.indices.contains(idx) ? symbols[idx] : "\(w)")
                 .accessibilityAddTraits(on ? [.isButton, .isSelected] : [.isButton])
             }

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 /// 周期阶段。用于日历多色标注 + 每日一句的阶段匹配。
 /// 说明:阶段仅为「基于你自己记录的估算」,**不作排卵/避孕依据**(见预测卡片免责声明)。
@@ -22,23 +23,43 @@ enum CyclePhase: String, CaseIterable, Identifiable {
         }
     }
 
-    /// 日历格背景填充浓度。排卵期刻意更深,让它在一片浅色里更醒目。
-    var fillOpacity: Double {
+    /// 阶段主色的浅色 / 深色两套 RGB。
+    ///
+    /// ⚠️ 深色模式必须单独给值,不能只靠调透明度。浅色那套色值是为「叠在白底上」挑的:
+    /// 同样的颜色叠在纯黑上会被压暗到肉眼分辨不出(卵泡期的墨绿、排卵期的深紫在黑底上
+    /// 几乎是同一块黑),用户只剩预测的虚线圈能看清。深色这套整体提亮 + 提饱和。
+    private var rgbPair: (light: (Double, Double, Double), dark: (Double, Double, Double)) {
         switch self {
-        case .ovulatory: return 0.42
-        default:         return 0.22
+        case .menstrual:  return ((0.90, 0.40, 0.46), (0.98, 0.55, 0.60))
+        case .follicular: return ((0.34, 0.70, 0.62), (0.44, 0.88, 0.78))
+        case .ovulatory:  return ((0.38, 0.26, 0.74), (0.66, 0.56, 1.00))
+        case .luteal:     return ((0.95, 0.66, 0.36), (1.00, 0.76, 0.44))
+        case .unknown:    return ((0, 0, 0), (0, 0, 0))
         }
     }
 
-    /// 日历格背景色(浅,保证数字可读)。
-    var tint: Color {
-        switch self {
-        case .menstrual:  return Color(red: 0.90, green: 0.40, blue: 0.46)
-        case .follicular: return Color(red: 0.34, green: 0.70, blue: 0.62)
-        case .ovulatory:  return Color(red: 0.38, green: 0.26, blue: 0.74)
-        case .luteal:     return Color(red: 0.95, green: 0.66, blue: 0.36)
-        case .unknown:    return .clear
-        }
+    /// 阶段主色(不透明)。随系统浅色 / 深色自动切换。
+    var tint: Color { fill(lightAlpha: 1, darkAlpha: 1) }
+
+    /// 日历格背景填充(已含透明度,直接 `.fill(phase.cellFill)`)。
+    /// 浅色 0.22 / 排卵期 0.42(排卵期刻意更深,好在一片浅色里跳出来);
+    /// 深色叠的是纯黑,同样的透明度只剩「脏灰块」,所以提到 0.42 / 0.55。
+    var cellFill: Color {
+        fill(lightAlpha: self == .ovulatory ? 0.42 : 0.22,
+             darkAlpha:  self == .ovulatory ? 0.55 : 0.42)
+    }
+
+    /// 图例 / 说明页的小圆点。10–14pt 的小面积需要比日历格更实才分辨得出。
+    var legendFill: Color { fill(lightAlpha: 0.5, darkAlpha: 0.85) }
+
+    private func fill(lightAlpha: Double, darkAlpha: Double) -> Color {
+        guard self != .unknown else { return .clear }
+        let pair = rgbPair
+        return Color(uiColor: UIColor { trait in
+            let isDark = trait.userInterfaceStyle == .dark
+            let (r, g, b) = isDark ? pair.dark : pair.light
+            return UIColor(red: r, green: g, blue: b, alpha: isDark ? darkAlpha : lightAlpha)
+        })
     }
 }
 
