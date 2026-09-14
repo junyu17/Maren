@@ -4,7 +4,7 @@
 
 **App:** Maren
 
-**Candidate:** `1.1.0 (7)`
+**Candidate:** `1.1.0 (8)`
 
 **Developer / legal entity:** `[LEGAL NAME OR ENTITY — COMPLETE]`
 
@@ -50,7 +50,7 @@ List anything that requires a narrower statement, attribution, territory restric
 
 ## Signature
 
-I confirm that this declaration is accurate for the exact Maren `1.1.0 (7)` binary, screenshots, recording, website, and App Store metadata submitted for review. I understand that a template, a planned license, or a local development asset is not evidence of authorization until the underlying permission is actually obtained.
+I confirm that this declaration is accurate for the exact Maren `1.1.0 (8)` binary, screenshots, recording, website, and App Store metadata submitted for review. I understand that a template, a planned license, or a local development asset is not evidence of authorization until the underlying permission is actually obtained.
 
 **Name:** `[COMPLETE]`
 

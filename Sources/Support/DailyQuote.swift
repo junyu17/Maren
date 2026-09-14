@@ -3,7 +3,7 @@ import Foundation
 /// F4:每日激励一句话。本地 JSON 词库,离线可用,按周期阶段智能匹配。
 enum DailyQuote {
 
-    private struct Entry: Decodable { let zh: String; let en: String }
+    private struct Entry: Decodable { let zh: String; let en: String; let es: String? }
 
     /// 词库缓存(阶段 key -> 句子列表)。
     private static let library: [String: [Entry]] = {
@@ -17,9 +17,11 @@ enum DailyQuote {
 
     /// 用「bundle 实际解析出的本地化」而不是 Locale.current 来判断语言,
     /// 这样每日一句和界面文案永远一致(例如系统是法语、界面回退到英文时,句子也给英文)。
-    private static var preferEnglish: Bool {
+    private static var languageCode: String {
         let localization = Bundle.main.preferredLocalizations.first ?? "en"
-        return !localization.hasPrefix("zh")
+        if localization.hasPrefix("zh") { return "zh" }
+        if localization.hasPrefix("es") { return "es" }
+        return "en"
     }
 
     /// 取今天这句:按阶段选桶(无则回落到 general),同一天稳定返回同一句。
@@ -41,6 +43,10 @@ enum DailyQuote {
         // 本地午夜除以 86400 的商会跳变/重复,与 dayKey 铁律不一致。
         let dayNumber = DayKey.from(date)
         let entry = bucket[((dayNumber % bucket.count) + bucket.count) % bucket.count]
-        return preferEnglish ? entry.en : entry.zh
+        switch languageCode {
+        case "zh": return entry.zh
+        case "es": return entry.es ?? entry.en
+        default:   return entry.en
+        }
     }
 }

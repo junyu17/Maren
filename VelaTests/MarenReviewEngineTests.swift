@@ -1,4 +1,5 @@
 import XCTest
+import SwiftData
 @testable import Vela
 
 final class MarenReviewEngineTests: XCTestCase {
@@ -515,5 +516,53 @@ final class MarenReviewEngineTests: XCTestCase {
         let a = date(2026,2,27)
         let b = date(2026,3,1) // 2026 is not a leap year
         XCTAssertEqual(MarenReviewEngine.calendarDaysBetween(a, b), 2)
+    }
+}
+
+/// Regression coverage for the bounded SwiftData queries used by the
+/// performance-sensitive screens. These tests keep the window definition and
+/// the all-history custom-tracker count semantics explicit.
+final class HistoricalDataQueryTests: XCTestCase {
+
+    private let cal = Calendar(identifier: .gregorian)
+
+    private func date(_ y: Int, _ m: Int, _ d: Int) -> Date {
+        var c = DateComponents()
+        c.year = y; c.month = m; c.day = d
+        return cal.date(from: c)!
+    }
+
+    func testRecentDayKeyRangeIsInclusiveAndMatchesCycleLookback() {
+        let anchor = date(2026, 8, 24)
+        let range = HistoricalDataQuery.recentDayKeyRange(ending: anchor)
+        let expectedStart = cal.date(byAdding: .day, value: -HistoricalDataQuery.lookbackDays, to: anchor)!
+
+        XCTAssertEqual(range.upperBound, DayKey.from(anchor))
+        XCTAssertEqual(range.lowerBound, DayKey.from(expectedStart))
+        XCTAssertTrue(range.contains(DayKey.from(anchor)))
+        XCTAssertTrue(range.contains(DayKey.from(expectedStart)))
+    }
+
+    @MainActor
+    func testDayKeyPredicateSelectsOnlyRecentRows() throws {
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: DailyLog.self, configurations: configuration)
+        let context = container.mainContext
+        let anchor = date(2026, 8, 24)
+        let range = HistoricalDataQuery.recentDayKeyRange(ending: anchor)
+
+        context.insert(DailyLog(date: date(2022, 1, 1)))
+        context.insert(DailyLog(date: date(2026, 8, 20)))
+        context.insert(DailyLog(date: date(2026, 8, 25)))
+        try context.save()
+
+        let matches = try context.fetch(FetchDescriptor<DailyLog>(
+            predicate: #Predicate<DailyLog> { log in
+                log.dayKey >= range.lowerBound && log.dayKey <= range.upperBound
+            }
+        ))
+
+        XCTAssertEqual(matches.count, 1)
+        XCTAssertEqual(matches.first?.dayKey, 20260820)
     }
 }

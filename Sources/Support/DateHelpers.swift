@@ -29,6 +29,23 @@ enum DayKey {
     static var today: Int { from(Date()) }
 }
 
+/// Bounds for screens that analyze a user's recent history.
+///
+/// This is the shared two-year lookback used by `CyclePredictor` and the
+/// cycle-relative screens, so rows
+/// older than this window cannot affect the current prediction or its phase
+/// labels.  Keeping the bound in one place also prevents individual views
+/// from quietly growing an unbounded SwiftData query as the app ages.
+enum HistoricalDataQuery {
+    static let lookbackDays = 730
+
+    static func recentDayKeyRange(ending anchor: Date = Date()) -> ClosedRange<Int> {
+        let end = Cal.startOfDay(anchor)
+        let start = Cal.current.date(byAdding: .day, value: -lookbackDays, to: end) ?? end
+        return DayKey.from(start)...DayKey.from(end)
+    }
+}
+
 /// 全 app 统一使用「当天 00:00(本地时区)」作为显示与运算的日期基准。
 enum Cal {
     /// 注意:必须是**计算属性**而不是 `static let`。

@@ -1,15 +1,19 @@
 import Foundation
 import SwiftUI
 import SwiftData
+import StoreKit
 
 /// F3:情绪 + 症状每日记录。3 秒打卡,极简。
 struct DailyLogView: View {
     @Environment(\.modelContext) private var context
-    @Query private var logs: [DailyLog]
+    @Environment(\.requestReview) private var requestReview
+    /// The review strip only needs the same recent history used by
+    /// `CyclePredictor`; keeping this query bounded avoids materializing a
+    /// user's entire lifetime of logs whenever the 3-second check-in opens.
+    @Query private var reviewLogs: [DailyLog]
     @Query(sort: \PeriodDay.dayKey) private var periodDays: [PeriodDay]
     @Query(sort: \CustomSymptom.createdAt) private var customSymptoms: [CustomSymptom]
     @Query(sort: \Medication.createdAt) private var medications: [Medication]
-    @Query private var intakes: [MedicationIntake]
 
     private let focusedDate: Date?
     private let focusedTrackerQuery: String?
@@ -20,6 +24,12 @@ struct DailyLogView: View {
     @State private var loadedDay: Date?
     /// 用户是否手动选过日期。没选过时,跨过午夜会自动跟到新的今天。
     @State private var userPickedDate = false
+    /// Exact row loaded for the selected day.  The review query is bounded,
+    /// but the check-in editor must still support opening an older date.
+    @State private var loadedLog: DailyLog?
+    /// Medication check-ins are an exact selected-day fetch as well. This
+    /// keeps older calendar dates correct without loading the intake table.
+    @State private var loadedIntakes: [MedicationIntake] = []
 
     // 编辑中的草稿状态
     @State private var mood: Mood?
@@ -74,6 +84,12 @@ struct DailyLogView: View {
          focusedTrackerQuery: String? = nil,
          focusedTrackerKey: String? = nil) {
         let normalizedDate = focusedDate.map(Cal.startOfDay)
+        let queryRange = HistoricalDataQuery.recentDayKeyRange()
+        let lowerDayKey = queryRange.lowerBound
+        let upperDayKey = queryRange.upperBound
+        _reviewLogs = Query(filter: #Predicate<DailyLog> { log in
+            log.dayKey >= lowerDayKey && log.dayKey <= upperDayKey
+        })
         self.focusedDate = normalizedDate
         self.focusedTrackerQuery = focusedTrackerQuery
         self.focusedTrackerKey = focusedTrackerKey
@@ -184,12 +200,13 @@ struct DailyLogView: View {
         Cal.isSameDay(day, Date()) ? medications : []
     }
     private var takenMedIds: Set<UUID> {
-        let key = DayKey.from(day)
-        return Set(intakes.filter { $0.dayKey == key }.map { $0.medicationId })
+        Set(loadedIntakes.map(\.medicationId))
     }
 
     private var todaysLog: DailyLog? {
-        logs.first { Cal.isSameDay($0.date, day) }
+        let key = DayKey.from(day)
+        guard loadedLog?.dayKey == key else { return nil }
+        return loadedLog
     }
 
     /// F4:按当天所处周期阶段匹配的每日一句。
@@ -267,7 +284,7 @@ struct DailyLogView: View {
                 }
 
                 Section {
-                    CompactReviewEntry(periodDays: periodDays, logs: logs)
+                    CompactReviewEntry(periodDays: periodDays, logs: reviewLogs)
                         .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
                         .listRowBackground(Color.clear)
                 }
@@ -570,17 +587,23 @@ struct DailyLogView: View {
     /// 打卡 / 取消今天的用药。
     private func toggleMed(_ med: Medication) {
         let key = DayKey.from(day)
-        if let existing = intakes.first(where: { $0.medicationId == med.id && $0.dayKey == key }) {
+        let previous = loadedIntakes
+        if let existing = loadedIntakes.first(where: { $0.medicationId == med.id }) {
             context.delete(existing)
+            loadedIntakes.removeAll { $0 === existing }
         } else {
-            context.insert(MedicationIntake(medicationId: med.id, dayKey: key))
+            let intake = MedicationIntake(medicationId: med.id, dayKey: key)
+            context.insert(intake)
+            loadedIntakes.append(intake)
         }
-        if saveContext() {
-            LocalDataChangeCenter.shared.post(
-                kind: .medicationIntakeChanged,
-                affectedDayKeys: [key]
-            )
+        guard saveContext() else {
+            loadedIntakes = previous
+            return
         }
+        LocalDataChangeCenter.shared.post(
+            kind: .medicationIntakeChanged,
+            affectedDayKeys: [key]
+        )
     }
 
     // MARK: - 草稿加载 / 保存
@@ -598,8 +621,12 @@ struct DailyLogView: View {
             predicate: #Predicate { $0.dayKey == key },
             sortBy: [SortDescriptor(\DailyLog.updatedAt, order: .reverse)])
         let log: DailyLog?
+        let intakesForDay: [MedicationIntake]
         do {
             log = try context.fetch(descriptor).first
+            intakesForDay = try context.fetch(FetchDescriptor<MedicationIntake>(
+                predicate: #Predicate { $0.dayKey == key }
+            ))
         } catch {
             draftLoadFailed = true
             presentAlert(
@@ -609,6 +636,8 @@ struct DailyLogView: View {
             return false
         }
         draftLoadFailed = false
+        loadedLog = log
+        loadedIntakes = intakesForDay
         if let log {
             mood = log.mood
             energy = log.energy
@@ -668,6 +697,7 @@ struct DailyLogView: View {
         ) {
         case .reset:
             clearDraft()
+            loadedIntakes = []
             loadedDay = day
         case .sanitizeTrackers:
             symptoms.subtract(event.removedCustomTrackerKeys)
@@ -685,6 +715,7 @@ struct DailyLogView: View {
     }
 
     private func clearDraft() {
+        loadedLog = nil
         mood = nil
         energy = 0
         pain = -1
@@ -776,6 +807,11 @@ struct DailyLogView: View {
         }
 
         guard saveContext() else { return }
+        // Only publish the model reference after the transaction commits.
+        // Keeping the previous reference through a failed delete, and nil
+        // through a failed insert, prevents the next retry from duplicating
+        // or losing the selected day's row after `context.rollback()`.
+        loadedLog = deletedDate == nil ? savedLog : nil
         loadedDay = day
 
         // Capture snapshot after successful save for dirty tracking.
@@ -815,6 +851,15 @@ struct DailyLogView: View {
         withAnimation { savedFlash = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             withAnimation { savedFlash = false }
+        }
+
+        // 记一次价值时刻:用户刚成功记录了一天。删除不算。
+        // 等"已保存"的闪烁走完再开口,免得盖住保存反馈。
+        if deletedDate == nil, ReviewPrompter.recordValueMoment() {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1.6))
+                requestReview()
+            }
         }
 
         guard HealthKitBridge.syncEnabled else { return }

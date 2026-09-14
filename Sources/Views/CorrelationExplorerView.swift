@@ -12,8 +12,11 @@ enum CorrelationExplorerSummary {
 /// 设备端相关性探索器 —— 展示 pairwise 关系的 Premium 详情页面。
 struct CorrelationExplorerView: View {
     @Query(sort: \PeriodDay.dayKey) private var periodDays: [PeriodDay]
-    @Query(sort: \DailyLog.dayKey) private var logs: [DailyLog]
-    @Query private var medications: [Medication]
+    /// Correlation is phase-relative to `CyclePredictor`, whose inputs are
+    /// bounded to two years. Keep the raw rows fed into the engine bounded as
+    /// well, otherwise opening this Premium screen scales with account age.
+    @Query private var logs: [DailyLog]
+    @Query(sort: \Medication.createdAt) private var medications: [Medication]
     @Query private var intakes: [MedicationIntake]
 
     @Environment(\.dismiss) private var dismiss
@@ -22,6 +25,18 @@ struct CorrelationExplorerView: View {
     @AppStorage(ManualCycle.Keys.enabled) private var manualEnabled = false
     @AppStorage(ManualCycle.Keys.cycleLength) private var manualCycleLength = ManualCycle.defaultCycleLength
     @AppStorage(ManualCycle.Keys.periodLength) private var manualPeriodLength = ManualCycle.defaultPeriodLength
+
+    init() {
+        let queryRange = HistoricalDataQuery.recentDayKeyRange()
+        let lowerDayKey = queryRange.lowerBound
+        let upperDayKey = queryRange.upperBound
+        _logs = Query(filter: #Predicate<DailyLog> { log in
+            log.dayKey >= lowerDayKey && log.dayKey <= upperDayKey
+        })
+        _intakes = Query(filter: #Predicate<MedicationIntake> { intake in
+            intake.dayKey >= lowerDayKey && intake.dayKey <= upperDayKey
+        })
+    }
 
     private var manualCycle: ManualCycle {
         ManualCycle(enabled: manualEnabled, cycleLength: manualCycleLength, periodLength: manualPeriodLength)

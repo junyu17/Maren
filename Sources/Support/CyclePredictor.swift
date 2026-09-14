@@ -66,7 +66,6 @@ enum CyclePredictor {
     /// ② 更重要的是**成本有界** —— 否则用户用了五年、十年后,
     /// 每次重算都要遍历全部历史,开销随使用年限无限增长。
     /// 2 年即使按 90 天的长周期算也有 8 个周期,远超 recentWindow 所需。
-    private static let lookbackDays = 730
     /// 两次经期首日至少相隔这么多天,才算「新的一个周期」。
     /// 小于它的多半是同一次经期中间断记 / 点滴出血,不能当成新周期,
     /// 否则会把预测锚点错误地往前挪。
@@ -111,8 +110,9 @@ enum CyclePredictor {
 
         // 1) 归一 + 去重 + 排序参与计算的经期日。
         //    - 未来日期不参与:误点一个将来的日子不该把整个预测锚点挪走。
-        //    - 只回溯 lookbackDays:让单次重算的成本有上界,不随使用年限增长。
-        let earliest = cal.date(byAdding: .day, value: -lookbackDays, to: today) ?? .distantPast
+        //    - 只回溯 HistoricalDataQuery.lookbackDays:让单次重算的成本有上界,
+        //      不随使用年限增长。
+        let earliest = cal.date(byAdding: .day, value: -HistoricalDataQuery.lookbackDays, to: today) ?? .distantPast
         let days = Array(Set(periodDays.map { Cal.startOfDay($0.date) }))
             .filter { $0 <= today && $0 >= earliest }
             .sorted()

@@ -1,4 +1,6 @@
 import Foundation
+import StoreKit
+import StoreKitTest
 import XCTest
 @testable import Vela
 
@@ -24,6 +26,17 @@ final class StoreConfigurationTests: XCTestCase {
         let url = projectRoot.appendingPathComponent("Maren.storekit")
         let data = try Data(contentsOf: url)
         let root = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let version = try XCTUnwrap(root["version"] as? [String: Any])
+        XCTAssertEqual(version["major"] as? Int, 5)
+        XCTAssertEqual(version["minor"] as? Int, 0)
+        let appPolicies = try XCTUnwrap(root["appPolicies"] as? [String: Any])
+        XCTAssertEqual(appPolicies["eula"] as? String, "")
+        let settings = try XCTUnwrap(root["settings"] as? [String: Any])
+        XCTAssertNil(settings["_applicationInternalID"], "Local StoreKit files must not remain bound to App Store Connect")
+        XCTAssertNil(settings["_developerTeamID"], "Local StoreKit files must stay editable in Xcode")
+        for key in ["_askToBuyEnabled", "_billingGracePeriodEnabled", "_billingIssuesEnabled", "_disableDialogs", "_failTransactionsEnabled", "_renewalBillingIssuesEnabled"] {
+            XCTAssertEqual(settings[key] as? Bool, false, "Missing StoreKit v5 setting: \(key)")
+        }
         let products = try XCTUnwrap(root["products"] as? [[String: Any]])
         let groups = try XCTUnwrap(root["subscriptionGroups"] as? [[String: Any]])
         XCTAssertEqual(groups.count, 1)
@@ -47,13 +60,13 @@ final class StoreConfigurationTests: XCTestCase {
             XCTAssertEqual(subscription["subscriptionGroupID"] as? String, groupID)
             XCTAssertEqual(subscription["groupNumber"] as? Int, 1)
             let localizations = try XCTUnwrap(subscription["localizations"] as? [[String: Any]])
-            XCTAssertEqual(Set(localizations.compactMap { $0["locale"] as? String }), ["en_US", "zh_CN"])
+            XCTAssertEqual(Set(localizations.compactMap { $0["locale"] as? String }), ["en_US", "zh_Hans"])
         }
 
         let groupLocalizations = try XCTUnwrap(group["localizations"] as? [[String: Any]])
-        XCTAssertEqual(Set(groupLocalizations.compactMap { $0["locale"] as? String }), ["en_US", "zh_CN"])
+        XCTAssertEqual(Set(groupLocalizations.compactMap { $0["locale"] as? String }), ["en_US", "zh_Hans"])
         let lifetimeLocalizations = try XCTUnwrap(byID[Store.ProductID.lifetime]?["localizations"] as? [[String: Any]])
-        XCTAssertEqual(Set(lifetimeLocalizations.compactMap { $0["locale"] as? String }), ["en_US", "zh_CN"])
+        XCTAssertEqual(Set(lifetimeLocalizations.compactMap { $0["locale"] as? String }), ["en_US", "zh_Hans"])
     }
 
     func testPrivacyManifestDeclaresOnlyExpectedRequiredReasons() throws {
@@ -92,10 +105,13 @@ final class StoreConfigurationTests: XCTestCase {
         let subscriptions = try XCTUnwrap(group["subscriptions"] as? [[String: Any]])
 
         let yearly = try XCTUnwrap(subscriptions.first { ($0["productID"] as? String) == Store.ProductID.yearly })
-        let introOffer = try XCTUnwrap(yearly["introductoryOffer"] as? [String: Any])
-        XCTAssertEqual(introOffer["paymentMode"] as? String, "freeTrial")
-        XCTAssertEqual(introOffer["displayPrice"] as? String, "0")
+        let introOffers = try XCTUnwrap(yearly["introductoryOffers"] as? [[String: Any]])
+        XCTAssertEqual(introOffers.count, 1)
+        let introOffer = try XCTUnwrap(introOffers.first)
+        XCTAssertEqual(introOffer["paymentMode"] as? String, "free")
         XCTAssertEqual(introOffer["subscriptionPeriod"] as? String, "P1W")
+        XCTAssertEqual(introOffer["numberOfPeriods"] as? Int, 1)
+        XCTAssertEqual(introOffer["billingPlanType"] as? String, "BILLED_UPFRONT")
     }
 
     func testMonthlySubscriptionHasNoIntroOffer() throws {
@@ -107,8 +123,8 @@ final class StoreConfigurationTests: XCTestCase {
         let subscriptions = try XCTUnwrap(group["subscriptions"] as? [[String: Any]])
 
         let monthly = try XCTUnwrap(subscriptions.first { ($0["productID"] as? String) == Store.ProductID.monthly })
-        let introOffer = monthly["introductoryOffer"]
-        XCTAssertTrue(introOffer == nil || introOffer is NSNull)
+        let introOffers = try XCTUnwrap(monthly["introductoryOffers"] as? [[String: Any]])
+        XCTAssertTrue(introOffers.isEmpty)
     }
 
     func testPaywallPricingUsesStorefrontValues() {
@@ -190,5 +206,44 @@ final class StoreConfigurationTests: XCTestCase {
             displayPrice: "$0.00",
             eligibleTrialDays: 7
         ))
+    }
+
+    func testPaywallSelectsDefaultPlanWithoutWaitingForTrialEligibility() {
+        XCTAssertEqual(
+            PaywallSelectionPolicy.defaultProductID(availableProductIDs: [
+                Store.ProductID.monthly,
+                Store.ProductID.yearly
+            ]),
+            Store.ProductID.yearly
+        )
+        XCTAssertEqual(
+            PaywallSelectionPolicy.defaultProductID(availableProductIDs: [
+                Store.ProductID.lifetime
+            ]),
+            Store.ProductID.lifetime
+        )
+        XCTAssertNil(PaywallSelectionPolicy.defaultProductID(availableProductIDs: []))
+    }
+
+    @MainActor
+    func testLocalStoreKitSessionReturnsAllConfiguredProducts() async throws {
+        let url = projectRoot.appendingPathComponent("Maren.storekit")
+        let session = try SKTestSession(contentsOf: url)
+        session.disableDialogs = true
+        session.clearTransactions()
+        defer { session.resetToDefaultState() }
+
+        let products = try await Product.products(for: Store.ProductID.all)
+        XCTAssertEqual(Set(products.map(\.id)), Set(Store.ProductID.all))
+
+        // Keep the per-ID query behavior visible too: it is the fallback used
+        // by Store when a device-side StoreKit bridge returns an empty batch.
+        var individuallyLoaded: [Product] = []
+        for id in Store.ProductID.all {
+            if let product = try await Product.products(for: [id]).first {
+                individuallyLoaded.append(product)
+            }
+        }
+        XCTAssertEqual(Set(individuallyLoaded.map(\.id)), Set(Store.ProductID.all))
     }
 }

@@ -8,7 +8,11 @@ struct SettingsView: View {
     @StateObject private var notifs = NotificationManager.shared
     @Environment(\.modelContext) private var context
     @Query(sort: \PeriodDay.dayKey) private var periodDays: [PeriodDay]
-    @Query private var allLogs: [DailyLog]
+    /// Settings uses logs for HealthKit's recent import merge and the
+    /// phase-based reminder preview. Both inputs are defined over the same
+    /// two-year window as `CyclePredictor`; avoid loading lifetime history
+    /// merely by opening Settings.
+    @Query private var recentLogs: [DailyLog]
 
     @State private var showDeleteConfirm = false
     @State private var healthSyncEnabled = HealthKitBridge.syncEnabled
@@ -45,6 +49,22 @@ struct SettingsView: View {
     @AppStorage(ManualCycle.Keys.enabled) private var manualEnabled = false
     @AppStorage(ManualCycle.Keys.cycleLength) private var manualCycleLength = ManualCycle.defaultCycleLength
     @AppStorage(ManualCycle.Keys.periodLength) private var manualPeriodLength = ManualCycle.defaultPeriodLength
+
+    init() {
+        let queryRange = HistoricalDataQuery.recentDayKeyRange()
+        let lowerDayKey = queryRange.lowerBound
+        let upperDayKey = queryRange.upperBound
+        _recentLogs = Query(filter: #Predicate<DailyLog> { log in
+            log.dayKey >= lowerDayKey && log.dayKey <= upperDayKey
+        })
+    }
+
+    /// The destructive-action confirmation promises the count of all local
+    /// rows, not only the recent rows used by Settings' live features. A
+    /// count query preserves that wording without materializing the history.
+    private var totalLogCount: Int {
+        (try? context.fetchCount(FetchDescriptor<DailyLog>())) ?? recentLogs.count
+    }
 
     private var prediction: CyclePredictor.Prediction {
         CyclePredictor.predict(from: periodDays, manual: ManualCycle(
@@ -260,7 +280,7 @@ struct SettingsView: View {
                             Button {
                                 if locked { showPaywall = true } else {
                                     themeRaw = t.rawValue
-                                    WidgetSync.refresh(periodDays: periodDays, logs: allLogs)
+                                    WidgetSync.refresh(periodDays: periodDays, logs: recentLogs)
                                 }
                             } label: {
                                 Circle()
@@ -485,7 +505,7 @@ struct SettingsView: View {
                         Toggle("按周期阶段的智能提醒", isOn: $smartEnabled)
                             .onChange(of: smartEnabled) { _, _ in reschedule() }
                         if smartEnabled,
-                           let preview = SmartReminderEngine.preview(prediction: prediction, logs: allLogs) {
+                           let preview = SmartReminderEngine.preview(prediction: prediction, logs: recentLogs) {
                             Text(preview)
                                 .font(.caption).foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -596,7 +616,7 @@ struct SettingsView: View {
                 }
                 Button("取消", role: .cancel) {}
             } message: {
-                Text(String(localized: "这会永久清空 \(periodDays.count) 条经期记录、\(allLogs.count) 条每日记录、全部自定义追踪项及其历史、用药定义与打卡历史,取消 Maren 的本机提醒,同时清除设置中的记录视图/周期参数、Widget 与 Apple Watch 快照和待处理快速记录。Maren 不会删除 Apple 健康中来自其他来源的数据;由 Maren 写入的样本会在本机删除后另行尝试清理。此操作无法恢复。"))
+                Text(String(localized: "这会永久清空 \(periodDays.count) 条经期记录、\(totalLogCount) 条每日记录、全部自定义追踪项及其历史、用药定义与打卡历史,取消 Maren 的本机提醒,同时清除设置中的记录视图/周期参数、Widget 与 Apple Watch 快照和待处理快速记录。Maren 不会删除 Apple 健康中来自其他来源的数据;由 Maren 写入的样本会在本机删除后另行尝试清理。此操作无法恢复。"))
             }
             .navigationTitle("设置")
             // 给底部留出空间,避免最后一行被浮动标签栏遮住。
@@ -627,7 +647,7 @@ struct SettingsView: View {
         notifs.schedulePeriodReminder(enabled: periodEnabled, advanceDays: advance, nextPeriodStart: prediction.nextPeriodStart)
         // Pro 高级提醒:免费层强制以 false 传入,确保不残留旧排期。
         notifs.schedulePMSReminder(enabled: store.premium && pmsEnabled, nextPeriodStart: prediction.nextPeriodStart)
-        notifs.scheduleSmartReminders(enabled: store.premium && smartEnabled, prediction: prediction, logs: allLogs)
+        notifs.scheduleSmartReminders(enabled: store.premium && smartEnabled, prediction: prediction, logs: recentLogs)
 
         // Manual cycle settings are not SwiftData rows, so refresh the
         // derived Widget/Watch snapshot explicitly after every change. The
@@ -660,7 +680,7 @@ struct SettingsView: View {
             }
         }
 
-        var logsByKey = Dictionary(uniqueKeysWithValues: allLogs.map { ($0.dayKey, $0) })
+        var logsByKey = Dictionary(uniqueKeysWithValues: recentLogs.map { ($0.dayKey, $0) })
         for imported in payload.daily {
             let hasActualValue = imported.sleepHours != nil
                 || imported.weight != nil

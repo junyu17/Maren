@@ -1,20 +1,20 @@
-# Maren 1.1.0 (7) 重新提交 Checklist
+# Maren 1.1.0 (8) 重新提交 Checklist
 
-> 规则：所有未有实际 build-7 证据的项目保持 `PENDING`。当前已完成的本地自动化、构建、归档、IPA 和签名证据可以标记为已完成，但模拟器证据不能替代实体机证据；不要把历史 build-5 archive/IPA 或 286/379 测试数改写成 build-7 证据。
+> 规则：所有未有实际 build-8 证据的项目保持 `PENDING`。当前已完成的本地自动化、构建、归档、IPA 和签名证据可以标记为已完成，但模拟器证据不能替代实体机证据；不要把历史 build-7 或更旧证据改写成 build-8 证据。
 
 ## A. 候选版本与工程
 
-- [x] 已确认候选版本为 `1.1.0`，build 为 `7`；四个 bundle（主 App、Widget、Watch、Watch Widget）版本号均为 `1.1.0 (7)`。
+- [x] 已确认候选版本为 `1.1.0`，build 为 `8`；四个 bundle（主 App、Widget、Watch、Watch Widget）版本号均为 `1.1.0 (8)`。
 - [x] 已用当前 `project.yml` 运行 `xcodegen generate` 并生成 `Vela.xcodeproj`。
 - [x] Debug 测试构建通过；命令、Xcode/SDK、destination 和结果保存在最终 `.xcresult`。
-- [x] build-7 全量测试通过：395/395 tests passed、0 failures；Xcode `26.6 (17F113)`、Vela Review iPhone 17 simulator / iOS `26.5`，`.xcresult` 为 `Evidence/Build7/Vela-1.1.0-7-full-tests.xcresult`。该模拟器证据不替代实体机测试。
-- [x] Release iOS scheme 与 VelaWatch scheme 构建成功，覆盖四个 target；archive 为 `../Builds/Maren-1.1.0-7/Maren-v1.1.0-b7.xcarchive`。
-- [x] IPA 导出成功：`../Builds/Maren-1.1.0-7/Maren.ipa`；SHA-256 为 `f928a2c2b7950ed0ccb8dfe0e944ff7f84fff15379d6701724b9f5e7e7933100`。
+- [x] build-8 全量测试通过：397/397 tests passed、0 failures；Xcode `26.6 (17F113)`、Vela Review iPhone 17 simulator / iOS `26.5`，`.xcresult` 为 `Evidence/Build8/Vela-1.1.0-8-full-tests.xcresult`。该模拟器证据不替代实体机测试。
+- [x] Release iOS scheme 与 VelaWatch scheme 构建成功，覆盖四个 target；archive 为 `../Builds/Maren-1.1.0-8/Maren-v1.1.0-b8.xcarchive`。
+- [x] IPA 导出成功：`../Builds/Maren-1.1.0-8/Maren.ipa`；SHA-256 为 `acdb4c97fd294939e758ea499b25b9149d80c74cb22fb9f681f72d6d5526515c`。
 - [x] 已核验 release 包 `get-task-allow=false`、Apple Distribution / Jun Yu / team `255R6QQR97` 签名，且 codesign strict/deep 通过。
 - [x] 已核对 release 包最低系统版本：iOS App/Widget 为 iOS 17.0，Watch App/Watch Widget 为 watchOS 10.0。
 - [x] 已核验 App、Widget、Watch、Watch Widget 四个 bundle 的 App Group 均为 `group.cd.cc.vela`，不是测试值。
 - [x] 已从最终分发 IPA 检查 HealthKit capability、Info.plist 使用说明、App Intents、WidgetKit 和 WatchConnectivity 嵌入关系；严格/深层 codesign 校验通过。
-- [x] 开发者确认精确 build 7 已在 iPhone Air / iOS 26.6.1 和 iPhone 12 / iOS 26.6 测试。
+- [ ] `PENDING` 在 iPhone Air / iOS 26.6.1 和 iPhone 12 / iOS 26.6 重新安装并确认精确 build 8。
 
 ## B. 实体机与录屏
 
@@ -35,7 +35,7 @@
 
 ## C. Apple Review Information
 
-- [x] `01-Apple-Review-Reply-EN.md` 和 `07-ASC-Review-Notes-EN.txt` 已更新为 build 7 及两台开发者确认设备。
+- [x] `01-Apple-Review-Reply-EN.md` 已更新为 build 8；`07-ASC-Review-Notes-EN.txt` 保留 Apple 要求的设备/OS 清单，必须在提交前完成精确 Build 8 复测。
 - [x] Review Notes 已提供无账号路径，明确无注册、登录、样例文件和 reviewer credentials。
 - [x] Review Notes 已说明 UGC 仅为本机私有记录，无公开社区、评论、消息、举报或屏蔽系统。
 - [x] Review Notes 已说明 HealthKit 七类数据和读写/只读边界，并与 App Privacy 一致。
@@ -72,16 +72,16 @@
 
 - [x] Review Notes 已声明教育文字、Daily Stories、界面素材和截图为原创、委托或依法授权，且不包含受保护的第三方媒体目录。
 - [x] App Store icon、截图和宣传文案按无受保护第三方素材的产品边界提交。
-- [ ] `PENDING` 截图展示当前 build-7 实际 UI，不使用已过时的 build-5 evidence 作为 build-7 截图。
+- [x] ASC 已替换 9 张当前 UI 截图；Build 8 仅修改数据查询边界，无界面或功能入口变化，截图仍准确反映 Build 8。
 - [x] App description 已统一“免费 Perimenopause 30/90 record summary vs Premium advanced insights”。
 - [x] 所有 IAP 文案已统一“年/月自动续费；终身一次性；年订阅符合资格时七天试用”。
 - [x] 中英文标题、功能名、Privacy Policy、Terms、Support URL 已检查并可打开。
 
 ## G. 最终提交流程
 
-- [x] 已选择正确 build `1.1.0 (7)`，不是 build 4/5；ASC 草稿中显示 `iOS App 1.1.0 — 1.1.0 (7)`。
-- [x] Xcode 官方 export/upload 已成功：2026-08-22 10:47 Pacific；日志明确 `EXPORT SUCCEEDED`、`Upload succeeded`、`Uploaded Vela`、`Uploaded package is processing`。
-- [x] App Store Connect Processing 已完成，build `1.1.0 (7)` 已绑定；本地归档已核对四个 bundle、签名、App Group、HealthKit 和 `get-task-allow=false`。
+- [ ] `PENDING` ASC Build 8 Processing 完成后，把 iOS App 1.1.0 从 Build 7 切换为 `1.1.0 (8)`。
+- [x] Xcode 官方 export/upload 已成功：2026-08-24 05:00 Pacific；日志明确 `EXPORT SUCCEEDED`、`Upload succeeded`、`Uploaded Vela`、`Uploaded package is processing`。
+- [ ] `PENDING` App Store Connect Processing 完成且 build `1.1.0 (8)` 已绑定；本地归档的四个 bundle、签名、App Group、HealthKit 和 `get-task-allow=false` 已核对通过。
 - [x] 已上传/绑定 IAP metadata、review screenshot、订阅组、价格和年度七天 introductory offer；四个 IAP/订阅组项目已加入 Draft Submission。
 - [ ] `PENDING` 附上实体机录屏和 reviewer instructions。
 - [x] 已填完 App Privacy、age rating、export compliance、content rights 和 Review Information；提交前仍应核对联系电话可接听。
@@ -91,4 +91,4 @@
 
 ## 明确不应写成已完成的事项
 
-最终录屏上传、录屏中的真实权限/IAP 展示和最终 Submit for Review 仍保持 `PENDING`。ASC Processing、build `1.1.0 (7)` 选择、两台实体测试设备清单、Review Notes 第 2–8 点、IAP/订阅组绑定和年度 7 天 introductory offer 配置均已完成；Xcode 官方 ASC upload、build-7 automated tests、Release build/archive、IPA export 和签名/App Group 检查也已有证据。
+最终录屏上传、精确 Build 8 实体机复测、录屏中的真实权限/IAP 展示和最终 Submit for Review 仍保持 `PENDING`。Review Notes 第 2–8 点、IAP/订阅组绑定和年度 7 天 introductory offer 配置已完成；Xcode 官方 ASC upload、build-8 automated tests、Release build/archive、IPA export 和签名/App Group 检查也已有证据。

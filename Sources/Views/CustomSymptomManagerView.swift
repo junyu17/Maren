@@ -5,8 +5,11 @@ import SwiftData
 struct CustomSymptomManagerView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \CustomSymptom.createdAt) private var items: [CustomSymptom]
-    /// 用来算每个自定义项被记录过多少次 —— 加完之后光看名字没有任何回报,
-    /// 用户不知道它到底有没有在起作用。
+    /// `DailyLog.symptoms` is a SwiftData transformable `[String]`. SwiftData
+    /// can compile a `#Predicate` using `contains`, but evaluating that
+    /// predicate against the transformable column crashes on iOS 26. Keep
+    /// this all-history fetch for the exact usage-count semantics instead of
+    /// trading a performance hint for a data-screen crash.
     @Query private var logs: [DailyLog]
     @State private var showAdd = false
     @State private var editing: CustomSymptom?

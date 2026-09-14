@@ -1,130 +1,170 @@
 {
-  "sourceLanguage" : "zh-Hans",
-  "strings" : {
-    "CFBundleDisplayName" : {
-      "comment" : "Bundle display name",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Maren"
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "Bundle display name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Maren"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maren"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
           }
         }
       }
     },
-    "CFBundleName" : {
-      "comment" : "Bundle name",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Maren"
+    "CFBundleName": {
+      "comment": "Bundle name",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Maren"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maren"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
           }
         }
       }
     },
-    "CFBundleTypeName" : {
-      "comment" : "Document type name for the encrypted Maren backup",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maren Encrypted Backup"
+    "CFBundleTypeName": {
+      "comment": "Document type name for the encrypted Maren backup",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren Encrypted Backup"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maren 加密备份"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren 加密备份"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia de seguridad cifrada de Maren"
           }
         }
       }
     },
-    "Maren Encrypted Backup" : {
-
-    },
-    "NSFaceIDUsageDescription" : {
-      "comment" : "Privacy - Face ID Usage Description",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use Face ID to unlock Maren so only you can see your health records."
+    "Maren Encrypted Backup": {},
+    "NSFaceIDUsageDescription": {
+      "comment": "Privacy - Face ID Usage Description",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use Face ID to unlock Maren so only you can see your health records."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "用 Face ID 解锁 Maren,保护你的健康记录只有你能看到。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用 Face ID 解锁 Maren,保护你的健康记录只有你能看到。"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa Face ID para desbloquear Maren, así solo tú puedes ver tus registros de salud."
           }
         }
       }
     },
-    "NSHealthShareUsageDescription" : {
-      "comment" : "Privacy - Health Share Usage Description",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Read menstrual flow, body mass, sleep analysis, basal body temperature, intermenstrual bleeding, step count, and Apple exercise time from Apple Health to import selected records into Maren. Sleep analysis, step count, and Apple exercise time are read-only. Optional and used only on this device; never sent to a developer server."
+    "NSHealthShareUsageDescription": {
+      "comment": "Privacy - Health Share Usage Description",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read menstrual flow, body mass, sleep analysis, basal body temperature, intermenstrual bleeding, step count, and Apple exercise time from Apple Health to import selected records into Maren. Sleep analysis, step count, and Apple exercise time are read-only. Optional and used only on this device; never sent to a developer server."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "从「健康」App 读取经期流量、体重、睡眠分析、基础体温、经间期出血、步数和 Apple 锻炼时间，将你选择的数据导入 Maren。睡眠分析、步数和 Apple 锻炼时间仅用于读取。授权可选，数据只在本机使用，不会发送到开发者服务器。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从「健康」App 读取经期流量、体重、睡眠分析、基础体温、经间期出血、步数和 Apple 锻炼时间，将你选择的数据导入 Maren。睡眠分析、步数和 Apple 锻炼时间仅用于读取。授权可选，数据只在本机使用，不会发送到开发者服务器。"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lee de Salud de Apple el flujo menstrual, el peso corporal, el análisis del sueño, la temperatura basal, el sangrado intermenstrual, los pasos y el tiempo de ejercicio de Apple para importar a Maren los registros que elijas. El análisis del sueño, los pasos y el tiempo de ejercicio son de solo lectura. Es opcional y se usa únicamente en este dispositivo; nunca se envía a un servidor del desarrollador."
           }
         }
       }
     },
-    "NSHealthUpdateUsageDescription" : {
-      "comment" : "Privacy - Health Update Usage Description",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Write the menstrual flow, body mass, basal body temperature, and intermenstrual bleeding you record in Maren to Apple Health when you choose to sync them. Sleep analysis, step count, and Apple exercise time are read-only and are never written to Apple Health. Optional and used only on this device; never sent to a developer server."
+    "NSHealthUpdateUsageDescription": {
+      "comment": "Privacy - Health Update Usage Description",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write the menstrual flow, body mass, basal body temperature, and intermenstrual bleeding you record in Maren to Apple Health when you choose to sync them. Sleep analysis, step count, and Apple exercise time are read-only and are never written to Apple Health. Optional and used only on this device; never sent to a developer server."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在你选择同步时，将你在 Maren 记录的经期流量、体重、基础体温和经间期出血写入「健康」App。睡眠分析、步数和 Apple 锻炼时间仅用于读取，绝不会写入 Apple Health。授权可选，数据只在本机使用，不会发送到开发者服务器。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在你选择同步时，将你在 Maren 记录的经期流量、体重、基础体温和经间期出血写入「健康」App。睡眠分析、步数和 Apple 锻炼时间仅用于读取，绝不会写入 Apple Health。授权可选，数据只在本机使用，不会发送到开发者服务器。"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribe en Salud de Apple el flujo menstrual, el peso corporal, la temperatura basal y el sangrado intermenstrual que registres en Maren, cuando elijas sincronizarlos. El análisis del sueño, los pasos y el tiempo de ejercicio son de solo lectura y nunca se escriben en Salud de Apple. Es opcional y se usa únicamente en este dispositivo; nunca se envía a un servidor del desarrollador."
           }
         }
       }
     },
-    "UTTypeDescription" : {
-      "comment" : "Exported document type description for .marenbackup files",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maren Encrypted Backup"
+    "UTTypeDescription": {
+      "comment": "Exported document type description for .marenbackup files",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren Encrypted Backup"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maren 加密备份"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren 加密备份"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia de seguridad cifrada de Maren"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

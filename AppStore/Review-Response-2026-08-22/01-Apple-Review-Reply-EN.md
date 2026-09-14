@@ -1,30 +1,30 @@
-# Draft response to App Review — Maren 1.1.0 (7)
+# Draft response to App Review — Maren 1.1.0 (8)
 
-> Submission status: this is a build-7 candidate response. Replace each `PENDING` item only after the corresponding evidence exists for the exact signed build `1.1.0 (7)`. The completed simulator automation and local archive/IPA evidence below do not replace physical-device recording, permissions, Watch testing, or App Store Connect evidence.
+> Submission status: this is a build-8 candidate response. Replace each `PENDING` item only after the corresponding evidence exists for the exact signed build `1.1.0 (8)`. The completed simulator automation and local archive/IPA evidence below do not replace physical-device recording, permissions, Watch testing, or App Store Connect evidence.
 
 Hello App Review Team,
 
-Thank you for reviewing Maren. The candidate described here is Maren `1.1.0 (7)`, a local-first period, symptom, mood, and personal-wellness tracker. We have included a physical-device recording plan and precise reviewer paths below. The build-7 recording remains `PENDING`. The exact IPA was uploaded through Xcode’s official export/upload flow, finished processing, and is selected for iOS app version `1.1.0`. The Maren Premium subscription group, monthly/yearly subscriptions, lifetime purchase, and eligible-new-subscriber seven-day annual introductory offer are configured in App Store Connect. The Draft Submission contains all five review items and is ready for the developer to submit after attaching the required recording.
+Thank you for reviewing Maren. The candidate described here is Maren `1.1.0 (8)`, a local-first period, symptom, mood, and personal-wellness tracker. We have included a physical-device recording plan and precise reviewer paths below. The build-8 recording remains `PENDING`. The exact IPA was uploaded through Xcode’s official export/upload flow. The Maren Premium subscription group, monthly/yearly subscriptions, lifetime purchase, and eligible-new-subscriber seven-day annual introductory offer are configured in App Store Connect. The Draft Submission contains all five review items and will be ready for the developer to submit after Build 8 processing/selection, exact-build physical testing, Sandbox/TestFlight purchase verification, and attachment of the required recording.
 
-## Build 7 local verification completed
+## Build 8 local verification completed
 
-The following local evidence has been completed for the exact `1.1.0 (7)` candidate:
+The following local evidence has been completed for the exact `1.1.0 (8)` candidate:
 
 - Xcode `26.6 (17F113)`; Vela Review iPhone 17 simulator on iOS `26.5`.
-- Full automated test result: **395/395 tests passed, 0 failures** — `Evidence/Build7/Vela-1.1.0-7-full-tests.xcresult`.
+- Full automated test result: **397/397 tests passed, 0 failures** — `Evidence/Build8/Vela-1.1.0-8-full-tests.xcresult`.
 - Release iOS scheme build and VelaWatch scheme build succeeded for all four targets.
-- Archive: `../Builds/Maren-1.1.0-7/Maren-v1.1.0-b7.xcarchive`.
-- Exported IPA: `../Builds/Maren-1.1.0-7/Maren.ipa`.
-- IPA SHA-256: `f928a2c2b7950ed0ccb8dfe0e944ff7f84fff15379d6701724b9f5e7e7933100`.
-- Signing: Apple Distribution, Jun Yu, team `255R6QQR97`; strict and deep code-sign verification passed. All four bundles report version `1.1.0 (7)`, App Group `group.cd.cc.vela`, and `get-task-allow=false`; the main app has HealthKit enabled.
-- App Store Connect upload: **succeeded at 2026-08-22 10:47 Pacific** through Xcode’s official export/upload flow. The upload log reported `EXPORT SUCCEEDED`, `Upload succeeded`, `Uploaded Vela`, and `Uploaded package is processing`.
-- App Store Connect processing and selection: **completed**. ASC shows iOS app `1.1.0 (7)` in the five-item Draft Submission with status **Ready for Review**; `Evidence/Build7/UI/asc-draft-build7-ready.png`.
+- Archive: `../Builds/Maren-1.1.0-8/Maren-v1.1.0-b8.xcarchive`.
+- Exported IPA: `../Builds/Maren-1.1.0-8/Maren.ipa`.
+- IPA SHA-256: `acdb4c97fd294939e758ea499b25b9149d80c74cb22fb9f681f72d6d5526515c`.
+- Signing: Apple Distribution, Jun Yu, team `255R6QQR97`; strict and deep code-sign verification passed. All four bundles report version `1.1.0 (8)`, App Group `group.cd.cc.vela`, and `get-task-allow=false`; the main app has HealthKit enabled.
+- App Store Connect upload: **succeeded at 2026-08-24 05:00 Pacific** through Xcode’s official export/upload flow. The upload log reported `EXPORT SUCCEEDED`, `Upload succeeded`, `Uploaded Vela`, and `Uploaded package is processing`.
+- App Store Connect processing and selection: `PENDING` until ASC reports Build 8 `VALID` and the iOS app version is rebound to `1.1.0 (8)`.
 
 The local artifacts and upload log do not by themselves replace physical-device evidence; ASC processing and build selection are documented separately by the saved ASC screenshot. None of this claims that the required physical iPhone recording, physical permissions, physical Apple Watch flow, or Sandbox/TestFlight purchases have been completed.
 
 ## 1. Physical-device screen recording
 
-**Attachment:** `PENDING — Maren-App-Review-iPhoneAir-iOS26.6.1-or-latest-v1.1.0-b7.mp4`
+**Attachment:** `PENDING — Maren-App-Review-iPhoneAir-iOS26.6.1-or-latest-v1.1.0-b8.mp4`
 
 The recording will begin on the physical iPhone Home Screen, show launching Maren, and follow a normal user flow through the core features. It will include:
 
@@ -43,9 +43,9 @@ The recording will begin on the physical iPhone Home Screen, show launching Mare
 - the single Maren Premium purchase screen, annual seven-day trial wording when StoreKit reports eligibility, monthly and lifetime choices, Restore Purchases, automatic-renewal disclosure, and Apple subscription-management path; and
 - the final Delete All Data confirmation, with the destructive action performed only at the end of the recording on disposable test data.
 
-The developer confirms that build 7 was tested on iPhone Air running iOS 26.6.1 and iPhone 12 running iOS 26.6. The final recording should use the iPhone Air on iOS 26.6.1 or the latest public Apple OS available on the recording date. The exact device, OS, language/region, build number, and recording date will be shown in the submission notes.
+The developer previously confirmed the device/OS matrix on build 7. Because the exact binary advanced to Build 8 for a bounded-query performance fix, Build 8 must be installed and re-confirmed on iPhone Air running iOS 26.6.1 and iPhone 12 running iOS 26.6 before submission. The final recording should use the iPhone Air on iOS 26.6.1 or the latest public Apple OS available on the recording date. The exact device, OS, language/region, build number, and recording date will be shown in the submission notes.
 
-**Build-7 physical recording status: PENDING.**
+**Build-8 physical recording status: PENDING.**
 
 ## 2. Devices and operating systems tested before submission
 
@@ -53,12 +53,12 @@ The developer-confirmed physical test list is:
 
 | Device | Operating system | Candidate / status |
 |---|---|---|
-| iPhone Air | iOS 26.6.1 | Build 7 tested |
-| iPhone 12 | iOS 26.6 | Build 7 tested |
-| Vela Review iPhone 17 simulator | iOS 26.5 | Build-7 automated local evidence: 395/395 passed, 0 failures; not a substitute for physical-device evidence |
-| Physical Apple Watch | OS and model to be recorded | Build-7 paired-device test; `PENDING` |
+| iPhone Air | iOS 26.6.1 | Exact Build 8 re-test and recording `PENDING` |
+| iPhone 12 | iOS 26.6 | Exact Build 8 re-test `PENDING` |
+| Vela Review iPhone 17 simulator | iOS 26.5 | Build-8 automated local evidence: 397/397 passed, 0 failures; not a substitute for physical-device evidence |
+| Physical Apple Watch | OS and model to be recorded | Build-8 paired-device test; `PENDING` |
 
-The build-7 archive, IPA, automated test result, successful upload, ASC processing, build selection, five-item Draft Submission, and developer-confirmed physical-device list are recorded above. The final physical recording remains pending. Historical 286/379 simulator test counts are not used as build-7 evidence.
+The build-8 archive, IPA, automated test result, and successful upload are recorded above. ASC processing/selection, exact-build physical-device confirmation, and the final physical recording remain pending. Historical build-7 and 286/379 simulator test counts are not used as build-8 evidence.
 
 Maren supports iOS 17.0 and later. The final submission notes will identify the actual OS versions tested rather than describing an unverified device as “latest.”
 
@@ -169,7 +169,7 @@ The purchase screen is reachable from:
 
 On the purchase screen, the user selects Monthly, Yearly, or Lifetime, reviews the localized price and billing period, and taps the purchase button. The annual plan may show **7 days free** for an eligible user. The screen explains that subscriptions automatically renew, the Apple ID is charged at confirmation and renewal, the user can cancel in Apple subscription settings, and the lifetime product is a one-time purchase. **Restore Purchases** calls Apple’s sync path and is available on the paywall and from Settings.
 
-**Build-7 Sandbox/TestFlight purchase and restore evidence: PENDING.**
+**Build-8 Sandbox/TestFlight purchase and restore evidence: PENDING.**
 
 ## 10. Privacy and legal links
 

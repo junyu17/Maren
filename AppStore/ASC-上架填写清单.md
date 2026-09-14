@@ -120,7 +120,7 @@ Your data stays on your device. Built for irregular & PCOS cycles. No subscripti
 
 **Keywords(≤100,逗号分隔,不加空格)**
 ```
-period tracker,cycle,menstrual,PCOS,ovulation,mood,symptom,privacy,irregular,calendar,pms,fertility
+cycle,menstrual,PCOS,symptom,irregular,calendar,pms,perimenopause,offline,diary,health,medication
 ```
 
 **Support URL**(必填):一个能联系到你的页面(可以是带邮箱的简单网页)。
@@ -163,6 +163,8 @@ Go deeper with on-device personalized insights (mood–cycle links, most frequen
 • Payment is charged to your Apple ID. Subscriptions auto-renew unless turned off at least 24 hours before the period ends; manage or cancel anytime in your App Store settings. Lifetime is a one-time purchase.
 
 Maren is a tracking and insight tool. It is not a contraceptive and does not provide medical advice; predictions are estimates and may be inaccurate, especially for irregular cycles.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 ```
 
 ---

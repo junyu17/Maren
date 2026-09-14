@@ -53,24 +53,32 @@ enum PaywallPurchaseStrategy {
     ) -> PaywallProductPresentation? {
         switch productID {
         case Store.ProductID.yearly:
-            let hasSevenDayTrial = eligibleTrialDays == 7
+            // Whatever free trial StoreKit reports for this account, of any
+            // length. Pinning this to "exactly 7 days" meant changing the offer
+            // in App Store Connect silently dropped every trial wording while
+            // Apple still charged nothing — no error, no failing test.
             return PaywallProductPresentation(
                 kind: .yearly,
                 displayName: displayName,
                 displayPrice: displayPrice,
-                cta: hasSevenDayTrial ? .startTrial(days: 7) : .subscribe,
+                cta: eligibleTrialDays.map { .startTrial(days: $0) } ?? .subscribe,
                 billingDisclosure: .automaticRenewal(
-                    trialDays: hasSevenDayTrial ? 7 : nil,
-                    postTrialPrice: hasSevenDayTrial ? displayPrice : nil
+                    trialDays: eligibleTrialDays,
+                    postTrialPrice: eligibleTrialDays == nil ? nil : displayPrice
                 )
             )
         case Store.ProductID.monthly:
+            // The monthly plan carries no trial today, but it can be given one
+            // from App Store Connect without a release, so read it too.
             return PaywallProductPresentation(
                 kind: .monthly,
                 displayName: displayName,
                 displayPrice: displayPrice,
-                cta: .subscribe,
-                billingDisclosure: .automaticRenewal(trialDays: nil, postTrialPrice: nil)
+                cta: eligibleTrialDays.map { .startTrial(days: $0) } ?? .subscribe,
+                billingDisclosure: .automaticRenewal(
+                    trialDays: eligibleTrialDays,
+                    postTrialPrice: eligibleTrialDays == nil ? nil : displayPrice
+                )
             )
         case Store.ProductID.lifetime:
             return PaywallProductPresentation(
@@ -83,6 +91,16 @@ enum PaywallPurchaseStrategy {
         default:
             return nil
         }
+    }
+}
+
+/// Picks a usable default as soon as StoreKit returns product identifiers.
+/// This is intentionally independent of introductory-offer eligibility: that
+/// account lookup may be slow on a physical device and must not leave the CTA
+/// in its disabled "Choose a plan" state.
+enum PaywallSelectionPolicy {
+    static func defaultProductID(availableProductIDs: [String]) -> String? {
+        Store.ProductID.all.first { availableProductIDs.contains($0) }
     }
 }
 
@@ -119,8 +137,10 @@ struct PaywallView: View {
             }
             .task {
                 if store.products.isEmpty { await store.loadProducts() }
-                await store.refreshTrialEligibility()
                 if selectedProductID == nil { selectDefaultProduct() }
+                // Trial eligibility is account-specific and can be slow on a
+                // real device. It must not delay the default selection/CTA.
+                await store.refreshTrialEligibility()
             }
             .alert("提示", isPresented: $showResultAlert) {
                 Button("好") {}
@@ -138,11 +158,9 @@ struct PaywallView: View {
     }
 
     private func selectDefaultProduct() {
-        if let yearly = store.products.first(where: { $0.id == Store.ProductID.yearly }) {
-            selectedProductID = yearly.id
-        } else if let first = store.products.first {
-            selectedProductID = first.id
-        }
+        selectedProductID = PaywallSelectionPolicy.defaultProductID(
+            availableProductIDs: store.products.map(\.id)
+        )
     }
 
     // MARK: - Hero
@@ -287,7 +305,6 @@ struct PaywallView: View {
         let isYearly = product.id == Store.ProductID.yearly
         let isLifetime = product.id == Store.ProductID.lifetime
         let presentation = presentation(for: product)
-        let hasTrial = presentation?.trialDays != nil
 
         return Button {
             withAnimation(.easeInOut(duration: 0.15)) {
@@ -313,8 +330,10 @@ struct PaywallView: View {
                                 .background(accent.opacity(0.15), in: Capsule())
                         }
                     }
-                    if hasTrial {
-                        Text(String(localized: "7 天免费试用"))
+                    if let trialDays = presentation?.trialDays {
+                        // Parameterized, so a different offer length in App Store
+                        // Connect shows the real number instead of a stale "7".
+                        Text(String(localized: "\(trialDays) 天免费试用"))
                             .font(.caption.weight(.medium))
                             .foregroundStyle(.green)
                     } else if isLifetime {
@@ -366,7 +385,7 @@ struct PaywallView: View {
 
     private var purchaseButton: some View {
         Button {
-            Task { await performPurchase() }
+            Task { await handlePurchaseButtonTap() }
         } label: {
             HStack {
                 if store.purchasing {
@@ -381,7 +400,10 @@ struct PaywallView: View {
             .frame(minHeight: 50)
             .background(accent, in: RoundedRectangle(cornerRadius: 14))
         }
-        .disabled(store.purchasing || selectedProductID == nil)
+        // When products are temporarily unavailable, keep this button
+        // tappable so it can retry instead of presenting a permanently dead
+        // "Choose a plan" CTA.
+        .disabled(store.purchasing)
         .opacity(store.purchasing ? 0.6 : 1)
     }
 
@@ -401,6 +423,20 @@ struct PaywallView: View {
         case .purchase:
             return String(localized: "购买并永久解锁")
         }
+    }
+
+    private func handlePurchaseButtonTap() async {
+        if selectedProductID == nil {
+            await store.loadProducts()
+            selectDefaultProduct()
+            guard selectedProductID != nil else {
+                resultMsg = store.lastError ?? String(localized: "暂时无法加载产品。请确认网络；若在本地测试，请在 Xcode 配置 StoreKit Configuration 文件。")
+                showResultAlert = true
+                return
+            }
+            await store.refreshTrialEligibility()
+        }
+        await performPurchase()
     }
 
     private func performPurchase() async {

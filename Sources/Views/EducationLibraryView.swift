@@ -377,7 +377,7 @@ struct LocalSearchView: View {
                             .buttonStyle(.plain)
                         }
                     } header: {
-                        Text("\(results.count) \(String(localized: "个搜索结果"))")
+                        Text(verbatim: "\(results.count) \(String(localized: "个搜索结果"))")
                     }
                 }
                 .listStyle(.insetGrouped)

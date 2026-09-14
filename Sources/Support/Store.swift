@@ -107,11 +107,34 @@ final class Store: ObservableObject {
     @MainActor
     func loadProducts() async {
         do {
-            let storeProducts = try await Product.products(for: ProductID.all)
+            var storeProducts = try await Product.products(for: ProductID.all)
+            // A device-side StoreKit bridge can occasionally return an empty
+            // batch even though the individual identifiers are available
+            // (local StoreKit testing is particularly prone to this after a
+            // scheme/configuration reload). Retry each identifier before
+            // treating the catalog as unavailable.
+            if storeProducts.isEmpty {
+                var individuallyLoaded: [Product] = []
+                for id in ProductID.all {
+                    if let product = try? await Product.products(for: [id]).first {
+                        individuallyLoaded.append(product)
+                    }
+                }
+                storeProducts = individuallyLoaded
+            }
             self.products = ProductID.all.compactMap { id in
                 storeProducts.first { $0.id == id }
             }
-            await checkTrialEligibility()
+            // Do not block the paywall on account-specific introductory-offer
+            // eligibility. StoreKit may take a long time to answer this on a
+            // physical device (especially with a Sandbox account), while the
+            // products themselves are already purchasable. The paywall starts
+            // this refresh after selecting a default product.
+            if self.products.isEmpty {
+                self.lastError = String(localized: "暂时无法加载产品。请确认网络；若在本地测试，请在 Xcode 配置 StoreKit Configuration 文件。")
+            } else {
+                self.lastError = nil
+            }
         } catch {
             self.lastError = error.localizedDescription
         }

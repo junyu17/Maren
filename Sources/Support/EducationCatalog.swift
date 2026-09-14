@@ -34,6 +34,14 @@ enum EducationCatalog {
     struct BilingualString: Codable, Equatable {
         let zh: String
         let en: String
+        /// Added after zh/en shipped, so older content files decode without it.
+        let es: String?
+
+        init(zh: String, en: String, es: String? = nil) {
+            self.zh = zh
+            self.en = en
+            self.es = es
+        }
     }
 
     // MARK: - Source
@@ -99,7 +107,9 @@ enum EducationCatalog {
 
     static func localized(_ b: BilingualString, locale: String? = nil) -> String {
         let loc = locale ?? Bundle.main.preferredLocalizations.first ?? "en"
-        return loc.hasPrefix("zh") ? b.zh : b.en
+        if loc.hasPrefix("zh") { return b.zh }
+        if loc.hasPrefix("es") { return b.es ?? b.en }
+        return b.en
     }
 
     /// Stable bilingual category terms for search, independent of the current
