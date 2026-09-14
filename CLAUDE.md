@@ -1,7 +1,7 @@
 # Vela — 项目开发上下文(CLAUDE.md)
 
 > 这是 Vela app 的开发上下文。新对话在本目录打开时会自动加载本文件。
-> 完整立项依据见同目录 `Vela-项目立项书.md`;隐私政策见 `隐私政策_Privacy-Policy.md`。
+> 完整立项依据见同目录 `Vela-项目立项书.md`;隐私政策见 `docs/privacy.html`(App Store 版为 `AppStore/privacy-policy.md`)。
 
 ## 这是什么
 
