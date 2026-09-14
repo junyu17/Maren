@@ -72,6 +72,17 @@ enum MarenDesign {
     static let shadowOpacity: Double = 0.08
     static let strokeWidth: CGFloat = 0.5
 
+    // MARK: Layout
+
+    /// Widest a scrolling page's content column gets. Cards and body text were
+    /// laid out for a phone; on an iPad they would otherwise span 1032pt in
+    /// portrait and 1376pt in landscape.
+    static let readableWidth: CGFloat = 700
+
+    /// Largest side of a calendar day cell. Past this the circles stop reading
+    /// as days in a month.
+    static let dayCellMaxSide: CGFloat = 56
+
     // MARK: Accent-derived Surface Colours
 
     /// Background tint derived from the current accent.
@@ -162,6 +173,13 @@ extension View {
     func marenAccentCard(cornerRadius: CGFloat = MarenDesign.radiusM,
                          tintOpacity: Double = 0.14) -> some View {
         modifier(MarenDesign.AccentCardStyle(cornerRadius: cornerRadius, tintOpacity: tintOpacity))
+    }
+
+    /// Cap a scrolling page's content at `MarenDesign.readableWidth` and centre it.
+    /// A no-op on iPhone, which is narrower than the cap in either orientation.
+    func marenReadableWidth() -> some View {
+        frame(maxWidth: MarenDesign.readableWidth)
+            .frame(maxWidth: .infinity)
     }
 
     /// Apply the outline card style.

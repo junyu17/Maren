@@ -48,6 +48,7 @@ struct TrendsView: View {
                     }
                 }
                 .padding()
+                .marenReadableWidth()
             }
             .navigationTitle("趋势")
             // 给底部留出空间,避免最后一张图表卡片被浮动标签栏遮住。

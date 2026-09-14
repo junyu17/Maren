@@ -81,6 +81,7 @@ struct CalendarView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
+                .marenReadableWidth()
             }
             .navigationTitle("Maren")
             .navigationBarTitleDisplayMode(.inline)
@@ -661,6 +662,9 @@ private struct DayCell: View {
 
     var body: some View {
         ZStack {
+            // 透明底层让每个格子都有可伸缩的尺寸;没有圆形的日子(只有数字)
+            // 否则会退回 44pt 最小高度,比着色日矮一截。
+            Color.clear
             if showsPhaseTint {
                 Circle().fill(phase.cellFill)
             }
@@ -681,7 +685,12 @@ private struct DayCell: View {
                 .foregroundStyle(period?.flow.foreground ?? (isPredicted ? FlowLevel.medium.tint : .primary))
                 .fontWeight(isToday ? .bold : .regular)
         }
-        .frame(minHeight: 44)
+        // 只给 minHeight 时,着色日的实心 Circle 会撑满整列:iPad 上列宽约 130pt,
+        // 这些日子变成直径 137pt 的大圆,未着色的日子却仍是 44pt,月历行高参差不齐。
+        // 固定成正方形并限制边长;iPhone 的列宽本就小于上限,点按区域仍是整列。
+        .aspectRatio(1, contentMode: .fit)
+        .frame(maxWidth: MarenDesign.dayCellMaxSide)
+        .frame(maxWidth: .infinity, minHeight: 44)
         .contentShape(Rectangle())
         // 颜色是唯一的视觉编码,必须给 VoiceOver 一份等价的文字描述,
         // 否则整张日历对视障用户完全不可读。
