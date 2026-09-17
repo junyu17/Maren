@@ -296,7 +296,8 @@ struct LocalSearchView: View {
                 title: dateText,
                 subtitle: summary,
                 body: summary,
-                keywords: [String(log.dayKey), String(localized: "每日记录")]
+                keywords: [String(log.dayKey), String(localized: "每日记录")],
+                sortDate: log.date
             )
         }
 
@@ -307,7 +308,8 @@ struct LocalSearchView: View {
                 kind: .periodDay,
                 title: dateText,
                 subtitle: period.flow.label,
-                keywords: [String(period.dayKey), String(localized: "经期记录")]
+                keywords: [String(period.dayKey), String(localized: "经期记录")],
+                sortDate: period.date
             )
         }
         return result

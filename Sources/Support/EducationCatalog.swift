@@ -276,19 +276,25 @@ enum LocalSearchEngine {
         let subtitle: String
         let body: String
         let keywords: [String]
+        /// 日期类结果(每日记录、经期日)的真实日期。它们的标题是本地化后的日期
+        /// 文本,按标题排序会变成按字符串排 —— "14 ago" 排在 "14 sep" 前面 ——
+        /// 所以同分时改用这个日期从新到旧排。
+        let sortDate: Date?
 
         init(id: String,
              kind: Kind,
              title: String,
              subtitle: String = "",
              body: String = "",
-             keywords: [String] = []) {
+             keywords: [String] = [],
+             sortDate: Date? = nil) {
             self.id = id
             self.kind = kind
             self.title = title
             self.subtitle = subtitle
             self.body = body
             self.keywords = keywords
+            self.sortDate = sortDate
         }
     }
 
@@ -335,6 +341,9 @@ enum LocalSearchEngine {
             if lhs.score != rhs.score { return lhs.score > rhs.score }
             if lhs.document.kind.sortOrder != rhs.document.kind.sortOrder {
                 return lhs.document.kind.sortOrder < rhs.document.kind.sortOrder
+            }
+            if let l = lhs.document.sortDate, let r = rhs.document.sortDate, l != r {
+                return l > r
             }
             let titleOrder = normalize(lhs.document.title).localizedCompare(normalize(rhs.document.title))
             if titleOrder != .orderedSame { return titleOrder == .orderedAscending }

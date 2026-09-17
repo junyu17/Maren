@@ -108,11 +108,15 @@ enum DemoSeed {
         let today = Cal.startOfDay(Date())
         func day(_ offset: Int) -> Date? { cal.date(byAdding: .day, value: offset, to: today) }
 
+        // 最近一段经期锚定在本月初,否则在月中截图时,日历页整月一条经期记录都没有
+        // ——第一张商店截图就会像一个没人用过的 App。周期间隔仍是 26、41、33 天。
+        let dayOfMonth = cal.component(.day, from: today)
+        let latestStart = dayOfMonth >= 8 ? -(dayOfMonth - 3) : -5
         let periods: [(start: Int, flows: [FlowLevel])] = [
-            (-124, [.medium, .heavy, .medium, .light, .light]),
-            (-98, [.light, .heavy, .heavy, .medium, .light]),
-            (-57, [.medium, .heavy, .medium, .light]),
-            (-24, [.medium, .heavy, .medium, .light, .spotting]),
+            (latestStart - 100, [.medium, .heavy, .medium, .light, .light]),
+            (latestStart - 74, [.light, .heavy, .heavy, .medium, .light]),
+            (latestStart - 33, [.medium, .heavy, .medium, .light]),
+            (latestStart, [.medium, .heavy, .medium, .light, .spotting]),
         ]
         var periodDay: [Int: Int] = [:]  // offset -> 周期第几天(0 起)
         for period in periods {

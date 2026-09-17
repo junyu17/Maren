@@ -65,8 +65,8 @@ struct ReviewSectionView: View {
                 Label(String(localized: "本周回顾"), systemImage: "calendar.badge.clock")
                     .font(.subheadline.weight(.medium))
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption).foregroundStyle(.tertiary)
+                // 这张卡片装在 List 行的 NavigationLink 里,系统已经画了一个尖括号;
+                // 再画一个会并排出现两个,看起来像渲染缺陷。
             }
 
             // Date range
@@ -184,8 +184,6 @@ struct ReviewSectionView: View {
                 Label(String(localized: "最近完成周期"), systemImage: "arrow.triangle.2.circlepath")
                     .font(.subheadline.weight(.medium))
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption).foregroundStyle(.tertiary)
             }
 
             // Cycle boundary

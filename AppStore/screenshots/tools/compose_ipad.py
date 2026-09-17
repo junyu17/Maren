@@ -16,6 +16,22 @@ PRIVACY={'en-US':("Your data never","leaves your iPad"),
          'zh-Hans':("数据不离开","你的 iPad")}
 caps=json.load(open('captions.json'))
 
+def trim_bottom(im):
+    """裁掉屏幕底部最后一段内容,让卡片的圆角落在空白行上。
+    否则底部那行文字会被圆角切成半截,看起来像渲染缺陷。"""
+    import statistics
+    W,H=im.size
+    px=im.convert('L').load()
+    limit=int(H*0.10)
+    step=max(1,W//160)
+    def uniform(y):
+        vals=[px[x,y] for x in range(0,W,step)]
+        return max(vals)-min(vals) <= 6
+    for y in range(H-1, H-limit, -1):
+        if all(uniform(yy) for yy in range(y-5, y+1)):
+            return im.crop((0,0,W,y+1))
+    return im
+
 def gradient():
     g=Image.new('RGB',(1,H))
     for y in range(H):
@@ -40,7 +56,8 @@ def compose(loc):
     made=[]
     for n,(stem,capidx) in enumerate(SHOTS,1):
         src=f'raw_ipad/{loc}/{stem}.png'
-        shot=Image.open(src).convert('RGB').resize((CARD_W,int(CARD_W*H/W)),Image.LANCZOS)
+        raw=trim_bottom(Image.open(src).convert('RGB'))
+        shot=raw.resize((CARD_W,int(CARD_W*raw.height/raw.width)),Image.LANCZOS)
         canvas=gradient()
         mask=Image.new('L',shot.size,0)
         ImageDraw.Draw(mask).rounded_rectangle([0,0,shot.width-1,shot.height-1],RADIUS,fill=255)

@@ -6350,7 +6350,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ideas personales"
+            "value": "Análisis personalizado"
           }
         }
       }
@@ -6373,7 +6373,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ideas personalizadas: correlación ánimo×fase, análisis de regularidad"
+            "value": "Información personalizada: correlación ánimo×fase, análisis de regularidad"
           }
         }
       }
@@ -6534,7 +6534,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Seguimiento e ideas pensados para ciclos irregulares o con SOP."
+            "value": "Seguimiento y análisis pensados para ciclos irregulares o con SOP."
           }
         }
       }
@@ -7151,7 +7151,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lo anterior son ideas obtenidas de datos de ejemplo, solo orientativas. No son consejo médico."
+            "value": "Lo anterior son observaciones obtenidas de datos de ejemplo, solo orientativas. No son consejo médico."
           }
         }
       }
@@ -7242,7 +7242,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Estas estadísticas e ideas son solo orientativas y no son consejo médico."
+            "value": "Estas estadísticas y observaciones son solo orientativas y no son consejo médico."
           }
         }
       }
@@ -9507,7 +9507,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mejora para desbloquear más ideas y análisis de tendencias, todo en el dispositivo y sin conexión a internet."
+            "value": "Mejora para desbloquear más información y análisis de tendencias, todo en el dispositivo y sin conexión a internet."
           }
         }
       }
@@ -10584,7 +10584,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Los datos del repaso se basan en tus registros del dispositivo y ofrecen ideas estadísticas de tendencia, no consejo médico."
+            "value": "Los datos del repaso se basan en tus registros del dispositivo y ofrecen observaciones estadísticas de tendencia, no consejo médico."
           }
         }
       }
@@ -11588,7 +11588,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Registra unos días más y aquí aparecerán tus ideas personales."
+            "value": "Registra unos días más y aquí aparecerá tu análisis personalizado."
           }
         }
       }
@@ -19301,7 +19301,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Idea"
+            "value": "Análisis"
           }
         }
       }
@@ -23131,7 +23131,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Los elementos personalizados aparecen al final de Síntomas y seguimientos en Hoy y funcionan igual que los integrados. Se incluyen en las exportaciones, en la frecuencia de seguimientos y en las ideas Premium."
+            "value": "Los elementos personalizados aparecen al final de Síntomas y seguimientos en Hoy y funcionan igual que los integrados. Se incluyen en las exportaciones, en la frecuencia de seguimientos y en el análisis Premium."
           }
         }
       }
@@ -23154,7 +23154,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Los elementos personalizados aparecen al final del apartado Síntomas y seguimientos de la pestaña Hoy, y los marcas igual que los integrados. Lo que registres entra en tus exportaciones y en la frecuencia de seguimientos e ideas de la pestaña Tendencias (Premium)."
+            "value": "Los elementos personalizados aparecen al final del apartado Síntomas y seguimientos de la pestaña Hoy, y los marcas igual que los integrados. Lo que registres entra en tus exportaciones y en la frecuencia de seguimientos y el análisis de la pestaña Tendencias (Premium)."
           }
         }
       }
@@ -23705,7 +23705,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Desbloquea ideas personales, gráficos avanzados y más."
+            "value": "Desbloquea análisis personalizado, gráficos avanzados y más."
           }
         }
       }
@@ -24782,7 +24782,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bajo"
+            "value": "Baja"
           }
         }
       }
@@ -24920,7 +24920,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alto"
+            "value": "Alta"
           }
         }
       }
