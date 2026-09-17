@@ -18,6 +18,7 @@ struct CalendarView: View {
     @State private var periodAlertMessage = ""
     @State private var showPhaseInfo = false
     @State private var showClinicalReport = false
+    @State private var showSearchForScreenshot = ScreenshotRoute.current == .search
 
     /// 跟随用户地区的星期简写与起始日(中国=周一开头,美国=周日开头)。
     private var weekdaySymbols: [String] { Cal.orderedWeekdaySymbols }
@@ -125,6 +126,9 @@ struct CalendarView: View {
             }
             .sheet(isPresented: $showPhaseInfo) {
                 PhaseInfoView()
+            }
+            .navigationDestination(isPresented: $showSearchForScreenshot) {
+                LocalSearchView(initialQuery: ScreenshotRoute.searchQuery)
             }
             .sheet(isPresented: $showClinicalReport) {
                 NavigationStack {

@@ -10,6 +10,7 @@ struct TrendsView: View {
     @ObservedObject private var store = Store.shared
     @ObservedObject private var dataChangeCenter = LocalDataChangeCenter.shared
     @State private var showPaywall = false
+    @State private var showPerimenopauseForScreenshot = ScreenshotRoute.current == .perimenopause
     @AppStorage(LifeStage.userDefaultsKey) private var lifeStageRaw = LifeStage.defaultValue.rawValue
     @AppStorage(ManualCycle.Keys.enabled) private var manualEnabled = false
     @AppStorage(ManualCycle.Keys.cycleLength) private var manualCycleLength = ManualCycle.defaultCycleLength
@@ -65,6 +66,9 @@ struct TrendsView: View {
                 }
             }
             .sheet(isPresented: $showPaywall) { PaywallView() }
+            .navigationDestination(isPresented: $showPerimenopauseForScreenshot) {
+                PerimenopauseDashboardView(report: perimenopauseReport)
+            }
         }
     }
 

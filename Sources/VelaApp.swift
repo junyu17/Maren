@@ -31,6 +31,7 @@ struct VelaApp: App {
         }
         #if DEBUG
         DemoSeed.runIfRequested(container)
+        DemoSeed.seedScreenshotsIfRequested(container)
         DemoSeed.seedDuplicates(container)
         #endif
         // 重复记录(异常导入 / 快速重复写入等)启动时折叠一次(无重复则 no-op)。

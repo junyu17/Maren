@@ -49,6 +49,9 @@ struct DailyLogView: View {
     @State private var alertMessage = ""
     @State private var showAddSymptom = false
     @State private var showPaywall = false
+    @State private var showLibraryForScreenshot = ScreenshotRoute.current == .library
+    /// `--shot trackers` 截图时滚动到的位置:睡眠一节起,下面是体重、体温和各项追踪。
+    private static let screenshotTrackersAnchor = "screenshot-trackers"
     @State private var dailyStoryItem: EducationCatalog.Item?
     @AppStorage("education.bookmarks") private var bookmarksData = ""
     @AppStorage("education.dailyStoryHistory") private var dailyStoryHistoryData = ""
@@ -266,320 +269,332 @@ struct DailyLogView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                if let focusedDate {
-                    Section {
-                        HStack {
-                            Label(String(localized: "已定位到搜索日期"), systemImage: "scope")
-                            Spacer()
-                            Text(focusedDate, style: .date)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-                Section {
-                    TodayStatusCard(output: todayStatusOutput, phase: estimatedPhase, date: day)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                        .listRowBackground(Color.clear)
-                }
-
-                Section {
-                    CompactReviewEntry(periodDays: periodDays, logs: reviewLogs)
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                        .listRowBackground(Color.clear)
-                }
-
-                Section {
-                    Text(todaysQuote)
-                        .font(.callout)
-                        .italic()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, MarenDesign.spacingS)
-                        .listRowBackground(MarenDesign.accentCapsuleFill())
-                }
-
-                if let story = dailyStoryItem {
-                    Section {
-                        NavigationLink {
-                            StoryReaderView(
-                                item: story,
-                                isBookmarked: bookmarkedIDs.contains(story.id),
-                                onBookmarkToggle: { currentIsBookmarked in
-                                    toggleBookmark(story.id, currentIsBookmarked: currentIsBookmarked)
-                                }
-                            )
-                        } label: {
-                            DailyStoryCard(item: story, isBookmarked: bookmarkedIDs.contains(story.id))
-                        }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            EducationLibraryView()
-                        } label: {
-                            Label("更多教育内容", systemImage: "books.vertical")
-                        }
-                    } header: {
-                        Text("每日故事")
-                    }
-                }
-
-                Section {
-                    // 用自定义 Binding:只有「用户真的动了日期选择器」才算手动选日期,
-                    // 程序自动跟到今天时不会被误判。
-                    DatePicker("日期", selection: Binding(
-                        get: { day },
-                        set: { newValue in
-                            userPickedDate = true
-                            day = Cal.startOfDay(newValue)
-                        }
-                    ), displayedComponents: .date)
-                    .datePickerStyle(.compact)
-                    .onChange(of: day) { _, _ in
-                        loadDraftIfNeeded()
-                        refreshDailyStory()
-                    }
-                }
-
-                Section("今天心情如何?") {
-                    HStack {
-                        ForEach(Mood.allCases) { m in
-                            MoodChoiceButton(mood: m, selectedMood: $mood)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-
-                Section("能量") {
-                    RatingRow(value: $energy, range: 1...5, symbol: "bolt.fill",
-                              tint: .orange, unsetValue: 0, title: "能量")
-                }
-
-                Section("疼痛") {
-                    // 5 格,与心情、能量三行统一;未选=不亮(-1)。
-                    RatingRow(value: $pain, range: 1...5, symbol: "waveform.path.ecg",
-                              tint: .red, unsetValue: -1, title: "疼痛")
-                }
-
-                Section("睡眠") {
-                    Stepper(value: Binding(get: { sleepHours ?? 7 },
-                                           set: { sleepHours = $0 }),
-                            in: 0...14, step: 0.5) {
-                        HStack {
-                            Text("睡眠时长")
-                            Spacer()
-                            Text(sleepHours == nil
-                                 ? String(localized: "未记录")
-                                 : String(localized: "\(sleepText) 小时"))
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    if sleepHours != nil {
-                        Button("清除睡眠记录") { sleepHours = nil }
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Section("体重") {
-                    Stepper(value: Binding(get: { weight ?? 60 },
-                                           set: { weight = $0 }),
-                            in: 30...200, step: 0.1) {
-                        HStack {
-                            Text("体重")
-                            Spacer()
-                            Text(weight == nil
-                                 ? String(localized: "未记录")
-                                 : String(localized: "\(weightText) 公斤"))
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    if weight != nil {
-                        Button("清除体重记录") { weight = nil }
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Section("基础体温") {
-                    Stepper(value: basalBodyTemperatureBinding,
-                            in: 33.0...43.0, step: 0.01) {
-                        HStack {
-                            Text("基础体温")
-                            Spacer()
-                            Text(basalBodyTemperatureDisplayText)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .accessibilityLabel(Text("基础体温"))
-                    .accessibilityValue(Text(basalBodyTemperatureDisplayText))
-                    if basalBodyTemperatureCelsius != nil {
-                        Button("清除基础体温记录") { basalBodyTemperatureCelsius = nil }
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Section("点滴出血") {
-                    Picker("点滴出血", selection: $spotting) {
-                        Text("未记录").tag(Optional<Bool>.none)
-                        Text("无").tag(Optional(false))
-                        Text("有").tag(Optional(true))
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityLabel(Text("点滴出血"))
-                    .accessibilityValue(Text(spottingText))
-                    .accessibilityHint(Text("选择未记录、无或有"))
-                }
-
-                if let savedLog = todaysLog,
-                   savedLog.steps != nil || savedLog.exerciseMinutes != nil {
-                    Section {
-                        if let steps = savedLog.steps {
-                            LabeledContent("步数") {
-                                Text(steps.formatted(.number))
+            ScrollViewReader { scrollProxy in
+                Form {
+                    if let focusedDate {
+                        Section {
+                            HStack {
+                                Label(String(localized: "已定位到搜索日期"), systemImage: "scope")
+                                Spacer()
+                                Text(focusedDate, style: .date)
                                     .foregroundStyle(.secondary)
                             }
                         }
-                        if let exerciseMinutes = savedLog.exerciseMinutes {
-                            LabeledContent("锻炼时间") {
-                                Text(String(localized: "\(exerciseMinutes) 分钟"))
-                                .foregroundStyle(.secondary)
+                    }
+                    Section {
+                        TodayStatusCard(output: todayStatusOutput, phase: estimatedPhase, date: day)
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                            .listRowBackground(Color.clear)
+                    }
+
+                    Section {
+                        CompactReviewEntry(periodDays: periodDays, logs: reviewLogs)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                            .listRowBackground(Color.clear)
+                    }
+
+                    Section {
+                        Text(todaysQuote)
+                            .font(.callout)
+                            .italic()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, MarenDesign.spacingS)
+                            .listRowBackground(MarenDesign.accentCapsuleFill())
+                    }
+
+                    if let story = dailyStoryItem {
+                        Section {
+                            NavigationLink {
+                                StoryReaderView(
+                                    item: story,
+                                    isBookmarked: bookmarkedIDs.contains(story.id),
+                                    onBookmarkToggle: { currentIsBookmarked in
+                                        toggleBookmark(story.id, currentIsBookmarked: currentIsBookmarked)
+                                    }
+                                )
+                            } label: {
+                                DailyStoryCard(item: story, isBookmarked: bookmarkedIDs.contains(story.id))
+                            }
+                            .buttonStyle(.plain)
+
+                            NavigationLink {
+                                EducationLibraryView()
+                            } label: {
+                                Label("更多教育内容", systemImage: "books.vertical")
+                            }
+                        } header: {
+                            Text("每日故事")
+                        }
+                    }
+
+                    Section {
+                        // 用自定义 Binding:只有「用户真的动了日期选择器」才算手动选日期,
+                        // 程序自动跟到今天时不会被误判。
+                        DatePicker("日期", selection: Binding(
+                            get: { day },
+                            set: { newValue in
+                                userPickedDate = true
+                                day = Cal.startOfDay(newValue)
+                            }
+                        ), displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .onChange(of: day) { _, _ in
+                            loadDraftIfNeeded()
+                            refreshDailyStory()
+                        }
+                    }
+
+                    Section("今天心情如何?") {
+                        HStack {
+                            ForEach(Mood.allCases) { m in
+                                MoodChoiceButton(mood: m, selectedMood: $mood)
                             }
                         }
-                    } header: {
-                        Text("Apple Health")
-                    } footer: {
-                        Text("来自 Apple Health 的只读记录")
+                        .padding(.vertical, 4)
                     }
-                }
 
-                if !todaysMeds.isEmpty {
-                    Section("今日用药") {
-                        ForEach(todaysMeds) { med in
-                            Button {
-                                toggleMed(med)
-                            } label: {
-                                HStack {
-                                    Text(med.emoji)
-                                    Text(med.name).foregroundStyle(.primary)
-                                    Spacer()
-                                    Image(systemName: takenMedIds.contains(med.id)
-                                          ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(takenMedIds.contains(med.id)
-                                                         ? AppTheme.current.accent : .secondary)
+                    Section("能量") {
+                        RatingRow(value: $energy, range: 1...5, symbol: "bolt.fill",
+                                  tint: .orange, unsetValue: 0, title: "能量")
+                    }
+
+                    Section("疼痛") {
+                        // 5 格,与心情、能量三行统一;未选=不亮(-1)。
+                        RatingRow(value: $pain, range: 1...5, symbol: "waveform.path.ecg",
+                                  tint: .red, unsetValue: -1, title: "疼痛")
+                    }
+
+                    Section("睡眠") {
+                        Stepper(value: Binding(get: { sleepHours ?? 7 },
+                                               set: { sleepHours = $0 }),
+                                in: 0...14, step: 0.5) {
+                            HStack {
+                                Text("睡眠时长")
+                                Spacer()
+                                Text(sleepHours == nil
+                                     ? String(localized: "未记录")
+                                     : String(localized: "\(sleepText) 小时"))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        if sleepHours != nil {
+                            Button("清除睡眠记录") { sleepHours = nil }
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .id(Self.screenshotTrackersAnchor)
+
+                    Section("体重") {
+                        Stepper(value: Binding(get: { weight ?? 60 },
+                                               set: { weight = $0 }),
+                                in: 30...200, step: 0.1) {
+                            HStack {
+                                Text("体重")
+                                Spacer()
+                                Text(weight == nil
+                                     ? String(localized: "未记录")
+                                     : String(localized: "\(weightText) 公斤"))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        if weight != nil {
+                            Button("清除体重记录") { weight = nil }
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Section("基础体温") {
+                        Stepper(value: basalBodyTemperatureBinding,
+                                in: 33.0...43.0, step: 0.01) {
+                            HStack {
+                                Text("基础体温")
+                                Spacer()
+                                Text(basalBodyTemperatureDisplayText)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityLabel(Text("基础体温"))
+                        .accessibilityValue(Text(basalBodyTemperatureDisplayText))
+                        if basalBodyTemperatureCelsius != nil {
+                            Button("清除基础体温记录") { basalBodyTemperatureCelsius = nil }
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Section("点滴出血") {
+                        Picker("点滴出血", selection: $spotting) {
+                            Text("未记录").tag(Optional<Bool>.none)
+                            Text("无").tag(Optional(false))
+                            Text("有").tag(Optional(true))
+                        }
+                        .pickerStyle(.segmented)
+                        .accessibilityLabel(Text("点滴出血"))
+                        .accessibilityValue(Text(spottingText))
+                        .accessibilityHint(Text("选择未记录、无或有"))
+                    }
+
+                    if let savedLog = todaysLog,
+                       savedLog.steps != nil || savedLog.exerciseMinutes != nil {
+                        Section {
+                            if let steps = savedLog.steps {
+                                LabeledContent("步数") {
+                                    Text(steps.formatted(.number))
+                                        .foregroundStyle(.secondary)
                                 }
                             }
-                            .accessibilityAddTraits(takenMedIds.contains(med.id) ? [.isButton, .isSelected] : .isButton)
+                            if let exerciseMinutes = savedLog.exerciseMinutes {
+                                LabeledContent("锻炼时间") {
+                                    Text(String(localized: "\(exerciseMinutes) 分钟"))
+                                    .foregroundStyle(.secondary)
+                                }
+                            }
+                        } header: {
+                            Text("Apple Health")
+                        } footer: {
+                            Text("来自 Apple Health 的只读记录")
                         }
                     }
-                }
 
-                Section("追踪项") {
-                    TrackerPickerSection(selected: $symptoms, customTags: customSymptoms.map {
-                        SymptomTag(key: $0.key, label: $0.label, emoji: $0.emoji)
-                    }, onAdd: { tryAddCustomSymptom() },
-                    initialSearchText: focusedTrackerQuery ?? "",
-                    initialFocusKey: focusedTrackerKey)
-                }
+                    if !todaysMeds.isEmpty {
+                        Section("今日用药") {
+                            ForEach(todaysMeds) { med in
+                                Button {
+                                    toggleMed(med)
+                                } label: {
+                                    HStack {
+                                        Text(med.emoji)
+                                        Text(med.name).foregroundStyle(.primary)
+                                        Spacer()
+                                        Image(systemName: takenMedIds.contains(med.id)
+                                              ? "checkmark.circle.fill" : "circle")
+                                            .foregroundStyle(takenMedIds.contains(med.id)
+                                                             ? AppTheme.current.accent : .secondary)
+                                    }
+                                }
+                                .accessibilityAddTraits(takenMedIds.contains(med.id) ? [.isButton, .isSelected] : .isButton)
+                            }
+                        }
+                    }
 
-                ReproductiveTestSection(selectedKeys: $symptoms)
+                    Section("追踪项") {
+                        TrackerPickerSection(selected: $symptoms, customTags: customSymptoms.map {
+                            SymptomTag(key: $0.key, label: $0.label, emoji: $0.emoji)
+                        }, onAdd: { tryAddCustomSymptom() },
+                        initialSearchText: focusedTrackerQuery ?? "",
+                        initialFocusKey: focusedTrackerKey)
+                    }
 
-                Section("备注") {
-                    TextField("想记点什么…", text: $note, axis: .vertical)
-                        .lineLimit(1...4)
-                        .focused($noteFocused)
-                }
+                    ReproductiveTestSection(selectedKeys: $symptoms)
 
-                Section {
-                    if todaysLog != nil {
-                        Button(role: .destructive) {
-                            deleteCurrentDayRecord()
+                    Section("备注") {
+                        TextField("想记点什么…", text: $note, axis: .vertical)
+                            .lineLimit(1...4)
+                            .focused($noteFocused)
+                    }
+
+                    Section {
+                        if todaysLog != nil {
+                            Button(role: .destructive) {
+                                deleteCurrentDayRecord()
+                            } label: {
+                                HStack {
+                                    Spacer()
+                                    Text(String(localized: "删除当天记录"))
+                                        .fontWeight(.semibold)
+                                    Spacer()
+                                }
+                            }
+                            .listRowBackground(Color.red.opacity(0.1))
+                            .disabled(isSaving)
+                        }
+
+                        Button {
+                            save()
                         } label: {
                             HStack {
                                 Spacer()
-                                Text(String(localized: "删除当天记录"))
+                                Text(savedFlash ? "已保存 ✓" : (isSaving ? "保存中…" : "保存今天的记录"))
                                     .fontWeight(.semibold)
                                 Spacer()
                             }
                         }
-                        .listRowBackground(Color.red.opacity(0.1))
                         .disabled(isSaving)
+                        .listRowBackground(AppTheme.current.accent)
+                        .foregroundStyle(.white)
                     }
-
-                    Button {
-                        save()
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text(savedFlash ? "已保存 ✓" : (isSaving ? "保存中…" : "保存今天的记录"))
-                                .fontWeight(.semibold)
-                            Spacer()
+                }
+                .navigationTitle("每日记录")
+                .navigationBarTitleDisplayMode(.inline)
+                // 给底部留出空间,避免最后一行(症状/保存)被浮动标签栏遮住。
+                .contentMargins(.top, 0, for: .scrollContent)
+                .contentMargins(.bottom, 48, for: .scrollContent)
+                // 多行备注的回车是换行,不能用来收键盘;这里给一个明确的出口,
+                // 否则键盘一直挡着「保存」按钮和底部标签栏。
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink {
+                            LocalSearchView()
+                        } label: {
+                            Image(systemName: "magnifyingglass")
                         }
+                        .accessibilityLabel(Text("全局搜索"))
                     }
-                    .disabled(isSaving)
-                    .listRowBackground(AppTheme.current.accent)
-                    .foregroundStyle(.white)
-                }
-            }
-            .navigationTitle("每日记录")
-            .navigationBarTitleDisplayMode(.inline)
-            // 给底部留出空间,避免最后一行(症状/保存)被浮动标签栏遮住。
-            .contentMargins(.top, 0, for: .scrollContent)
-            .contentMargins(.bottom, 48, for: .scrollContent)
-            // 多行备注的回车是换行,不能用来收键盘;这里给一个明确的出口,
-            // 否则键盘一直挡着「保存」按钮和底部标签栏。
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        LocalSearchView()
-                    } label: {
-                        Image(systemName: "magnifyingglass")
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button("完成") { noteFocused = false }
                     }
-                    .accessibilityLabel(Text("全局搜索"))
                 }
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("完成") { noteFocused = false }
-                }
-            }
-            // 往下拖动即可收键盘(拖到哪收到哪),不用非得点「完成」。
-            .scrollDismissesKeyboard(.interactively)
-            .sheet(isPresented: $showAddSymptom) {
-                CustomSymptomEditor { label, emoji in
-                    let s = CustomSymptom(label: label, emoji: emoji)
-                    context.insert(s)
-                    if saveContext() {
-                        CustomSymptomStore.refresh(context)
-                        LocalDataChangeCenter.shared.post(kind: .customTrackerChanged)
-                        symptoms.insert(s.key)   // 新建即选中
-                        return true
+                // 往下拖动即可收键盘(拖到哪收到哪),不用非得点「完成」。
+                .scrollDismissesKeyboard(.interactively)
+                .sheet(isPresented: $showAddSymptom) {
+                    CustomSymptomEditor { label, emoji in
+                        let s = CustomSymptom(label: label, emoji: emoji)
+                        context.insert(s)
+                        if saveContext() {
+                            CustomSymptomStore.refresh(context)
+                            LocalDataChangeCenter.shared.post(kind: .customTrackerChanged)
+                            symptoms.insert(s.key)   // 新建即选中
+                            return true
+                        }
+                        return false
                     }
-                    return false
                 }
-            }
-            .sheet(isPresented: $showPaywall) { PaywallView() }
-            .alert(alertTitle, isPresented: $showErrorAlert) {
-                Button("好", role: .cancel) { }
-            } message: {
-                Text(alertMessage)
-            }
-            .alert(String(localized: "外部数据更新"), isPresented: $showConflictAlert) {
-                Button(String(localized: "重新加载外部数据")) {
-                    if loadDraft(for: day) { loadedDay = day }
+                .sheet(isPresented: $showPaywall) { PaywallView() }
+                .navigationDestination(isPresented: $showLibraryForScreenshot) {
+                    EducationLibraryView()
                 }
-                Button(String(localized: "保留我的修改"), role: .cancel) {
-                    // Keep the original baseline so the draft remains dirty.
+                .alert(alertTitle, isPresented: $showErrorAlert) {
+                    Button("好", role: .cancel) { }
+                } message: {
+                    Text(alertMessage)
                 }
-            } message: {
-                Text(String(localized: "有外部更新影响了当前日期的记录。你要重新加载还是保留未保存的修改？"))
-            }
-            .onAppear {
-                // 跨过午夜后自动跟到新的今天(前提是用户没有手动选过别的日期)。
-                let today = Cal.startOfDay(Date())
-                if !userPickedDate && day != today { day = today }
-                loadDraftIfNeeded()
-                sanitizeDraftAgainstCurrentTrackers()
-                refreshDailyStory()
-            }
-            .onReceive(dataChangeCenter.$lastEvent.compactMap { $0 }) { event in
-                handleExternalChange(event)
+                .alert(String(localized: "外部数据更新"), isPresented: $showConflictAlert) {
+                    Button(String(localized: "重新加载外部数据")) {
+                        if loadDraft(for: day) { loadedDay = day }
+                    }
+                    Button(String(localized: "保留我的修改"), role: .cancel) {
+                        // Keep the original baseline so the draft remains dirty.
+                    }
+                } message: {
+                    Text(String(localized: "有外部更新影响了当前日期的记录。你要重新加载还是保留未保存的修改？"))
+                }
+                .onAppear {
+                    // 跨过午夜后自动跟到新的今天(前提是用户没有手动选过别的日期)。
+                    let today = Cal.startOfDay(Date())
+                    if !userPickedDate && day != today { day = today }
+                    loadDraftIfNeeded()
+                    sanitizeDraftAgainstCurrentTrackers()
+                    refreshDailyStory()
+                }
+                .onReceive(dataChangeCenter.$lastEvent.compactMap { $0 }) { event in
+                    handleExternalChange(event)
+                }
+                .onAppear {
+                    guard ScreenshotRoute.current == .trackers else { return }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        scrollProxy.scrollTo(Self.screenshotTrackersAnchor, anchor: .top)
+                    }
+                }
             }
         }
     }

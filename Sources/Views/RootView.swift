@@ -17,7 +17,8 @@ struct RootView: View {
     var storeFailed: Bool = false
 
     /// 允许通过启动参数选择初始标签页(便于自动化自测);默认日历。
-    @State private var selection: Int = ProcessInfo.processInfo.arguments.contains("--start-today") ? 1 : 0
+    @State private var selection: Int = ScreenshotRoute.current?.tab
+        ?? (ProcessInfo.processInfo.arguments.contains("--start-today") ? 1 : 0)
     @State private var showStoreAlert = false
 
     // 层级 3:首次引导 + 应用锁。

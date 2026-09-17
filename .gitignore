@@ -30,3 +30,6 @@ Package.resolved
 # 临时导出
 *.csv
 *.pdf
+
+# App Store 截图成品（由 AppStore/screenshots/tools 重新生成）
+AppStore/screenshots/v*/

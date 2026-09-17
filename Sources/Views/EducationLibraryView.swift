@@ -221,9 +221,13 @@ struct LocalSearchView: View {
     @Query(sort: \PeriodDay.dayKey, order: .reverse) private var periodDays: [PeriodDay]
 
     @State private var educationItems: [EducationCatalog.Item] = []
-    @State private var searchText = ""
+    @State private var searchText: String
     @State private var selectedKind: LocalSearchEngine.Kind?
     @AppStorage("education.bookmarks") private var bookmarksData = ""
+
+    init(initialQuery: String = "") {
+        _searchText = State(initialValue: initialQuery)
+    }
 
     private var trimmedQuery: String {
         searchText.trimmingCharacters(in: .whitespacesAndNewlines)

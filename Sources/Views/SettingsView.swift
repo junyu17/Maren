@@ -637,6 +637,9 @@ struct SettingsView: View {
                 notifs.refreshAuthorization()
                 healthSyncEnabled = HealthKitBridge.syncEnabled
                 healthSelectedTypes = HealthKitBridge.selectedTypes
+                if ScreenshotRoute.current == .paywall {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { showPaywall = true }
+                }
             }
         }
     }
