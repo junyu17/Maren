@@ -65,8 +65,8 @@ struct ReviewSectionView: View {
                 Label(String(localized: "本周回顾"), systemImage: "calendar.badge.clock")
                     .font(.subheadline.weight(.medium))
                 Spacer()
-                // 这张卡片装在 List 行的 NavigationLink 里,系统已经画了一个尖括号;
-                // 再画一个会并排出现两个,看起来像渲染缺陷。
+                Image(systemName: "chevron.right")
+                    .font(.caption).foregroundStyle(.tertiary)
             }
 
             // Date range
@@ -184,6 +184,8 @@ struct ReviewSectionView: View {
                 Label(String(localized: "最近完成周期"), systemImage: "arrow.triangle.2.circlepath")
                     .font(.subheadline.weight(.medium))
                 Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption).foregroundStyle(.tertiary)
             }
 
             // Cycle boundary
@@ -734,6 +736,8 @@ struct CompletedCycleDetailView: View {
 
 /// Compact one-line review entry for the Today tab.
 /// Shows either a completed-cycle update or weekly summary.
+/// 放在「今天」页的 Form 里:Form 行里的 NavigationLink 自带尖括号,所以这里的
+/// 两种行都不再自己画,否则会并排出现两个。(「趋势」页的卡片在 ScrollView 里,要自己画。)
 struct CompactReviewEntry: View {
     let periodDays: [PeriodDay]
     let logs: [DailyLog]
@@ -794,8 +798,6 @@ struct CompactReviewEntry: View {
                     .font(.caption2).foregroundStyle(.secondary)
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption2).foregroundStyle(.tertiary)
         }
         .padding(.horizontal, MarenDesign.spacingM)
         .padding(.vertical, MarenDesign.spacingS)
@@ -828,8 +830,6 @@ struct CompactReviewEntry: View {
                 }
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption2).foregroundStyle(.tertiary)
         }
         .padding(.horizontal, MarenDesign.spacingM)
         .padding(.vertical, MarenDesign.spacingS)
