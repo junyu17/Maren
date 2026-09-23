@@ -36,11 +36,14 @@ enum EducationCatalog {
         let en: String
         /// Added after zh/en shipped, so older content files decode without it.
         let es: String?
+        /// Added after zh/en/es shipped, so older content files decode without it.
+        let ja: String?
 
-        init(zh: String, en: String, es: String? = nil) {
+        init(zh: String, en: String, es: String? = nil, ja: String? = nil) {
             self.zh = zh
             self.en = en
             self.es = es
+            self.ja = ja
         }
     }
 
@@ -109,6 +112,7 @@ enum EducationCatalog {
         let loc = locale ?? Bundle.main.preferredLocalizations.first ?? "en"
         if loc.hasPrefix("zh") { return b.zh }
         if loc.hasPrefix("es") { return b.es ?? b.en }
+        if loc.hasPrefix("ja") { return b.ja ?? b.en }
         return b.en
     }
 

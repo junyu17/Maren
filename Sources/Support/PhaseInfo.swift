@@ -3,7 +3,7 @@ import Foundation
 /// 层级 1 · 阶段科普内容加载器。本地 JSON,离线、双语。
 enum PhaseInfo {
 
-    private struct Entry: Decodable { let zh: String; let en: String }
+    private struct Entry: Decodable { let zh: String; let en: String; let ja: String? }
 
     private static let library: [String: Entry] = {
         guard let url = Bundle.main.url(forResource: "phase_info", withExtension: "json"),
@@ -14,15 +14,21 @@ enum PhaseInfo {
         return dict
     }()
 
-    private static var preferEnglish: Bool {
+    private static var languageCode: String {
         let localization = Bundle.main.preferredLocalizations.first ?? "en"
-        return !localization.hasPrefix("zh")
+        if localization.hasPrefix("zh") { return "zh" }
+        if localization.hasPrefix("ja") { return "ja" }
+        return "en"
     }
 
     /// 某阶段的科普说明文字(按界面语言)。unknown 无内容。
     static func body(for phase: CyclePhase) -> String {
         guard let e = library[phase.rawValue] else { return "" }
-        return preferEnglish ? e.en : e.zh
+        switch languageCode {
+        case "zh": return e.zh
+        case "ja": return e.ja ?? e.en
+        default:   return e.en
+        }
     }
 
     /// 简短的「该注意什么」提示(按阶段),用于 widget 等紧凑展示。每个阶段都有(含 unknown)。

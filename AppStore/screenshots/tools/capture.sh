@@ -8,12 +8,13 @@ boot_wait() {
   xcrun simctl bootstatus "$SIM" -b >/dev/null 2>&1 || { xcrun simctl boot "$SIM" >/dev/null 2>&1; xcrun simctl bootstatus "$SIM" -b >/dev/null 2>&1; }
 }
 
-for loc in en-US es-ES es-MX zh-Hans; do
+for loc in ${LOCALES:-en-US es-ES es-MX zh-Hans ja}; do
   case "$loc" in
     en-US) L=en; R=US; Q="Hot flashes";;
     es-ES) L=es; R=ES; Q="Sofocos";;
     es-MX) L=es; R=MX; Q="Sofocos";;
     zh-Hans) L=zh-Hans; R=CN; Q="潮热";;
+    ja) L=ja; R=JP; Q="ホットフラッシュ";;
   esac
   mkdir -p "$OUT/$loc"
   # 设备级语言要跟着截图语言走,否则状态栏日期会是英文

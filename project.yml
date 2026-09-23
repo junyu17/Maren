@@ -12,8 +12,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.4.0"
-    CURRENT_PROJECT_VERSION: "17"
+    MARKETING_VERSION: "1.5.0"
+    CURRENT_PROJECT_VERSION: "18"
     DEVELOPMENT_TEAM: "255R6QQR97"
     CODE_SIGN_STYLE: Automatic
 targets:
@@ -67,9 +67,13 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         # 声明实际支持的语言。简体中文是开发/源语言；英文由完整的 en
         # catalog 提供。其他未翻译的系统语言按 Apple 语言回退规则选择可用本地化。
+        # App Store 的「语言」一栏读的是这里,不是 xcstrings —— 少写一个,
+        # 商店就不会告诉用户这个语言可用。
         CFBundleLocalizations:
           - en
           - zh-Hans
+          - es
+          - ja
         NSFaceIDUsageDescription: "Use Face ID to unlock Maren so only you can see your health records."
         # Apple Health 双向同步的用途说明(HealthKit capability 已在上面 entitlements 启用)。
         NSHealthShareUsageDescription: "Read menstrual flow, body mass, sleep analysis, basal body temperature, intermenstrual bleeding, step count, and Apple exercise time from Apple Health to import selected records into Maren. Sleep analysis, step count, and Apple exercise time are read-only. Optional and used only on this device; never sent to a developer server."

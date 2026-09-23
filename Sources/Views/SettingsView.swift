@@ -598,6 +598,8 @@ struct SettingsView: View {
                     Text("开启后,每次打开 Maren 都需要 Face ID、Touch ID 或设备密码。")
                 }
 
+                MoreAppsSection()
+
                 Section {
                     Button(role: .destructive) {
                         showDeleteConfirm = true

@@ -7,13 +7,15 @@ CARD_W=1569; CARD_X=(W-CARD_W)//2; CARD_Y=540; RADIUS=88
 L1_Y=132; L2_Y=312; FS=150
 LATIN=('/System/Library/Fonts/Helvetica.ttc',1)
 CJK=('/System/Library/Fonts/Hiragino Sans GB.ttc',2)
+# 日文要用日文字体:中文字体缺字形,日文标题会整行变成方块。
+JP=('/System/Library/Fonts/\u30d2\u30e9\u30ae\u30ce\u89d2\u30b4\u30b7\u30c3\u30af W7.ttc',0)
 
 SHOTS=[('01_calendar',0),('02_perimenopause',1),('03_today',2),('04_trends',3),
        ('05_trackers',4),('07_library',6),('08_search',7),('09_settings','privacy')]
 PRIVACY={'en-US':("Your data never","leaves your iPad"),
          'es-ES':("Tus datos no","salen del iPad"),
          'es-MX':("Tus datos no","salen del iPad"),
-         'zh-Hans':("数据不离开","你的 iPad")}
+         'zh-Hans':("数据不离开","你的 iPad"),'ja':("データは","iPadから出ない")}
 caps=json.load(open('captions.json'))
 
 def trim_bottom(im):
@@ -40,7 +42,7 @@ def gradient():
     return g.resize((W,H))
 
 def font_for(loc,size):
-    p,i = CJK if loc=='zh-Hans' else LATIN
+    p,i = JP if loc=='ja' else (CJK if loc=='zh-Hans' else LATIN)
     return ImageFont.truetype(p,size,index=i)
 
 def fit(draw,text,f,loc,maxw):
@@ -72,5 +74,6 @@ def compose(loc):
         canvas.save(p); made.append(p)
     return made
 
-for loc in ['en-US','es-ES','es-MX','zh-Hans']:
+import os
+for loc in (os.environ.get('LOCALES') or 'en-US es-ES es-MX zh-Hans').split():
     m=compose(loc); print(loc, len(m))

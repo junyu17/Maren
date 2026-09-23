@@ -3,7 +3,7 @@ import Foundation
 /// F4:每日激励一句话。本地 JSON 词库,离线可用,按周期阶段智能匹配。
 enum DailyQuote {
 
-    private struct Entry: Decodable { let zh: String; let en: String; let es: String? }
+    private struct Entry: Decodable { let zh: String; let en: String; let es: String?; let ja: String? }
 
     /// 词库缓存(阶段 key -> 句子列表)。
     private static let library: [String: [Entry]] = {
@@ -21,6 +21,7 @@ enum DailyQuote {
         let localization = Bundle.main.preferredLocalizations.first ?? "en"
         if localization.hasPrefix("zh") { return "zh" }
         if localization.hasPrefix("es") { return "es" }
+        if localization.hasPrefix("ja") { return "ja" }
         return "en"
     }
 
@@ -46,6 +47,7 @@ enum DailyQuote {
         switch languageCode {
         case "zh": return entry.zh
         case "es": return entry.es ?? entry.en
+        case "ja": return entry.ja ?? entry.en
         default:   return entry.en
         }
     }
