@@ -3,7 +3,7 @@ import Foundation
 /// F4:每日激励一句话。本地 JSON 词库,离线可用,按周期阶段智能匹配。
 enum DailyQuote {
 
-    private struct Entry: Decodable { let zh: String; let en: String; let es: String?; let ja: String? }
+    private struct Entry: Decodable { let zh: String; let zhHant: String?; let en: String; let es: String?; let ja: String? }
 
     /// 词库缓存(阶段 key -> 句子列表)。
     private static let library: [String: [Entry]] = {
@@ -19,6 +19,10 @@ enum DailyQuote {
     /// 这样每日一句和界面文案永远一致(例如系统是法语、界面回退到英文时,句子也给英文)。
     private static var languageCode: String {
         let localization = Bundle.main.preferredLocalizations.first ?? "en"
+        // zh-Hant must be tested before the generic zh prefix, or a Taiwan
+        // device falls into the Simplified branch and reads Simplified copy
+        // under a Traditional interface.
+        if localization.hasPrefix("zh-Hant") { return "zh-Hant" }
         if localization.hasPrefix("zh") { return "zh" }
         if localization.hasPrefix("es") { return "es" }
         if localization.hasPrefix("ja") { return "ja" }
@@ -45,6 +49,7 @@ enum DailyQuote {
         let dayNumber = DayKey.from(date)
         let entry = bucket[((dayNumber % bucket.count) + bucket.count) % bucket.count]
         switch languageCode {
+        case "zh-Hant": return entry.zhHant ?? entry.zh
         case "zh": return entry.zh
         case "es": return entry.es ?? entry.en
         case "ja": return entry.ja ?? entry.en

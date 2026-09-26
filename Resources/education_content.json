@@ -6,19 +6,22 @@
       "zh": "月经与周期基础",
       "en": "Period & Cycle Basics",
       "es": "Fundamentos del periodo y el ciclo",
-      "ja": "生理と周期の基礎知識"
+      "ja": "生理と周期の基礎知識",
+      "zhHant": "月經與週期基礎"
     },
     "summary": {
       "zh": "了解月经周期如何计算，以及可以记录哪些日期。",
       "en": "Learn how to count a menstrual cycle and which dates to record.",
       "es": "Aprende a contar un ciclo menstrual y qué fechas conviene registrar.",
-      "ja": "月経周期の数え方と、記録しておきたい日付について知りましょう。"
+      "ja": "月経周期の数え方と、記録しておきたい日付について知りましょう。",
+      "zhHant": "瞭解月經週期如何計算，以及可以記錄哪些日期。"
     },
     "body": {
       "zh": "月经周期从一次出血的第一天算到下一次出血的第一天。记录每次出血的首日和持续天数，方便回顾自己的周期模式。",
       "en": "A menstrual cycle is counted from the first day of bleeding to the first day of the next period. Logging each start date and duration can help you review your own pattern.",
       "es": "El ciclo menstrual se cuenta desde el primer día de sangrado hasta el primer día del periodo siguiente. Registrar cada fecha de inicio y su duración te ayuda a repasar tu propio patrón.",
-      "ja": "月経周期は、出血が始まった日から次の生理が始まった日までを1周期として数えます。毎回の開始日と続いた日数を記録しておくと、自分自身の周期パターンを振り返りやすくなります。"
+      "ja": "月経周期は、出血が始まった日から次の生理が始まった日までを1周期として数えます。毎回の開始日と続いた日数を記録しておくと、自分自身の周期パターンを振り返りやすくなります。",
+      "zhHant": "月經週期從一次出血的第一天算到下一次出血的第一天。記錄每次出血的首日和持續天數，方便回顧自己的週期模式。"
     },
     "trackerTags": [
       "cramps",
@@ -43,7 +46,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。需要个体化建议时，请咨询医疗专业人员。",
       "en": "This content is for general information only and is not medical advice. Consult a healthcare professional for individualized guidance.",
       "es": "Este contenido es solo información general y no es consejo médico. Consulta a un profesional sanitario para una orientación personalizada.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。個別のアドバイスが必要な場合は、医療専門家にご相談ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。個別のアドバイスが必要な場合は、医療専門家にご相談ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。需要個體化建議時，請諮詢醫療專業人員。"
     },
     "isPro": false
   },
@@ -54,19 +58,22 @@
       "zh": "出血记录与就医参考",
       "en": "Bleeding Records & Visit Notes",
       "es": "Registros de sangrado y notas para la consulta",
-      "ja": "出血の記録と受診メモ"
+      "ja": "出血の記録と受診メモ",
+      "zhHant": "出血記錄與就醫參考"
     },
     "summary": {
       "zh": "记录出血日期、持续时间和变化，为就诊讨论准备信息。",
       "en": "Record bleeding dates, duration, and changes to prepare for a visit.",
       "es": "Anota fechas, duración y cambios del sangrado para preparar una consulta.",
-      "ja": "受診に備えて、出血のあった日付・続いた期間・変化を記録しましょう。"
+      "ja": "受診に備えて、出血のあった日付・続いた期間・変化を記録しましょう。",
+      "zhHant": "記錄出血日期、持續時間和變化，為就診討論準備資訊。"
     },
     "body": {
       "zh": "记录经量变化、周期外出血及伴随不适；就诊时可把这些记录与用药和既往情况一起告诉医生。",
       "en": "Log changes in flow, bleeding between periods, and related symptoms; share these notes with your doctor along with medicines and relevant history.",
       "es": "Registra los cambios de flujo, el sangrado entre periodos y los síntomas relacionados; comparte estas notas con tu médico junto con los medicamentos y tu historial relevante.",
-      "ja": "経血量の変化、不正出血、関連する症状を記録しておきましょう。服用中の薬や関連する既往歴とあわせて、このメモを医師と共有してください。"
+      "ja": "経血量の変化、不正出血、関連する症状を記録しておきましょう。服用中の薬や関連する既往歴とあわせて、このメモを医師と共有してください。",
+      "zhHant": "記錄經量變化、週期外出血及伴隨不適；就診時可把這些記錄與用藥和既往情況一起告訴醫生。"
     },
     "trackerTags": [
       "heavyFlow"
@@ -90,7 +97,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。出血变化请与医疗专业人员讨论。",
       "en": "This content is for general information only and is not medical advice. Discuss bleeding changes with a healthcare professional.",
       "es": "Este contenido es solo información general y no es consejo médico. Comenta los cambios de sangrado con un profesional sanitario.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。出血の変化については医療専門家にご相談ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。出血の変化については医療専門家にご相談ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。出血變化請與醫療專業人員討論。"
     },
     "isPro": false
   },
@@ -101,19 +109,22 @@
       "zh": "分泌物追踪",
       "en": "Discharge Tracking",
       "es": "Seguimiento del flujo vaginal",
-      "ja": "おりものの記録"
+      "ja": "おりものの記録",
+      "zhHant": "分泌物追蹤"
     },
     "summary": {
       "zh": "了解分泌物在周期中的正常变化，并记录自己的观察。",
       "en": "Learn how discharge can vary across the cycle and record your observations.",
       "es": "Descubre cómo puede variar el flujo a lo largo del ciclo y registra tus observaciones.",
-      "ja": "周期の中でおりものがどのように変化するかを知り、気づいたことを記録しましょう。"
+      "ja": "周期の中でおりものがどのように変化するかを知り、気づいたことを記録しましょう。",
+      "zhHant": "瞭解分泌物在週期中的正常變化，並記錄自己的觀察。"
     },
     "body": {
       "zh": "正常分泌物的量和组成会随月经周期变化。记录颜色、质地及不适等观察，必要时带给医生参考。",
       "en": "The amount and makeup of normal discharge can change throughout the menstrual cycle. Record observations such as color, texture, and discomfort to discuss with a doctor if needed.",
       "es": "La cantidad y la composición del flujo normal pueden cambiar a lo largo del ciclo menstrual. Anota observaciones como el color, la textura y las molestias para comentarlas con un médico si hace falta.",
-      "ja": "正常なおりものの量や状態は、月経周期を通じて変化することがあります。色、状態、不快感などの気づきを記録しておくと、必要に応じて医師と話す際に役立ちます。"
+      "ja": "正常なおりものの量や状態は、月経周期を通じて変化することがあります。色、状態、不快感などの気づきを記録しておくと、必要に応じて医師と話す際に役立ちます。",
+      "zhHant": "正常分泌物的量和組成會隨月經週期變化。記錄顏色、質地及不適等觀察，必要時帶給醫生參考。"
     },
     "trackerTags": [
       "wateryDischarge"
@@ -138,7 +149,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。让医疗专业人员评估异常或令人担忧的变化。",
       "en": "This content is for general information only and is not medical advice. Ask a healthcare professional to assess unusual or concerning changes.",
       "es": "Este contenido es solo información general y no es consejo médico. Pide a un profesional sanitario que valore cualquier cambio inusual o preocupante.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。いつもと違う、または気になる変化については医療専門家に評価を依頼してください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。いつもと違う、または気になる変化については医療専門家に評価を依頼してください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。讓醫療專業人員評估異常或令人擔憂的變化。"
     },
     "isPro": false
   },
@@ -149,19 +161,22 @@
       "zh": "月经追踪方法",
       "en": "Period Tracking Methods",
       "es": "Formas de registrar el periodo",
-      "ja": "生理記録の方法"
+      "ja": "生理記録の方法",
+      "zhHant": "月經追蹤方法"
     },
     "summary": {
       "zh": "用简单的日期记录回顾周期变化。",
       "en": "Use simple date entries to review cycle changes.",
       "es": "Usa anotaciones sencillas de fechas para repasar los cambios del ciclo.",
-      "ja": "シンプルな日付の記録で、周期の変化を振り返りましょう。"
+      "ja": "シンプルな日付の記録で、周期の変化を振り返りましょう。",
+      "zhHant": "用簡單的日期記錄回顧週期變化。"
     },
     "body": {
       "zh": "在日历上标记出血首日和之后的出血日期，再记录持续天数。持续记录能帮助你在就诊时更清楚地描述自己的周期。",
       "en": "Mark the first day of bleeding and following bleeding days on a calendar, then record the duration. Consistent notes can help you describe your cycle more clearly during a visit.",
       "es": "Marca en un calendario el primer día de sangrado y los días siguientes, y anota la duración. Unas notas constantes te ayudan a describir tu ciclo con más claridad en la consulta.",
-      "ja": "出血が始まった日とその後の出血日をカレンダーに記し、続いた日数を記録します。継続的なメモがあると、受診の際に自分の周期をより明確に説明しやすくなります。"
+      "ja": "出血が始まった日とその後の出血日をカレンダーに記し、続いた日数を記録します。継続的なメモがあると、受診の際に自分の周期をより明確に説明しやすくなります。",
+      "zhHant": "在日曆上標記出血首日和之後的出血日期，再記錄持續天數。持續記錄能幫助你在就診時更清楚地描述自己的週期。"
     },
     "trackerTags": [
       "cramps",
@@ -185,7 +200,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。记录不能替代医疗记录或专业建议。",
       "en": "This content is for general information only and is not medical advice. Tracking does not replace medical records or professional guidance.",
       "es": "Este contenido es solo información general y no es consejo médico. Llevar un registro no sustituye a la historia clínica ni a la orientación profesional.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。記録は医療記録や専門家による指導の代わりにはなりません。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。記録は医療記録や専門家による指導の代わりにはなりません。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。記錄不能替代醫療記錄或專業建議。"
     },
     "isPro": false
   },
@@ -196,19 +212,22 @@
       "zh": "避孕方式记录",
       "en": "Contraception Method Notes",
       "es": "Notas sobre el método anticonceptivo",
-      "ja": "避妊方法のメモ"
+      "ja": "避妊方法のメモ",
+      "zhHant": "避孕方式記錄"
     },
     "summary": {
       "zh": "记录避孕方式和想与医生讨论的问题。",
       "en": "Record your contraception method and questions for your clinician.",
       "es": "Registra tu método anticonceptivo y las dudas que quieras plantear a tu médico.",
-      "ja": "使用している避妊方法と、医師に聞きたいことを記録しましょう。"
+      "ja": "使用している避妊方法と、医師に聞きたいことを記録しましょう。",
+      "zhHant": "記錄避孕方式和想與醫生討論的問題。"
     },
     "body": {
       "zh": "Maren 支持记录正在使用的避孕方式、开始日期和提醒事项。选择或调整方式时，可与医疗专业人员进行知情讨论。",
       "en": "Maren can store the method you use, its start date, and reminder notes. Discuss choices or changes with a healthcare professional.",
       "es": "Maren puede guardar el método que usas, su fecha de inicio y notas de recordatorio. Comenta cualquier elección o cambio con un profesional sanitario.",
-      "ja": "Marenでは、使用している避妊方法とその開始日、リマインダーのメモを保存できます。選択や変更については医療専門家にご相談ください。"
+      "ja": "Marenでは、使用している避妊方法とその開始日、リマインダーのメモを保存できます。選択や変更については医療専門家にご相談ください。",
+      "zhHant": "Maren 支援記錄正在使用的避孕方式、開始日期和提醒事項。選擇或調整方式時，可與醫療專業人員進行知情討論。"
     },
     "trackerTags": [
       "contraceptionMethod"
@@ -231,7 +250,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。避孕方式相关问题请咨询医疗专业人员。",
       "en": "This content is for general information only and is not medical advice. Consult a healthcare professional with questions about contraception.",
       "es": "Este contenido es solo información general y no es consejo médico. Consulta a un profesional sanitario si tienes dudas sobre anticoncepción.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。避妊についての疑問は医療専門家にご相談ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。避妊についての疑問は医療専門家にご相談ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。避孕方式相關問題請諮詢醫療專業人員。"
     },
     "isPro": false
   },
@@ -242,19 +262,22 @@
       "zh": "周期阶段记录",
       "en": "Cycle Phase Notes",
       "es": "Notas sobre las fases del ciclo",
-      "ja": "周期フェーズのメモ"
+      "ja": "周期フェーズのメモ",
+      "zhHant": "週期階段記錄"
     },
     "summary": {
       "zh": "记录周期中的日期和观察，不让应用替你解读结果。",
       "en": "Record cycle dates and observations without asking the app to interpret them.",
       "es": "Registra fechas y observaciones del ciclo sin pedirle a la app que las interprete.",
-      "ja": "周期の日付や気づいたことを、アプリに解釈させずに記録できます。"
+      "ja": "周期の日付や気づいたことを、アプリに解釈させずに記録できます。",
+      "zhHant": "記錄週期中的日期和觀察，不讓應用替你解讀結果。"
     },
     "body": {
       "zh": "你可以在 Maren 中记录周期日期和自己观察到的身体感受。应用仅保存你输入的内容，不对医疗结果作出判断或解读。",
       "en": "You can record cycle dates and your own observations in Maren. The app stores what you enter and does not make medical judgments or interpret results.",
       "es": "En Maren puedes anotar las fechas de tu ciclo y tus propias observaciones. La app guarda lo que introduces y no emite juicios médicos ni interpreta resultados.",
-      "ja": "Marenでは、周期の日付や自分自身の気づきを記録できます。アプリは入力された内容を保存するのみで、医学的な判断や結果の解釈は行いません。"
+      "ja": "Marenでは、周期の日付や自分自身の気づきを記録できます。アプリは入力された内容を保存するのみで、医学的な判断や結果の解釈は行いません。",
+      "zhHant": "你可以在 Maren 中記錄週期日期和自己觀察到的身體感受。應用僅儲存你輸入的內容，不對醫療結果作出判斷或解讀。"
     },
     "trackerTags": [
       "cramps"
@@ -280,7 +303,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。应用不会替代医疗专业人员解读记录。",
       "en": "This content is for general information only and is not medical advice. The app does not replace a healthcare professional's interpretation of your records.",
       "es": "Este contenido es solo información general y no es consejo médico. La app no sustituye la interpretación que un profesional sanitario haga de tus registros.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。本アプリは、記録内容に対する医療専門家による解釈の代わりにはなりません。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。本アプリは、記録内容に対する医療専門家による解釈の代わりにはなりません。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。應用不會替代醫療專業人員解讀記錄。"
     },
     "isPro": false
   },
@@ -291,19 +315,22 @@
       "zh": "经期变化记录",
       "en": "Period Change Notes",
       "es": "Notas sobre cambios en el periodo",
-      "ja": "生理の変化に関するメモ"
+      "ja": "生理の変化に関するメモ",
+      "zhHant": "經期變化記錄"
     },
     "summary": {
       "zh": "记录周期变得不规律时的日期和变化，便于和医生沟通。",
       "en": "Record dates and changes when your periods become irregular to support a conversation with your doctor.",
       "es": "Anota fechas y cambios cuando tus periodos se vuelvan irregulares para preparar la conversación con tu médico.",
-      "ja": "生理が不規則になったときは、日付や変化を記録しておくと、医師との相談に役立ちます。"
+      "ja": "生理が不規則になったときは、日付や変化を記録しておくと、医師との相談に役立ちます。",
+      "zhHant": "記錄週期變得不規律時的日期和變化，便於和醫生溝通。"
     },
     "body": {
       "zh": "如果原本规律的周期持续变得不规律，或出血频率和持续时间出现明显变化，记录日期和细节，并在就诊时告诉医生。",
       "en": "If regular periods stay irregular, or the frequency or duration of bleeding changes noticeably, log the dates and details and tell your doctor at a visit.",
       "es": "Si unos periodos regulares se vuelven irregulares, o si la frecuencia o la duración del sangrado cambian de forma notable, anota las fechas y los detalles y coméntalo con tu médico en la consulta.",
-      "ja": "規則的だった生理が不規則な状態が続く場合や、出血の頻度・期間が大きく変化した場合は、日付と詳細を記録し、受診時に医師に伝えてください。"
+      "ja": "規則的だった生理が不規則な状態が続く場合や、出血の頻度・期間が大きく変化した場合は、日付と詳細を記録し、受診時に医師に伝えてください。",
+      "zhHant": "如果原本規律的週期持續變得不規律，或出血頻率和持續時間出現明顯變化，記錄日期和細節，並在就診時告訴醫生。"
     },
     "trackerTags": [
       "irregularCycle"
@@ -326,7 +353,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。周期变化请与医疗专业人员讨论。",
       "en": "This content is for general information only and is not medical advice. Discuss cycle changes with a healthcare professional.",
       "es": "Este contenido es solo información general y no es consejo médico. Comenta los cambios del ciclo con un profesional sanitario.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。周期の変化については医療専門家にご相談ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。周期の変化については医療専門家にご相談ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。週期變化請與醫療專業人員討論。"
     },
     "isPro": false
   },
@@ -337,19 +365,22 @@
       "zh": "围绝经期概述",
       "en": "Perimenopause Overview",
       "es": "Perimenopausia en resumen",
-      "ja": "更年期の基礎知識"
+      "ja": "更年期の基礎知識",
+      "zhHant": "圍絕經期概述"
     },
     "summary": {
       "zh": "了解围绝经期可能出现的周期变化。",
       "en": "Learn about cycle changes that may occur during perimenopause.",
       "es": "Conoce los cambios del ciclo que pueden aparecer durante la perimenopausia.",
-      "ja": "更年期に起こりうる周期の変化について知りましょう。"
+      "ja": "更年期に起こりうる周期の変化について知りましょう。",
+      "zhHant": "瞭解圍絕經期可能出現的週期變化。"
     },
     "body": {
       "zh": "围绝经期是绝经前的过渡阶段。月经周期可能变长、变短或跳过，流量也可能改变；如有变化，可与医疗专业人员讨论。",
       "en": "Perimenopause is the transition before menopause. Periods may become longer, shorter, or skipped, and flow may change; discuss changes with a healthcare professional.",
       "es": "La perimenopausia es la transición previa a la menopausia. Los periodos pueden alargarse, acortarse o saltarse, y el flujo puede cambiar; comenta estos cambios con un profesional sanitario.",
-      "ja": "更年期は、閉経に至るまでの移行期間です。生理の間隔が長くなったり短くなったり、来ない月があったり、経血量が変化したりすることがあります。変化については医療専門家にご相談ください。"
+      "ja": "更年期は、閉経に至るまでの移行期間です。生理の間隔が長くなったり短くなったり、来ない月があったり、経血量が変化したりすることがあります。変化については医療専門家にご相談ください。",
+      "zhHant": "圍絕經期是絕經前的過渡階段。月經週期可能變長、變短或跳過，流量也可能改變；如有變化，可與醫療專業人員討論。"
     },
     "trackerTags": [
       "irregularCycle",
@@ -373,7 +404,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。围绝经期问题请咨询医疗专业人员。",
       "en": "This content is for general information only and is not medical advice. Consult a healthcare professional with questions about perimenopause.",
       "es": "Este contenido es solo información general y no es consejo médico. Consulta a un profesional sanitario si tienes dudas sobre la perimenopausia.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。更年期についての疑問は医療専門家にご相談ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。更年期についての疑問は医療専門家にご相談ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。圍絕經期問題請諮詢醫療專業人員。"
     },
     "isPro": false
   },
@@ -384,19 +416,22 @@
       "zh": "围绝经期症状趋势",
       "en": "Perimenopause Symptom Trends",
       "es": "Tendencias de los síntomas de la perimenopausia",
-      "ja": "更年期の症状の傾向"
+      "ja": "更年期の症状の傾向",
+      "zhHant": "圍絕經期症狀趨勢"
     },
     "summary": {
       "zh": "记录围绝经期常见感受的时间和频率。",
       "en": "Record the timing and frequency of common perimenopause symptoms.",
       "es": "Registra cuándo y con qué frecuencia aparecen los síntomas habituales de la perimenopausia.",
-      "ja": "更年期によくみられる症状の時期と頻度を記録しましょう。"
+      "ja": "更年期によくみられる症状の時期と頻度を記録しましょう。",
+      "zhHant": "記錄圍絕經期常見感受的時間和頻率。"
     },
     "body": {
       "zh": "潮热、盗汗、睡眠问题和阴道干燥等情况可能出现。记录出现日期和频率，便于与医生讨论。",
       "en": "Hot flashes, night sweats, sleep problems, and vaginal dryness may occur. Logging dates and frequency can support a discussion with your doctor.",
       "es": "Pueden aparecer sofocos, sudores nocturnos, problemas de sueño y sequedad vaginal. Anotar las fechas y la frecuencia facilita la conversación con tu médico.",
-      "ja": "ホットフラッシュ、寝汗、睡眠の問題、腟の乾燥などが起こることがあります。日付と頻度を記録しておくと、医師との相談に役立ちます。"
+      "ja": "ホットフラッシュ、寝汗、睡眠の問題、腟の乾燥などが起こることがあります。日付と頻度を記録しておくと、医師との相談に役立ちます。",
+      "zhHant": "潮熱、盜汗、睡眠問題和陰道乾燥等情況可能出現。記錄出現日期和頻率，便於與醫生討論。"
     },
     "trackerTags": [
       "hotFlashes",
@@ -421,7 +456,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。令人担忧的症状请咨询医疗专业人员。",
       "en": "This content is for general information only and is not medical advice. Consult a healthcare professional about concerning symptoms.",
       "es": "Este contenido es solo información general y no es consejo médico. Consulta a un profesional sanitario ante síntomas que te preocupen.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。気になる症状については医療専門家にご相談ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。気になる症状については医療専門家にご相談ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。令人擔憂的症狀請諮詢醫療專業人員。"
     },
     "isPro": false
   },
@@ -432,19 +468,22 @@
       "zh": "绝经后出血",
       "en": "Bleeding After Menopause",
       "es": "Sangrado después de la menopausia",
-      "ja": "閉経後の出血について"
+      "ja": "閉経後の出血について",
+      "zhHant": "絕經後出血"
     },
     "summary": {
       "zh": "了解绝经后出血为何需要及时沟通。",
       "en": "Learn why bleeding after menopause should be discussed promptly.",
       "es": "Entiende por qué el sangrado tras la menopausia debe comentarse cuanto antes.",
-      "ja": "閉経後の出血について、なぜすぐに相談すべきかを知りましょう。"
+      "ja": "閉経後の出血について、なぜすぐに相談すべきかを知りましょう。",
+      "zhHant": "瞭解絕經後出血為何需要及時溝通。"
     },
     "body": {
       "zh": "绝经后再次出血，或围绝经期出血模式明显变化时，记录日期、持续时间和经量，并及时联系医生。",
       "en": "If bleeding occurs after menopause or the bleeding pattern changes noticeably during perimenopause, record the date, duration, and flow, and contact a doctor promptly.",
       "es": "Si aparece sangrado después de la menopausia, o si el patrón de sangrado cambia de forma notable durante la perimenopausia, anota la fecha, la duración y el flujo, y contacta pronto con un médico.",
-      "ja": "閉経後に出血がある場合、または更年期の間に出血のパターンが大きく変化した場合は、日付・期間・経血量を記録し、速やかに医師に連絡してください。"
+      "ja": "閉経後に出血がある場合、または更年期の間に出血のパターンが大きく変化した場合は、日付・期間・経血量を記録し、速やかに医師に連絡してください。",
+      "zhHant": "絕經後再次出血，或圍絕經期出血模式明顯變化時，記錄日期、持續時間和經量，並及時聯絡醫生。"
     },
     "trackerTags": [
       "heavyFlow",
@@ -468,7 +507,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。绝经后出血请及时联系医疗专业人员。",
       "en": "This content is for general information only and is not medical advice. Contact a healthcare professional promptly about bleeding after menopause.",
       "es": "Este contenido es solo información general y no es consejo médico. Contacta cuanto antes con un profesional sanitario si sangras después de la menopausia.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。閉経後の出血については、速やかに医療専門家にご連絡ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。閉経後の出血については、速やかに医療専門家にご連絡ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。絕經後出血請及時聯絡醫療專業人員。"
     },
     "isPro": false
   },
@@ -479,19 +519,22 @@
       "zh": "就诊前整理周期记录",
       "en": "Organizing Cycle Notes for a Visit",
       "es": "Ordenar las notas del ciclo para la consulta",
-      "ja": "受診に向けて周期のメモを整理する"
+      "ja": "受診に向けて周期のメモを整理する",
+      "zhHant": "就診前整理週期記錄"
     },
     "summary": {
       "zh": "整理周期记录，让就诊讨论更有条理。",
       "en": "Organize cycle notes to make a visit discussion clearer.",
       "es": "Organiza tus notas del ciclo para que la conversación en consulta sea más clara.",
-      "ja": "周期の記録を整理して、受診時の会話をより分かりやすくしましょう。"
+      "ja": "周期の記録を整理して、受診時の会話をより分かりやすくしましょう。",
+      "zhHant": "整理週期記錄，讓就診討論更有條理。"
     },
     "body": {
       "zh": "就诊前整理出血首日、持续天数、周期长度和想咨询的问题。把记录带给医生，按时间顺序说明你的观察。",
       "en": "Before a visit, gather bleeding start dates, duration, cycle length, and questions. Bring the notes and describe your observations in time order.",
       "es": "Antes de la cita, reúne las fechas de inicio del sangrado, su duración, la duración del ciclo y tus preguntas. Lleva las notas y describe tus observaciones en orden cronológico.",
-      "ja": "受診の前に、出血開始日、続いた期間、周期の長さ、聞きたいことをまとめておきましょう。メモを持参し、気づいたことを時系列で説明してください。"
+      "ja": "受診の前に、出血開始日、続いた期間、周期の長さ、聞きたいことをまとめておきましょう。メモを持参し、気づいたことを時系列で説明してください。",
+      "zhHant": "就診前整理出血首日、持續天數、週期長度和想諮詢的問題。把記錄帶給醫生，按時間順序說明你的觀察。"
     },
     "trackerTags": [
       "cramps",
@@ -515,7 +558,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。就诊时请听取医疗专业人员的意见。",
       "en": "This content is for general information only and is not medical advice. Follow your healthcare professional's guidance during visits.",
       "es": "Este contenido es solo información general y no es consejo médico. Sigue las indicaciones de tu profesional sanitario durante las consultas.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。受診の際は医療専門家の指導に従ってください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。受診の際は医療専門家の指導に従ってください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。就診時請聽取醫療專業人員的意見。"
     },
     "isPro": false
   },
@@ -526,19 +570,22 @@
       "zh": "预约前的症状与用药清单",
       "en": "Symptom and Medication Notes for a Visit",
       "es": "Notas de síntomas y medicación para la consulta",
-      "ja": "受診に向けて症状と服薬のメモを整理する"
+      "ja": "受診に向けて症状と服薬のメモを整理する",
+      "zhHant": "預約前的症狀與用藥清單"
     },
     "summary": {
       "zh": "提前整理症状、用药和既往情况，方便与医生沟通。",
       "en": "Prepare symptoms, medicines, and relevant history for a conversation with your doctor.",
       "es": "Prepara síntomas, medicamentos e historial relevante para hablar con tu médico.",
-      "ja": "医師との相談に向けて、症状・服用中の薬・関連する既往歴を準備しましょう。"
+      "ja": "医師との相談に向けて、症状・服用中の薬・関連する既往歴を準備しましょう。",
+      "zhHant": "提前整理症狀、用藥和既往情況，方便與醫生溝通。"
     },
     "body": {
       "zh": "记下症状开始时间、出现频率、出血变化、正在使用的药物和想询问的问题。就诊时可将这些记录交给医生参考。",
       "en": "Note when symptoms began, how often they occur, bleeding changes, current medicines, and questions. Share these notes with your doctor during the visit.",
       "es": "Anota cuándo empezaron los síntomas, con qué frecuencia aparecen, los cambios en el sangrado, los medicamentos actuales y tus preguntas. Comparte estas notas con tu médico durante la consulta.",
-      "ja": "症状が始まった時期、頻度、出血の変化、現在服用中の薬、聞きたいことをメモしておきましょう。受診の際にこのメモを医師と共有してください。"
+      "ja": "症状が始まった時期、頻度、出血の変化、現在服用中の薬、聞きたいことをメモしておきましょう。受診の際にこのメモを医師と共有してください。",
+      "zhHant": "記下症狀開始時間、出現頻率、出血變化、正在使用的藥物和想詢問的問題。就診時可將這些記錄交給醫生參考。"
     },
     "trackerTags": [
       "heavyFlow",
@@ -562,7 +609,8 @@
       "zh": "本内容仅供一般信息参考，不构成医疗建议。个体化问题请咨询医疗专业人员。",
       "en": "This content is for general information only and is not medical advice. Consult a healthcare professional about individual concerns.",
       "es": "Este contenido es solo información general y no es consejo médico. Consulta a un profesional sanitario sobre tus circunstancias concretas.",
-      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。個別の心配事については医療専門家にご相談ください。"
+      "ja": "本内容は一般的な情報提供のみを目的としており、医学的な助言ではありません。個別の心配事については医療専門家にご相談ください。",
+      "zhHant": "本內容僅供一般資訊參考，不構成醫療建議。個體化問題請諮詢醫療專業人員。"
     },
     "isPro": false
   }

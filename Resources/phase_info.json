@@ -2,21 +2,25 @@
   "menstrual": {
     "zh": "经期是子宫内膜脱落的阶段,也就是月经来潮的这几天。很多人会感到能量偏低、想休息,或伴随痛经、腰酸。这是身体在正常工作,允许自己放慢一点、多喝温水、照顾好自己。",
     "en": "Menstruation is when the uterine lining sheds — the days your period flows. Many people feel lower energy, want more rest, or have cramps and back aches. It's your body doing normal work; it's okay to slow down, stay warm, and be kind to yourself.",
-    "ja": "月経期は子宮内膜がはがれ落ちる時期、つまり生理が流れている数日間です。多くの人はエネルギーの低下を感じたり、もっと休みたくなったり、生理痛や腰の痛みを伴ったりします。これはあなたの体が正常に働いているだけのこと。少しペースを落として、体を温かくして、自分自身に優しくしてあげてくださいね。"
+    "ja": "月経期は子宮内膜がはがれ落ちる時期、つまり生理が流れている数日間です。多くの人はエネルギーの低下を感じたり、もっと休みたくなったり、生理痛や腰の痛みを伴ったりします。これはあなたの体が正常に働いているだけのこと。少しペースを落として、体を温かくして、自分自身に優しくしてあげてくださいね。",
+    "zhHant": "經期是子宮內膜脫落的階段,也就是月經來潮的這幾天。很多人會感到能量偏低、想休息,或伴隨痛經、腰痠。這是身體在正常工作,允許自己放慢一點、多喝溫水、照顧好自己。"
   },
   "follicular": {
     "zh": "经期结束后进入卵泡期,雌激素逐渐上升。这段时间不少人会觉得精力和心情慢慢回升,思路更清晰,适合开始一些期待已久的事。",
     "en": "After your period, the follicular phase begins and estrogen gradually rises. Many people notice energy and mood climbing back up and thinking feeling clearer — often a good stretch to start things you've been looking forward to.",
-    "ja": "生理が終わると卵胞期が始まり、エストロゲンが少しずつ上昇していきます。多くの人はこの時期、エネルギーや気分が徐々に上向き、頭の中もすっきりしてくるのを感じます。楽しみにしていたことを始めるのに、ちょうどよいタイミングであることが多い時期です。"
+    "ja": "生理が終わると卵胞期が始まり、エストロゲンが少しずつ上昇していきます。多くの人はこの時期、エネルギーや気分が徐々に上向き、頭の中もすっきりしてくるのを感じます。楽しみにしていたことを始めるのに、ちょうどよいタイミングであることが多い時期です。",
+    "zhHant": "經期結束後進入卵泡期,雌激素逐漸上升。這段時間不少人會覺得精力和心情慢慢回升,思路更清晰,適合開始一些期待已久的事。"
   },
   "ovulatory": {
     "zh": "排卵期前后雌激素达到高点,很多人在这几天感觉精力最充沛、更愿意社交、也更自信。这里显示的是基于你记录的估算日期,可能与实际有偏差,仅供参考。",
     "en": "Around ovulation, estrogen peaks and many people feel their most energetic, social, and confident. The days shown here are an estimate based on your records and may differ from reality — for reference only.",
-    "ja": "排卵の前後はエストロゲンがピークに達し、多くの人がこの数日間、最もエネルギッシュで社交的、そして自信に満ちた気持ちになります。ここに表示されている日付は、あなたの記録に基づく推定であり、実際とは異なる場合があります。あくまで参考としてご覧ください。"
+    "ja": "排卵の前後はエストロゲンがピークに達し、多くの人がこの数日間、最もエネルギッシュで社交的、そして自信に満ちた気持ちになります。ここに表示されている日付は、あなたの記録に基づく推定であり、実際とは異なる場合があります。あくまで参考としてご覧ください。",
+    "zhHant": "排卵期前後雌激素達到高點,很多人在這幾天感覺精力最充沛、更願意社交、也更自信。這裡顯示的是基於你記錄的估算日期,可能與實際有偏差,僅供參考。"
   },
   "luteal": {
     "zh": "排卵之后进入黄体期,孕激素先升后降。临近经期时,不少人会出现情绪起伏、食欲变化、疲惫或乳房胀痛等经前感受。这段时间对自己宽容一点,把标准放低都没关系。",
     "en": "After ovulation comes the luteal phase, when progesterone rises and then falls. As your period nears, many people notice mood swings, cravings, fatigue, or tender breasts. Go easy on yourself here — lowering the bar a little is completely okay.",
-    "ja": "排卵の後には黄体期が訪れ、プロゲステロンが上昇してからやがて低下していきます。生理が近づくにつれて、気分の浮き沈み、食欲の変化、だるさ、胸の張りなどを感じる人も少なくありません。この時期は自分に少し甘くしても大丈夫。ハードルを少し下げるくらい、まったく問題ありません。"
+    "ja": "排卵の後には黄体期が訪れ、プロゲステロンが上昇してからやがて低下していきます。生理が近づくにつれて、気分の浮き沈み、食欲の変化、だるさ、胸の張りなどを感じる人も少なくありません。この時期は自分に少し甘くしても大丈夫。ハードルを少し下げるくらい、まったく問題ありません。",
+    "zhHant": "排卵之後進入黃體期,孕激素先升後降。臨近經期時,不少人會出現情緒起伏、食慾變化、疲憊或乳房脹痛等經前感受。這段時間對自己寬容一點,把標準放低都沒關係。"
   }
 }

@@ -21,6 +21,12 @@
             "state": "translated",
             "value": "Maren"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
+          }
         }
       }
     },
@@ -40,6 +46,12 @@
           }
         },
         "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "Maren"
@@ -68,6 +80,12 @@
             "state": "translated",
             "value": "Copia de seguridad cifrada de Maren"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren 加密備份"
+          }
         }
       }
     },
@@ -92,6 +110,12 @@
             "state": "translated",
             "value": "Usa Face ID para desbloquear Maren, así solo tú puedes ver tus registros de salud."
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用 Face ID 解鎖 Maren,保護你的健康記錄只有你能看到。"
+          }
         }
       }
     },
@@ -114,6 +138,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lee de Salud de Apple el flujo menstrual, el peso corporal, el análisis del sueño, la temperatura basal, el sangrado intermenstrual, los pasos y el tiempo de ejercicio de Apple para importar a Maren los registros que elijas. El análisis del sueño, los pasos y el tiempo de ejercicio son de solo lectura. Es opcional y se usa únicamente en este dispositivo; nunca se envía a un servidor del desarrollador."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從「健康」App 讀取經期流量、體重、睡眠分析、基礎體溫、經間期出血、步數和 Apple 鍛鍊時間，將你選擇的資料匯入 Maren。睡眠分析、步數和 Apple 鍛鍊時間僅用於讀取。授權可選，資料只在本機使用，不會發送到開發者伺服器。"
           }
         }
       }
@@ -138,6 +168,12 @@
             "state": "translated",
             "value": "Escribe en Salud de Apple el flujo menstrual, el peso corporal, la temperatura basal y el sangrado intermenstrual que registres en Maren, cuando elijas sincronizarlos. El análisis del sueño, los pasos y el tiempo de ejercicio son de solo lectura y nunca se escriben en Salud de Apple. Es opcional y se usa únicamente en este dispositivo; nunca se envía a un servidor del desarrollador."
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在你選擇同步時，將你在 Maren 記錄的經期流量、體重、基礎體溫和經間期出血寫入「健康」App。睡眠分析、步數和 Apple 鍛鍊時間僅用於讀取，絕不會寫入 Apple Health。授權可選，資料只在本機使用，不會發送到開發者伺服器。"
+          }
         }
       }
     },
@@ -161,6 +197,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Copia de seguridad cifrada de Maren"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren 加密備份"
           }
         }
       }

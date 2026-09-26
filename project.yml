@@ -9,11 +9,20 @@ options:
   # same source locale. English is a complete translated localization, so an
   # English device resolves to the en catalog with a consistent UI language.
   developmentLanguage: zh-Hans
+  # Listed explicitly so the build produces an lproj for each catalog locale.
+  # Without zh-Hant here a Taiwan device resolves to zh-Hans and reads
+  # Simplified, even though the catalog carries the Traditional strings.
+  knownRegions:
+    - en
+    - zh-Hans
+    - zh-Hant
+    - es
+    - ja
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.5.0"
-    CURRENT_PROJECT_VERSION: "18"
+    MARKETING_VERSION: "1.6.0"
+    CURRENT_PROJECT_VERSION: "19"
     DEVELOPMENT_TEAM: "255R6QQR97"
     CODE_SIGN_STYLE: Automatic
 targets:
@@ -72,6 +81,7 @@ targets:
         CFBundleLocalizations:
           - en
           - zh-Hans
+          - zh-Hant
           - es
           - ja
         NSFaceIDUsageDescription: "Use Face ID to unlock Maren so only you can see your health records."

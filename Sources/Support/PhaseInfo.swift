@@ -3,7 +3,7 @@ import Foundation
 /// 层级 1 · 阶段科普内容加载器。本地 JSON,离线、双语。
 enum PhaseInfo {
 
-    private struct Entry: Decodable { let zh: String; let en: String; let ja: String? }
+    private struct Entry: Decodable { let zh: String; let zhHant: String?; let en: String; let ja: String? }
 
     private static let library: [String: Entry] = {
         guard let url = Bundle.main.url(forResource: "phase_info", withExtension: "json"),
@@ -16,6 +16,7 @@ enum PhaseInfo {
 
     private static var languageCode: String {
         let localization = Bundle.main.preferredLocalizations.first ?? "en"
+        if localization.hasPrefix("zh-Hant") { return "zh-Hant" }
         if localization.hasPrefix("zh") { return "zh" }
         if localization.hasPrefix("ja") { return "ja" }
         return "en"
@@ -25,6 +26,7 @@ enum PhaseInfo {
     static func body(for phase: CyclePhase) -> String {
         guard let e = library[phase.rawValue] else { return "" }
         switch languageCode {
+        case "zh-Hant": return e.zhHant ?? e.zh
         case "zh": return e.zh
         case "ja": return e.ja ?? e.en
         default:   return e.en

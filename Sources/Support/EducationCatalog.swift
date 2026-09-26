@@ -33,14 +33,18 @@ enum EducationCatalog {
 
     struct BilingualString: Codable, Equatable {
         let zh: String
+        /// Traditional Chinese, converted from `zh`. Optional so content files
+        /// written before zh-Hant shipped still decode.
+        let zhHant: String?
         let en: String
         /// Added after zh/en shipped, so older content files decode without it.
         let es: String?
         /// Added after zh/en/es shipped, so older content files decode without it.
         let ja: String?
 
-        init(zh: String, en: String, es: String? = nil, ja: String? = nil) {
+        init(zh: String, zhHant: String? = nil, en: String, es: String? = nil, ja: String? = nil) {
             self.zh = zh
+            self.zhHant = zhHant
             self.en = en
             self.es = es
             self.ja = ja
@@ -110,6 +114,7 @@ enum EducationCatalog {
 
     static func localized(_ b: BilingualString, locale: String? = nil) -> String {
         let loc = locale ?? Bundle.main.preferredLocalizations.first ?? "en"
+        if loc.hasPrefix("zh-Hant") { return b.zhHant ?? b.zh }
         if loc.hasPrefix("zh") { return b.zh }
         if loc.hasPrefix("es") { return b.es ?? b.en }
         if loc.hasPrefix("ja") { return b.ja ?? b.en }

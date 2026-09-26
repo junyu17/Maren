@@ -14,6 +14,7 @@ for loc in ${LOCALES:-en-US es-ES es-MX zh-Hans ja}; do
     es-ES) L=es; R=ES; Q="Sofocos";;
     es-MX) L=es; R=MX; Q="Sofocos";;
     zh-Hans) L=zh-Hans; R=CN; Q="潮热";;
+    zh-Hant) L=zh-Hant; R=TW; Q="潮熱";;
     ja) L=ja; R=JP; Q="ホットフラッシュ";;
   esac
   mkdir -p "$OUT/$loc"
