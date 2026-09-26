@@ -11,7 +11,12 @@ import Foundation
 @MainActor
 enum ReviewPrompter {
     /// 累计多少次价值时刻后才第一次开口。
-    private static let momentsBeforeAsking = 5
+    ///
+    /// 2,不是 5。5 适合已经有用户的 App —— 稀缺的是系统每年 3 次的配额;
+    /// 在这个装机量下没有人累计得到 5 次,于是弹窗从未出现过。
+    /// 现在记经期也算一次价值时刻,2 次意味着用户第二天回来记录时就会问,
+    /// 那时第一次预测刚好出现。
+    private static let momentsBeforeAsking = 2
     private static let momentCountKey = "review.valueMomentCount"
     private static let promptedVersionKey = "review.promptedVersion"
 

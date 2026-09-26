@@ -1,9 +1,11 @@
 import SwiftUI
+import StoreKit
 import SwiftData
 
 /// F1:经期 / 周期日历追踪。月视图,点某天可标记经期与流量。
 struct CalendarView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.requestReview) private var requestReview
     @Query(sort: \PeriodDay.dayKey) private var periodDays: [PeriodDay]
     @Query(sort: \DailyLog.dayKey) private var logs: [DailyLog]
 
@@ -443,6 +445,16 @@ struct CalendarView: View {
             day = new
         }
         guard savePeriodContext() else { return }
+
+        // Marking a period day is the single most common thing anyone does in
+        // this app, and until now it did not count as a value moment at all -
+        // only the daily log did. That is most of why the prompt never fired.
+        if ReviewPrompter.recordValueMoment() {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1.6))
+                requestReview()
+            }
+        }
 
         do {
             let actual = try fetchActualData()
