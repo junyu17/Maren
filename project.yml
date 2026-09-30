@@ -18,11 +18,12 @@ options:
     - zh-Hant
     - es
     - ja
+    - ko
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.7.0"
-    CURRENT_PROJECT_VERSION: "20"
+    MARKETING_VERSION: "1.9"
+    CURRENT_PROJECT_VERSION: "23"
     DEVELOPMENT_TEAM: "255R6QQR97"
     CODE_SIGN_STYLE: Automatic
 targets:
@@ -84,6 +85,7 @@ targets:
           - zh-Hant
           - es
           - ja
+          - ko
         NSFaceIDUsageDescription: "Use Face ID to unlock Maren so only you can see your health records."
         # Apple Health 双向同步的用途说明(HealthKit capability 已在上面 entitlements 启用)。
         NSHealthShareUsageDescription: "Read menstrual flow, body mass, sleep analysis, basal body temperature, intermenstrual bleeding, step count, and Apple exercise time from Apple Health to import selected records into Maren. Sleep analysis, step count, and Apple exercise time are read-only. Optional and used only on this device; never sent to a developer server."

@@ -396,6 +396,8 @@ enum ClinicalReportEngine {
             // 底部声明
             draw(String(localized: "⚠ 免责声明:本报告仅供参考,不构成医学诊断、治疗建议或生育指导。数据准确性取决于用户记录的完整性和及时性。如有健康疑问,请咨询专业医疗人员。"),
                  disclaimerAttrs, lineHeight: 14)
+            draw(String(localized: "Generated with Maren") + " - " + AppLinks.share(.pdf).absoluteString,
+                 disclaimerAttrs, lineHeight: 14)
         })
 
         do {

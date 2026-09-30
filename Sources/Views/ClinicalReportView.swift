@@ -171,15 +171,15 @@ struct ClinicalReportView: View {
             Label(String(localized: "报告预览"), systemImage: "doc.text")
                 .font(.subheadline.weight(.semibold))
 
-            previewRow(String(localized: "观测周期"), "\(stats.observedCycles) 个")
+            previewRow(String(localized: "观测周期"), String(localized: "\(stats.observedCycles) 个"))
             if let avg = stats.avgCycleLength {
-                previewRow(String(localized: "平均周期"), "\(String(format: "%.1f", avg)) 天")
+                previewRow(String(localized: "平均周期"), String(localized: "\(String(format: "%.1f", avg)) 天"))
             }
             if let avg = stats.avgPeriodLength {
-                previewRow(String(localized: "平均经期"), "\(String(format: "%.1f", avg)) 天")
+                previewRow(String(localized: "平均经期"), String(localized: "\(String(format: "%.1f", avg)) 天"))
             }
-            previewRow(String(localized: "每日记录"), "\(filtered.logs.count) 条")
-            previewRow(String(localized: "用药打卡"), "\(filtered.intakes.count) 次")
+            previewRow(String(localized: "每日记录"), String(localized: "\(filtered.logs.count) 条"))
+            previewRow(String(localized: "用药打卡"), String(localized: "\(filtered.intakes.count) 次"))
 
             if stats.topTrackers.isEmpty == false {
                 VStack(alignment: .leading, spacing: 4) {

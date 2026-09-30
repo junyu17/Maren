@@ -15,6 +15,13 @@ final class ClinicalReportEngineTests: XCTestCase {
         return cal.date(from: c)!
     }
 
+    /// PDF 报告范围以"今天"为基准回溯计算(如 .sixMonths = 今天往前 6 个月),
+    /// 因此凡是走 generatePDF 的用例必须用相对日期构造记录;
+    /// 写死的固定日期会随时间滑出报告窗口,记录被过滤掉,看起来像分页失效。
+    private func daysAgo(_ days: Int) -> Date {
+        cal.date(byAdding: .day, value: -days, to: Cal.startOfDay(Date()))!
+    }
+
     // MARK: - 1. 连续 4 天经期不被拆成 2 段
 
     func testFourConsecutiveDaysOneSpan() {
@@ -322,7 +329,7 @@ final class ClinicalReportEngineTests: XCTestCase {
     func testPDFLongNoteNotTruncatedAcrossPages() {
         let sentinel = "SENTINELA7X3END"
         let longNote = String(repeating: "这是一段很长的备注内容,用来测试PDF分页算法是否能正确处理超长无换行文本。", count: 200) + sentinel
-        let log = DailyLog(date: date(2026, 3, 15), mood: .good, note: longNote)
+        let log = DailyLog(date: daysAgo(30), mood: .good, note: longNote)
         let data = ClinicalReportEngine.ReportData(
             periodDays: [], logs: [log], medications: [], intakes: [],
             prediction: .empty, includeNotes: true, range: .sixMonths)
@@ -363,7 +370,7 @@ final class ClinicalReportEngineTests: XCTestCase {
         let tailSentinel = "TAILA7X3END"
         let body = String(repeating: "这是一段很长的备注内容,用来测试PDF分页算法。1234567890 ", count: 300)
         let longNote = headSentinel + body + tailSentinel
-        let log = DailyLog(date: date(2026, 3, 15), mood: .good, note: longNote)
+        let log = DailyLog(date: daysAgo(30), mood: .good, note: longNote)
         let data = ClinicalReportEngine.ReportData(
             periodDays: [], logs: [log], medications: [], intakes: [],
             prediction: .empty, includeNotes: true, range: .sixMonths)
@@ -422,7 +429,7 @@ final class ClinicalReportEngineTests: XCTestCase {
     }
 
     func testClinicalReportPDFUsesCompactTemperatureAndReadableHealthFields() {
-        let firstDate = date(2026, 3, 15)
+        let firstDate = daysAgo(120)
         var logs: [DailyLog] = []
         for offset in 0...120 {
             let day = cal.date(byAdding: .day, value: offset, to: firstDate)!

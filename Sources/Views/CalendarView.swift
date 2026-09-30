@@ -137,6 +137,15 @@ struct CalendarView: View {
                     ClinicalReportView()
                 }
             }
+            // 截图用:`--shot report`。首帧就把 sheet 置为 true 会被 SwiftUI 丢掉
+            // (搜索那张用的是 navigationDestination,所以没有这个问题),
+            // 要等这个 tab 真正上屏、导航栈安顿下来之后再 present。
+            .onAppear {
+                guard ScreenshotRoute.current == .report, !showClinicalReport else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    showClinicalReport = true
+                }
+            }
             .sheet(item: Binding(
                 get: { selectedDay.map { DayBox(date: $0) } },
                 set: { selectedDay = $0?.date }

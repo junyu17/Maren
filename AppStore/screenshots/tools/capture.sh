@@ -1,14 +1,14 @@
 #!/bin/bash
 set -u
 SIM="$1"; OUT="$2"; APP="$3"
-ROUTES="calendar perimenopause today trends trackers paywall library search settings"
+ROUTES="${ROUTES:-calendar perimenopause today trends trackers paywall library search settings report meds}"
 BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")
 
 boot_wait() {
   xcrun simctl bootstatus "$SIM" -b >/dev/null 2>&1 || { xcrun simctl boot "$SIM" >/dev/null 2>&1; xcrun simctl bootstatus "$SIM" -b >/dev/null 2>&1; }
 }
 
-for loc in ${LOCALES:-en-US es-ES es-MX zh-Hans ja}; do
+for loc in ${LOCALES:-en-US es-ES es-MX zh-Hans zh-Hant ja}; do
   case "$loc" in
     en-US) L=en; R=US; Q="Hot flashes";;
     es-ES) L=es; R=ES; Q="Sofocos";;

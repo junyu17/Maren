@@ -209,6 +209,10 @@ enum DataExport {
             .font: UIFont.systemFont(ofSize: 11),
             .foregroundColor: UIColor.darkGray
         ]
+        let footerAttrs: [NSAttributedString.Key: Any] = [
+            .font: UIFont.italicSystemFont(ofSize: 9),
+            .foregroundColor: UIColor.gray
+        ]
 
         let data = renderer.pdfData { ctx in
             var y: CGFloat = margin
@@ -347,6 +351,10 @@ enum DataExport {
                     draw("\(s.key)    \(s.label) \(s.emoji)", bodyAttrs, lineHeight: 15)
                 }
             }
+            y += 10
+
+            draw(String(localized: "Generated with Maren") + " - " + AppLinks.share(.pdf).absoluteString,
+                 footerAttrs, lineHeight: 14)
         }
 
         return writeData(String(localized: "Maren-健康记录.pdf"), data)

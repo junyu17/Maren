@@ -27,6 +27,12 @@
             "state": "translated",
             "value": "Maren"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
+          }
         }
       }
     },
@@ -52,6 +58,12 @@
           }
         },
         "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren"
+          }
+        },
+        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "Maren"
@@ -86,6 +98,12 @@
             "state": "translated",
             "value": "Maren 加密備份"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren 암호화 백업"
+          }
         }
       }
     },
@@ -116,6 +134,12 @@
             "state": "translated",
             "value": "用 Face ID 解鎖 Maren,保護你的健康記錄只有你能看到。"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID로 Maren을 잠금 해제하면 나만 내 건강 기록을 볼 수 있어요."
+          }
         }
       }
     },
@@ -144,6 +168,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "從「健康」App 讀取經期流量、體重、睡眠分析、基礎體溫、經間期出血、步數和 Apple 鍛鍊時間，將你選擇的資料匯入 Maren。睡眠分析、步數和 Apple 鍛鍊時間僅用於讀取。授權可選，資料只在本機使用，不會發送到開發者伺服器。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택한 기록을 Maren으로 가져오기 위해 Apple 건강에서 생리량, 체중, 수면 분석, 기초체온, 생리 중간 출혈, 걸음 수, Apple 운동 시간을 읽어요. 수면 분석, 걸음 수, Apple 운동 시간은 읽기 전용이에요. 선택 사항이며 이 기기에서만 사용되고 개발자 서버로 전송되지 않아요."
           }
         }
       }
@@ -174,6 +204,12 @@
             "state": "translated",
             "value": "在你選擇同步時，將你在 Maren 記錄的經期流量、體重、基礎體溫和經間期出血寫入「健康」App。睡眠分析、步數和 Apple 鍛鍊時間僅用於讀取，絕不會寫入 Apple Health。授權可選，資料只在本機使用，不會發送到開發者伺服器。"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "동기화를 선택하면 Maren에 기록한 생리량, 체중, 기초체온, 생리 중간 출혈을 Apple 건강에 써요. 수면 분석, 걸음 수, Apple 운동 시간은 읽기 전용이며 Apple 건강에 쓰지 않아요. 선택 사항이며 이 기기에서만 사용되고 개발자 서버로 전송되지 않아요."
+          }
         }
       }
     },
@@ -203,6 +239,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maren 加密備份"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maren 암호화 백업"
           }
         }
       }

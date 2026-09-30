@@ -5,6 +5,7 @@ import SwiftData
 /// Release 构建里恒为 nil,所以线上包没有任何可达的跳转。
 enum ScreenshotRoute: String {
     case calendar, perimenopause, today, trends, trackers, paywall, library, search, settings
+    case report, meds
 
     static let current: ScreenshotRoute? = {
         #if DEBUG
@@ -32,7 +33,8 @@ enum ScreenshotRoute: String {
         case .calendar, .search: return 0
         case .today, .trackers, .library: return 1
         case .perimenopause, .trends: return 2
-        case .paywall, .settings: return 3
+        case .paywall, .settings, .meds: return 3
+        case .report: return 0
         }
     }
 }
@@ -172,6 +174,18 @@ enum DemoSeed {
         context.insert(DailyLog(date: today, mood: .good, energy: 3, pain: 2,
                                 sleepHours: 6.5, weight: 64.2, basalBodyTemperatureCelsius: 36.5,
                                 spotting: false, symptoms: ["hotFlashes", "nightSweats", "walking"]))
+
+        // 用药/补剂页在没有数据时只会渲染空状态,商店截图会拍成一个没人用过的页面。
+        // 这里只放补剂、不放处方药,也不写剂量:App Store 截图里出现药名加剂量,
+        // 读起来就像用药指导,而这个 App 明确不提供用药指导。
+        for (name, emoji, hour, minute) in [
+            ("Vitamin D", "\u{2600}\u{FE0F}", 8, 0),
+            ("Magnesium", "\u{1F319}", 21, 0),
+        ] {
+            context.insert(Medication(name: name, emoji: emoji, reminderEnabled: true,
+                                      reminderHour: hour, reminderMinute: minute))
+        }
+
         try? context.save()
     }
 

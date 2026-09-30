@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Query private var recentLogs: [DailyLog]
 
     @State private var showDeleteConfirm = false
+    @State private var showMedsForScreenshot = ScreenshotRoute.current == .meds
     @State private var healthSyncEnabled = HealthKitBridge.syncEnabled
     @State private var healthConnecting = false
     @State private var healthSelectedTypes: Set<HealthKitBridge.SyncType> = HealthKitBridge.selectedTypes
@@ -324,6 +325,10 @@ struct SettingsView: View {
                     } label: {
                         Label("用药与补剂", systemImage: "pills")
                     }
+                    // 截图用:`--shot meds` 直接推到用药与补剂页,免去点两级菜单。
+                    .navigationDestination(isPresented: $showMedsForScreenshot) {
+                        MedicationManagerView()
+                    }
                     NavigationLink {
                         CustomSymptomManagerView()
                     } label: {
@@ -597,6 +602,8 @@ struct SettingsView: View {
                 } footer: {
                     Text("开启后,每次打开 Maren 都需要 Face ID、Touch ID 或设备密码。")
                 }
+
+                RateShareSection()
 
                 MoreAppsSection()
 
