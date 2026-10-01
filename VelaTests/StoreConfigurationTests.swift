@@ -143,7 +143,13 @@ final class StoreConfigurationTests: XCTestCase {
         )
     }
 
-    func testPaywallStrategyUsesSevenDayTrialOnlyForEligibleYearlyProduct() throws {
+    // The paywall shows exactly the free trial StoreKit reports for this account,
+    // of any length and on either subscription: the offer lives in App Store
+    // Connect and can change without a release. Pinning it to "7 days, yearly
+    // only" made a changed offer silently drop the trial wording while Apple
+    // still charged nothing. Monthly carries no intro offer in App Store Connect
+    // today, so StoreKit reports nil and the paywall shows no trial for it.
+    func testPaywallStrategyShowsWhateverTrialStoreKitReportsForYearly() throws {
         let yearly = try XCTUnwrap(PaywallPurchaseStrategy.presentation(
             productID: Store.ProductID.yearly,
             displayName: "Annual Premium",
@@ -165,27 +171,36 @@ final class StoreConfigurationTests: XCTestCase {
         XCTAssertEqual(ineligibleYearly.cta, .subscribe)
         XCTAssertEqual(ineligibleYearly.billingDisclosure, .automaticRenewal(trialDays: nil, postTrialPrice: nil))
 
-        let nonSevenDayYearly = try XCTUnwrap(PaywallPurchaseStrategy.presentation(
+        let threeDayYearly = try XCTUnwrap(PaywallPurchaseStrategy.presentation(
             productID: Store.ProductID.yearly,
             displayName: "Annual Premium",
             displayPrice: "$29.99",
             eligibleTrialDays: 3
         ))
-        XCTAssertEqual(nonSevenDayYearly.cta, .subscribe)
-        XCTAssertEqual(nonSevenDayYearly.billingDisclosure, .automaticRenewal(trialDays: nil, postTrialPrice: nil))
+        XCTAssertEqual(threeDayYearly.cta, .startTrial(days: 3))
+        XCTAssertEqual(threeDayYearly.billingDisclosure, .automaticRenewal(trialDays: 3, postTrialPrice: "$29.99"))
     }
 
-    func testPaywallStrategyNeverShowsTrialForMonthlyOrLifetime() throws {
+    func testPaywallStrategyShowsNoTrialWhenStoreKitReportsNoneAndNeverForLifetime() throws {
         let monthly = try XCTUnwrap(PaywallPurchaseStrategy.presentation(
             productID: Store.ProductID.monthly,
             displayName: "Monthly Premium",
             displayPrice: "€3.99",
-            eligibleTrialDays: 7
+            eligibleTrialDays: nil
         ))
         XCTAssertEqual(monthly.kind, .monthly)
         XCTAssertEqual(monthly.cta, .subscribe)
         XCTAssertEqual(monthly.billingDisclosure, .automaticRenewal(trialDays: nil, postTrialPrice: nil))
         XCTAssertNil(monthly.trialDays)
+
+        let monthlyWithOffer = try XCTUnwrap(PaywallPurchaseStrategy.presentation(
+            productID: Store.ProductID.monthly,
+            displayName: "Monthly Premium",
+            displayPrice: "€3.99",
+            eligibleTrialDays: 7
+        ))
+        XCTAssertEqual(monthlyWithOffer.cta, .startTrial(days: 7))
+        XCTAssertEqual(monthlyWithOffer.billingDisclosure, .automaticRenewal(trialDays: 7, postTrialPrice: "€3.99"))
 
         let lifetime = try XCTUnwrap(PaywallPurchaseStrategy.presentation(
             productID: Store.ProductID.lifetime,
