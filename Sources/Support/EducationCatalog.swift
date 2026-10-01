@@ -41,13 +41,16 @@ enum EducationCatalog {
         let es: String?
         /// Added after zh/en/es shipped, so older content files decode without it.
         let ja: String?
+        /// Added after zh/en/es/ja shipped, so older content files decode without it.
+        let ko: String?
 
-        init(zh: String, zhHant: String? = nil, en: String, es: String? = nil, ja: String? = nil) {
+        init(zh: String, zhHant: String? = nil, en: String, es: String? = nil, ja: String? = nil, ko: String? = nil) {
             self.zh = zh
             self.zhHant = zhHant
             self.en = en
             self.es = es
             self.ja = ja
+            self.ko = ko
         }
     }
 
@@ -118,6 +121,7 @@ enum EducationCatalog {
         if loc.hasPrefix("zh") { return b.zh }
         if loc.hasPrefix("es") { return b.es ?? b.en }
         if loc.hasPrefix("ja") { return b.ja ?? b.en }
+        if loc.hasPrefix("ko") { return b.ko ?? b.en }
         return b.en
     }
 

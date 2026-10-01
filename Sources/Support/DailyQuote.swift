@@ -3,7 +3,7 @@ import Foundation
 /// F4:每日激励一句话。本地 JSON 词库,离线可用,按周期阶段智能匹配。
 enum DailyQuote {
 
-    private struct Entry: Decodable { let zh: String; let zhHant: String?; let en: String; let es: String?; let ja: String? }
+    private struct Entry: Decodable { let zh: String; let zhHant: String?; let en: String; let es: String?; let ja: String?; let ko: String? }
 
     /// 词库缓存(阶段 key -> 句子列表)。
     private static let library: [String: [Entry]] = {
@@ -17,8 +17,7 @@ enum DailyQuote {
 
     /// 用「bundle 实际解析出的本地化」而不是 Locale.current 来判断语言,
     /// 这样每日一句和界面文案永远一致(例如系统是法语、界面回退到英文时,句子也给英文)。
-    private static var languageCode: String {
-        let localization = Bundle.main.preferredLocalizations.first ?? "en"
+    private static func languageCode(for localization: String) -> String {
         // zh-Hant must be tested before the generic zh prefix, or a Taiwan
         // device falls into the Simplified branch and reads Simplified copy
         // under a Traditional interface.
@@ -26,11 +25,14 @@ enum DailyQuote {
         if localization.hasPrefix("zh") { return "zh" }
         if localization.hasPrefix("es") { return "es" }
         if localization.hasPrefix("ja") { return "ja" }
+        if localization.hasPrefix("ko") { return "ko" }
         return "en"
     }
 
     /// 取今天这句:按阶段选桶(无则回落到 general),同一天稳定返回同一句。
-    static func forToday(phase: CyclePhase, date: Date = Date()) -> String {
+    /// `localization` 默认取 bundle 实际解析出的本地化;测试可显式传入,如 "ko"。
+    static func forToday(phase: CyclePhase, date: Date = Date(),
+                         localization: String = Bundle.main.preferredLocalizations.first ?? "en") -> String {
         let bucketKey: String
         switch phase {
         case .menstrual:  bucketKey = "menstrual"
@@ -48,11 +50,12 @@ enum DailyQuote {
         // 本地午夜除以 86400 的商会跳变/重复,与 dayKey 铁律不一致。
         let dayNumber = DayKey.from(date)
         let entry = bucket[((dayNumber % bucket.count) + bucket.count) % bucket.count]
-        switch languageCode {
+        switch languageCode(for: localization) {
         case "zh-Hant": return entry.zhHant ?? entry.zh
         case "zh": return entry.zh
         case "es": return entry.es ?? entry.en
         case "ja": return entry.ja ?? entry.en
+        case "ko": return entry.ko ?? entry.en
         default:   return entry.en
         }
     }

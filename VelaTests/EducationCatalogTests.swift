@@ -527,4 +527,98 @@ final class EducationCatalogTests: XCTestCase {
             }
         }
     }
+
+    // MARK: - Korean content
+
+    /// Korean text must contain Hangul and no Han ideographs, which would mean a
+    /// Chinese string was pasted into the ko slot.
+    private static func isKorean(_ text: String) -> Bool {
+        let scalars = text.unicodeScalars
+        return scalars.contains { (0xAC00...0xD7A3).contains($0.value) }
+            && !scalars.contains { (0x4E00...0x9FFF).contains($0.value) }
+    }
+
+    private func bundledJSON(_ name: String) throws -> Any {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: name, withExtension: "json"),
+                                "\(name).json is missing from the app bundle")
+        return try JSONSerialization.jsonObject(with: Data(contentsOf: url))
+    }
+
+    func testLocalizedReturnsKoreanForKOAndFallsBackToEnglish() {
+        let withKo = EducationCatalog.BilingualString(zh: "你好", en: "Hello", ko: "안녕하세요")
+        XCTAssertEqual(EducationCatalog.localized(withKo, locale: "ko"), "안녕하세요")
+        XCTAssertEqual(EducationCatalog.localized(withKo, locale: "ko-KR"), "안녕하세요")
+        let withoutKo = EducationCatalog.BilingualString(zh: "你好", en: "Hello")
+        XCTAssertEqual(EducationCatalog.localized(withoutKo, locale: "ko"), "Hello")
+    }
+
+    func testBundledEducationItemsHaveKoreanForEveryField() {
+        let items = EducationCatalog.load(from: Bundle.main)
+        XCTAssertEqual(items.count, 12)
+        for item in items {
+            let fields: [(String, EducationCatalog.BilingualString)] = [
+                ("title", item.title), ("summary", item.summary),
+                ("body", item.body), ("nonMedicalAdvice", item.nonMedicalAdvice)
+            ]
+            for (name, field) in fields {
+                let ko = field.ko ?? ""
+                XCTAssertTrue(Self.isKorean(ko), "\(item.id).\(name) needs Korean text")
+                XCTAssertNotEqual(ko, field.en, "\(item.id).\(name).ko must not be the English text")
+                XCTAssertEqual(EducationCatalog.localized(field, locale: "ko"), ko,
+                               "\(item.id).\(name) must resolve to Korean for ko")
+            }
+        }
+    }
+
+    func testBundledQuotesHaveKoreanForEveryEntry() throws {
+        let root = try XCTUnwrap(try bundledJSON("quotes") as? [String: [[String: String]]])
+        XCTAssertEqual(Set(root.keys), ["menstrual", "follicular", "ovulatory", "luteal", "general"])
+        var total = 0
+        for (bucket, entries) in root {
+            XCTAssertFalse(entries.isEmpty, "\(bucket) must not be empty")
+            for (index, entry) in entries.enumerated() {
+                total += 1
+                let ko = entry["ko"] ?? ""
+                XCTAssertTrue(Self.isKorean(ko), "quotes.\(bucket)[\(index)] needs Korean text")
+                XCTAssertNotEqual(ko, entry["en"], "quotes.\(bucket)[\(index)].ko must not be English")
+            }
+        }
+        XCTAssertEqual(total, 464)
+    }
+
+    func testBundledPhaseInfoHasKoreanForEveryPhase() throws {
+        let root = try XCTUnwrap(try bundledJSON("phase_info") as? [String: [String: String]])
+        XCTAssertEqual(Set(root.keys), ["menstrual", "follicular", "ovulatory", "luteal"])
+        for (phase, entry) in root {
+            let ko = entry["ko"] ?? ""
+            XCTAssertTrue(Self.isKorean(ko), "phase_info.\(phase) needs Korean text")
+            XCTAssertNotEqual(ko, entry["en"], "phase_info.\(phase).ko must not be English")
+        }
+    }
+
+    func testDailyQuoteAndPhaseInfoSelectKoreanWhenLocalizationIsKO() throws {
+        let day = Date(timeIntervalSince1970: 1_790_000_000)
+        let quotes = try XCTUnwrap(try bundledJSON("quotes") as? [String: [[String: String]]])
+
+        for phase in CyclePhase.allCases {
+            let ko = DailyQuote.forToday(phase: phase, date: day, localization: "ko")
+            let en = DailyQuote.forToday(phase: phase, date: day, localization: "en")
+            XCTAssertTrue(Self.isKorean(ko), "DailyQuote must return Korean for \(phase)")
+            XCTAssertNotEqual(ko, en)
+
+            let bucketKey = phase == .unknown ? "general" : phase.rawValue
+            let bucket = try XCTUnwrap(quotes[bucketKey])
+            let dayNumber = DayKey.from(day)
+            let expected = bucket[((dayNumber % bucket.count) + bucket.count) % bucket.count]
+            XCTAssertEqual(ko, expected["ko"], "ko quote must come from the same slot as the other languages")
+            XCTAssertEqual(en, expected["en"])
+        }
+
+        for phase in [CyclePhase.menstrual, .follicular, .ovulatory, .luteal] {
+            let ko = PhaseInfo.body(for: phase, localization: "ko")
+            XCTAssertTrue(Self.isKorean(ko), "PhaseInfo must return Korean for \(phase)")
+            XCTAssertNotEqual(ko, PhaseInfo.body(for: phase, localization: "en"))
+        }
+        XCTAssertEqual(PhaseInfo.body(for: .unknown, localization: "ko"), "")
+    }
 }
