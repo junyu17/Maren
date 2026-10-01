@@ -43,7 +43,13 @@ struct CalendarView: View {
             let components = Cal.current.dateComponents([.year, .month], from: normalizedDate)
             _visibleMonth = State(initialValue: Cal.current.date(from: components) ?? normalizedDate)
         } else {
-            _visibleMonth = State(initialValue: Cal.startOfDay(Date()))
+            var month = Cal.startOfDay(Date())
+            // 截图用:每月 1–7 日当月还没有经期记录(种子的最近一次经期在上月末),
+            // 首图改拍上个月,否则日历里一条经期都没有。Release 里 current 恒为 nil。
+            if ScreenshotRoute.current == .calendar, Cal.current.component(.day, from: month) < 8 {
+                month = Cal.addMonths(-1, to: month)
+            }
+            _visibleMonth = State(initialValue: month)
         }
     }
 

@@ -5,7 +5,7 @@ import SwiftData
 /// Release 构建里恒为 nil,所以线上包没有任何可达的跳转。
 enum ScreenshotRoute: String {
     case calendar, perimenopause, today, trends, trackers, paywall, library, search, settings
-    case report, meds
+    case report, meds, logday
 
     static let current: ScreenshotRoute? = {
         #if DEBUG
@@ -31,7 +31,7 @@ enum ScreenshotRoute: String {
     var tab: Int {
         switch self {
         case .calendar, .search: return 0
-        case .today, .trackers, .library: return 1
+        case .today, .trackers, .library, .logday: return 1
         case .perimenopause, .trends: return 2
         case .paywall, .settings, .meds: return 3
         case .report: return 0
@@ -113,7 +113,15 @@ enum DemoSeed {
         // 最近一段经期锚定在本月初,否则在月中截图时,日历页整月一条经期记录都没有
         // ——第一张商店截图就会像一个没人用过的 App。周期间隔仍是 26、41、33 天。
         let dayOfMonth = cal.component(.day, from: today)
-        let latestStart = dayOfMonth >= 8 ? -(dayOfMonth - 3) : -5
+        // 每月 1–7 日当月放不下一整段经期:改放在上个月 3 日,日历截图翻到上个月(见 CalendarView)。
+        let latestStart: Int
+        if dayOfMonth >= 8 {
+            latestStart = -(dayOfMonth - 3)
+        } else {
+            let lastMonth = cal.date(byAdding: .month, value: -1, to: today) ?? today
+            let lastMonthDays = cal.range(of: .day, in: .month, for: lastMonth)?.count ?? 30
+            latestStart = -(lastMonthDays - 3 + dayOfMonth)
+        }
         let periods: [(start: Int, flows: [FlowLevel])] = [
             (latestStart - 100, [.medium, .heavy, .medium, .light, .light]),
             (latestStart - 74, [.light, .heavy, .heavy, .medium, .light]),
@@ -178,9 +186,11 @@ enum DemoSeed {
         // 用药/补剂页在没有数据时只会渲染空状态,商店截图会拍成一个没人用过的页面。
         // 这里只放补剂、不放处方药,也不写剂量:App Store 截图里出现药名加剂量,
         // 读起来就像用药指导,而这个 App 明确不提供用药指导。
+        // 韩语截图里补剂名用韩文写法,否则整页只有这两行是英文。
+        let korean = Bundle.main.preferredLocalizations.first == "ko"
         for (name, emoji, hour, minute) in [
-            ("Vitamin D", "\u{2600}\u{FE0F}", 8, 0),
-            ("Magnesium", "\u{1F319}", 21, 0),
+            (korean ? "비타민 D" : "Vitamin D", "\u{2600}\u{FE0F}", 8, 0),
+            (korean ? "마그네슘" : "Magnesium", "\u{1F319}", 21, 0),
         ] {
             context.insert(Medication(name: name, emoji: emoji, reminderEnabled: true,
                                       reminderHour: hour, reminderMinute: minute))

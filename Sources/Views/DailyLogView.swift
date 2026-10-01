@@ -50,8 +50,11 @@ struct DailyLogView: View {
     @State private var showAddSymptom = false
     @State private var showPaywall = false
     @State private var showLibraryForScreenshot = ScreenshotRoute.current == .library
-    /// `--shot trackers` 截图时滚动到的位置:睡眠一节起,下面是体重、体温和各项追踪。
+    /// `--shot trackers` 截图时滚动到的位置:基础体温一节起,下面是点滴出血、今日用药和各项追踪。
+    /// (1.9 起种子里有补剂,今日用药那一节把追踪项挤到首屏之外,所以锚点从睡眠挪到了体温。)
     private static let screenshotTrackersAnchor = "screenshot-trackers"
+    /// `--shot logday`:滚到日期一节,首屏是日期、心情、能量、疼痛、睡眠 —— 不含英文的每日故事卡。
+    private static let screenshotLogDayAnchor = "screenshot-logday"
     @State private var dailyStoryItem: EducationCatalog.Item?
     @AppStorage("education.bookmarks") private var bookmarksData = ""
     @AppStorage("education.dailyStoryHistory") private var dailyStoryHistoryData = ""
@@ -343,6 +346,7 @@ struct DailyLogView: View {
                             refreshDailyStory()
                         }
                     }
+                    .id(Self.screenshotLogDayAnchor)
 
                     Section("今天心情如何?") {
                         HStack {
@@ -382,7 +386,6 @@ struct DailyLogView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    .id(Self.screenshotTrackersAnchor)
 
                     Section("体重") {
                         Stepper(value: Binding(get: { weight ?? 60 },
@@ -420,6 +423,7 @@ struct DailyLogView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    .id(Self.screenshotTrackersAnchor)
 
                     Section("点滴出血") {
                         Picker("点滴出血", selection: $spotting) {
@@ -590,9 +594,14 @@ struct DailyLogView: View {
                     handleExternalChange(event)
                 }
                 .onAppear {
-                    guard ScreenshotRoute.current == .trackers else { return }
+                    let anchor: String
+                    switch ScreenshotRoute.current {
+                    case .trackers: anchor = Self.screenshotTrackersAnchor
+                    case .logday: anchor = Self.screenshotLogDayAnchor
+                    default: return
+                    }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                        scrollProxy.scrollTo(Self.screenshotTrackersAnchor, anchor: .top)
+                        scrollProxy.scrollTo(anchor, anchor: .top)
                     }
                 }
             }

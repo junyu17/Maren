@@ -9,8 +9,14 @@ CJK=('/System/Library/Fonts/Hiragino Sans GB.ttc',2)
 # 日文要用日文字体:中文字体缺字形,日文标题会整行变成方块。
 JP=('/System/Library/Fonts/\u30d2\u30e9\u30ae\u30ce\u89d2\u30b4\u30b7\u30c3\u30af W7.ttc',0)
 TC=('/System/Library/Fonts/STHeiti Medium.ttc',0)
+# 韩文粗体是 AppleSDGothicNeo 的 index 6;index 0 是 Regular,和其他语言并排显得发虚。
+KO=('/System/Library/Fonts/AppleSDGothicNeo.ttc',6)
 SHOTS=[('01_calendar',0),('02_perimenopause',1),('03_today',2),('04_trends',3),('05_trackers',4),('07_library',6),('08_search',7),('09_settings','privacy')]
-PRIVACY={'en-US':("Your data never","leaves your phone"),'es-ES':("Tus datos no","salen del mo\u0301vil"),'es-MX':("Tus datos no","salen del celular"),'zh-Hans':("\u6570\u636e\u4e0d\u79bb\u5f00","\u4f60\u7684\u624b\u673a"),'ja':("データは","iPhoneから出ない"),'zh-Hant':("資料不離開","你的手機")}
+# 韩语:每日故事、每日一句、资料库内容没有韩文译本(quotes/education_content/phase_info 无 ko 字段,回落英文),
+# 所以不拍「今天」顶部和「资料库」;用滚到日期一节的 logday 代替 today。
+SHOTS_KO=[('01_calendar',0),('02_perimenopause',1),('03_logday',2),('04_trends',3),('05_trackers',4),('06_search',7),('07_settings','privacy'),('08_report',9),('09_meds',10)]
+SHOTS_BY_LOC={'ko':SHOTS_KO}
+PRIVACY={'ko':("내 데이터는","휴대폰에만 저장"),'en-US':("Your data never","leaves your phone"),'es-ES':("Tus datos no","salen del mo\u0301vil"),'es-MX':("Tus datos no","salen del celular"),'zh-Hans':("\u6570\u636e\u4e0d\u79bb\u5f00","\u4f60\u7684\u624b\u673a"),'ja':("データは","iPhoneから出ない"),'zh-Hant':("資料不離開","你的手機")}
 caps=json.load(open('captions.json'))
 def trim_bottom(im):
     """裁掉屏幕底部最后一段内容,让卡片的圆角落在空白行上。
@@ -34,7 +40,7 @@ def gradient():
         t=y/(H-1); g.putpixel((0,y),tuple(int(TOP[i]+(BOT[i]-TOP[i])*t) for i in range(3)))
     return g.resize((W,H))
 def font_for(loc,size):
-    p,i = JP if loc=='ja' else (TC if loc=='zh-Hant' else (CJK if loc=='zh-Hans' else LATIN))
+    p,i = KO if loc=='ko' else JP if loc=='ja' else (TC if loc=='zh-Hant' else (CJK if loc=='zh-Hans' else LATIN))
     return ImageFont.truetype(p,size,index=i)
 def fit(d,text,loc,maxw):
     s=FS
@@ -46,7 +52,7 @@ def fit(d,text,loc,maxw):
 import os
 for loc in (os.environ.get('LOCALES') or 'en-US es-ES es-MX zh-Hans').split():
     out=f'final_iphone/{loc}'; os.makedirs(out,exist_ok=True)
-    for n,(stem,capidx) in enumerate(SHOTS,1):
+    for n,(stem,capidx) in enumerate(SHOTS_BY_LOC.get(loc,SHOTS),1):
         src=trim_bottom(Image.open(f'raw_iphone/{loc}/{stem}.png').convert('RGB'))
         shot=src.resize((CARD_W,int(CARD_W*src.height/src.width)),Image.LANCZOS)
         canvas=gradient()

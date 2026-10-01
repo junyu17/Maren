@@ -16,6 +16,7 @@ for loc in ${LOCALES:-en-US es-ES es-MX zh-Hans zh-Hant ja}; do
     zh-Hans) L=zh-Hans; R=CN; Q="潮热";;
     zh-Hant) L=zh-Hant; R=TW; Q="潮熱";;
     ja) L=ja; R=JP; Q="ホットフラッシュ";;
+    ko) L=ko; R=KR; Q="안면홍조";;
   esac
   mkdir -p "$OUT/$loc"
   # 设备级语言要跟着截图语言走,否则状态栏日期会是英文
@@ -35,7 +36,7 @@ for loc in ${LOCALES:-en-US es-ES es-MX zh-Hans zh-Hant ja}; do
     xcrun simctl terminate "$SIM" "$BUNDLE" >/dev/null 2>&1
     xcrun simctl launch "$SIM" "$BUNDLE" --seed-screenshots --shot "$r" --shot-query "$Q" -onboarding.done YES \
       -AppleLanguages "($L)" -AppleLocale "${L}_${R}" >/dev/null || exit 1
-    sleep 6
+    sleep "${SHOT_WAIT:-6}"
     xcrun simctl io "$SIM" screenshot --type=png "$f" >/dev/null 2>&1
     echo "$loc/$r $(python3 -c "from PIL import Image;print(Image.open('$f').size)" 2>/dev/null)"
   done

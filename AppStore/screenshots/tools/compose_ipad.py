@@ -10,10 +10,16 @@ CJK=('/System/Library/Fonts/Hiragino Sans GB.ttc',2)
 # 日文要用日文字体:中文字体缺字形,日文标题会整行变成方块。
 JP=('/System/Library/Fonts/\u30d2\u30e9\u30ae\u30ce\u89d2\u30b4\u30b7\u30c3\u30af W7.ttc',0)
 TC=('/System/Library/Fonts/STHeiti Medium.ttc',0)
+KO=('/System/Library/Fonts/AppleSDGothicNeo.ttc',6)  # Bold;index 0 是 Regular
 
 SHOTS=[('01_calendar',0),('02_perimenopause',1),('03_today',2),('04_trends',3),
        ('05_trackers',4),('07_library',6),('08_search',7),('09_settings','privacy')]
-PRIVACY={'en-US':("Your data never","leaves your iPad"),
+# 韩语:同 compose_iphone.py,不含今天顶部/资料库,用 logday;iPad 现有各语言也没有 report/meds。
+SHOTS_KO=[('01_calendar',0),('02_perimenopause',1),('03_logday',2),('04_trends',3),
+          ('05_trackers',4),('06_search',7),('07_settings','privacy')]
+SHOTS_BY_LOC={'ko':SHOTS_KO}
+PRIVACY={'ko':("내 데이터는","iPad에만 저장"),
+         'en-US':("Your data never","leaves your iPad"),
          'es-ES':("Tus datos no","salen del iPad"),
          'es-MX':("Tus datos no","salen del iPad"),
          'zh-Hans':("数据不离开","你的 iPad"),'ja':("データは","iPadから出ない"),
@@ -28,12 +34,15 @@ def trim_bottom(im):
     px=im.convert('L').load()
     limit=int(H*0.10)
     step=max(1,W//160)
-    def uniform(y):
+    def uniform(y,tol):
         vals=[px[x,y] for x in range(0,W,step)]
-        return max(vals)-min(vals) <= 6
-    for y in range(H-1, H-limit, -1):
-        if all(uniform(yy) for yy in range(y-5, y+1)):
-            return im.crop((0,0,W,y+1))
+        return max(vals)-min(vals) <= tol
+    # 先用严格容差;韩语 iPad 的追踪项截图底部是「白卡片 + 灰底」,两者亮度差 12,
+    # 严格容差找不到空白行,底部一行灰字会被圆角切半,所以放宽到 14 再找一次。
+    for tol in (6,14):
+        for y in range(H-1, H-limit, -1):
+            if all(uniform(yy,tol) for yy in range(y-5, y+1)):
+                return im.crop((0,0,W,y+1))
     return im
 
 def gradient():
@@ -44,7 +53,7 @@ def gradient():
     return g.resize((W,H))
 
 def font_for(loc,size):
-    p,i = JP if loc=='ja' else (TC if loc=='zh-Hant' else (CJK if loc=='zh-Hans' else LATIN))
+    p,i = KO if loc=='ko' else JP if loc=='ja' else (TC if loc=='zh-Hant' else (CJK if loc=='zh-Hans' else LATIN))
     return ImageFont.truetype(p,size,index=i)
 
 def fit(draw,text,f,loc,maxw):
@@ -58,7 +67,7 @@ def fit(draw,text,f,loc,maxw):
 def compose(loc):
     out=f'final_ipad/{loc}'; os.makedirs(out,exist_ok=True)
     made=[]
-    for n,(stem,capidx) in enumerate(SHOTS,1):
+    for n,(stem,capidx) in enumerate(SHOTS_BY_LOC.get(loc,SHOTS),1):
         src=f'raw_ipad/{loc}/{stem}.png'
         raw=trim_bottom(Image.open(src).convert('RGB'))
         shot=raw.resize((CARD_W,int(CARD_W*raw.height/raw.width)),Image.LANCZOS)
