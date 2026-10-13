@@ -70,3 +70,15 @@ section .sub { color: var(--muted); margin: 0 0 22px; }
 .doc th { background: #fff5f6; }
 .doc ul { padding-left: 1.3em; }
 @media (max-width: 560px) { .hero h1 { font-size: 1.9rem; } }
+
+/* 首页截图 gallery */
+.screenshot-gallery { padding: 24px 0 34px; }
+.screenshot-gallery__items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.screenshot-gallery__item { min-width: 0; margin: 0; overflow: hidden; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.screenshot-gallery__item img { display: block; width: 100%; height: auto; }
+.screenshot-gallery__item figcaption { padding: 10px 12px 12px; color: var(--muted); font-size: 0.9rem; text-align: center; }
+.screenshot-gallery__cta { margin: 22px 0 0; text-align: center; }
+@media (max-width: 560px) {
+  .screenshot-gallery__items { display: flex; gap: 12px; overflow-x: auto; padding: 0 2px 10px; scroll-snap-type: x proximity; }
+  .screenshot-gallery__item { flex: 0 0 min(72vw, 220px); scroll-snap-align: start; }
+}
