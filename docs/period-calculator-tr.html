@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adet Hesaplama: Sonraki Adet ve Yumurtlama Tarihi | Maren</title>
+<meta name="description" content="Ücretsiz adet hesaplama: son adetine göre sonraki adetini, sonraki 6 adeti, yumurtlama gününü ve doğurgan dönemini tahmin et. Gizli, tarayıcında çalışır.">
+<meta name="apple-itunes-app" content="app-id=6795029983, affiliate-data=pt=129087449&amp;ct=web_maren_periodcalc_tr">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Maren">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="Adet Hesaplama: Sonraki Adet, Yumurtlama ve Doğurgan Dönem">
+<meta property="og:description" content="Sonraki adetini, sonraki 6 adeti, olası yumurtlama gününü ve doğurgan dönemini tahmin et. Ücretsiz, gizli, tarayıcında hesaplanır. Yalnızca tahmindir, doğum kontrol yöntemi değildir.">
+<meta property="og:url" content="https://junyu17.github.io/Maren/period-calculator-tr.html">
+<meta property="og:image" content="https://junyu17.github.io/Maren/og-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Adet Hesaplama: Sonraki Adet, Yumurtlama ve Doğurgan Dönem">
+<meta name="twitter:description" content="Yumurtlama ve doğurgan dönem tahminli ücretsiz adet hesaplama. Hiçbir şey saklanmaz veya gönderilmez. Yalnızca tahmindir, doğum kontrol yöntemi değildir.">
+<meta name="twitter:image" content="https://junyu17.github.io/Maren/og-card.jpg">
+<link rel="canonical" href="https://junyu17.github.io/Maren/period-calculator-tr.html">
+<link rel="alternate" hreflang="en" href="https://junyu17.github.io/Maren/period-calculator.html">
+<link rel="alternate" hreflang="de" href="https://junyu17.github.io/Maren/period-calculator-de.html">
+<link rel="alternate" hreflang="fr" href="https://junyu17.github.io/Maren/period-calculator-fr.html">
+<link rel="alternate" hreflang="it" href="https://junyu17.github.io/Maren/period-calculator-it.html">
+<link rel="alternate" hreflang="es" href="https://junyu17.github.io/Maren/period-calculator-es.html">
+<link rel="alternate" hreflang="pt-BR" href="https://junyu17.github.io/Maren/period-calculator-pt-br.html">
+<link rel="alternate" hreflang="ru" href="https://junyu17.github.io/Maren/period-calculator-ru.html">
+<link rel="alternate" hreflang="tr" href="https://junyu17.github.io/Maren/period-calculator-tr.html">
+<link rel="alternate" hreflang="x-default" href="https://junyu17.github.io/Maren/period-calculator.html">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .crumb { font-size: 0.9rem; margin-bottom: 10px; }
+  .crumb a { text-decoration: none; }
+  .doc { overflow-wrap: break-word; }
+  .lead-p { font-size: 1.05rem; color: var(--muted); }
+  .strong-disc { border-color: var(--rose); color: var(--ink); font-size: 0.95rem; margin: 16px 0; }
+  .calc-card, .result-card { padding: 22px; margin: 18px 0; }
+  .calc-card h2, .result-card h2 { margin-top: 0; font-size: 1.25rem; }
+  .field { margin-bottom: 14px; min-width: 0; flex: 1 1 200px; }
+  .field label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
+  .field input { display: block; width: 100%; max-width: 100%; min-width: 0; font: inherit; padding: 9px 12px; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
+  .field input:focus { outline: 2px solid var(--rose); outline-offset: 1px; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hint { font-size: 0.82rem; color: var(--muted); margin: 4px 0 0; }
+  .calc-btn { border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+  .err { color: #a3001b; font-weight: 600; margin: 12px 0 0; }
+  .priv { margin: 14px 0 0; }
+  .result-card .est-line { color: var(--muted); font-size: 0.92rem; margin-top: 0; }
+  .result-card .gentle { background: #fff5f6; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 0.92rem; }
+  .big { background: #fff5f6; border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .big h3 { margin: 6px 0 2px; }
+  .big .bigdate { font-size: 1.45rem; font-weight: 800; color: var(--rose-dark); margin: 0; line-height: 1.25; }
+  .big .rel { margin: 2px 0 0; color: var(--muted); }
+  .tag { display: inline-block; background: var(--line); color: var(--rose-dark); border-radius: 999px; padding: 1px 10px; font-size: 0.75rem; font-weight: 700; }
+  .tbl { overflow-x: auto; max-width: 100%; }
+  .tbl table { margin: 6px 0; }
+  .tbl td, .tbl th { white-space: normal; }
+  .small { font-size: 0.85rem; color: var(--muted); }
+  .ov p { margin: 10px 0; }
+  .source-list { padding-left: 1.2em; }
+  .source-list li { margin-bottom: 4px; font-size: 0.92rem; }
+  .cta-row { text-align: center; margin: 30px 0 10px; }
+  .doc h3 { overflow-wrap: break-word; }
+  /* lang-switch */
+  header.site { flex-wrap: wrap; }
+  .lang-switch { flex-basis: 100%; width: 100%; max-width: 880px; margin: 10px auto 0; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--rose-dark); }
+  .lang-switch a[aria-current] { font-weight: 700; color: var(--ink); }
+  /* /lang-switch */
+  header.site nav:not(.lang-switch) { flex-wrap: wrap; gap: 4px 14px; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Adet Hesaplama",
+  "description": "Son adetinin ilk günü ve döngü süren temel alınarak sonraki adetini, sonraki altı adeti, yumurtlama gününü ve doğurgan dönemini tahmin eden ücretsiz adet hesaplama aracı.",
+  "url": "https://junyu17.github.io/Maren/period-calculator-tr.html",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "tr",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jun Yu"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Bunu doğum kontrolü için kullanabilir miyim?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hayır. Takvime dayalı bir tahmin doğum kontrol yöntemi değildir ve bu araç yalnızca gün sayar. NHS’e göre gün saymaktan çok daha kapsamlı olan doğurganlık farkındalığı yöntemleri, her zaman doğru kullanıldığında gebeliği önlemede %91 ila %99 etkilidir; ancak talimatlara tam olarak uyulmazsa yalnızca %76 etkilidir ve adetlerin düzensizse sana uygun olmayabilir."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Yumurtlama tahmini ne kadar doğru?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kaba bir yol göstericidir. NHS, yumurtlama ile sonraki adet arasında 12 ila 16 gün olduğunu belirtir; womenshealth.gov ise bu sürenin 7 günden 2 haftadan fazlasına (19 gün) kadar değişebileceğini söyler. Bu nedenle gerçek yumurtlama günü tahminden birkaç gün farklı olabilir; döngülerin değişkense fark daha da büyür."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Adetim neden tahmin edilenden önce veya sonra geldi?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Döngü süresi bir döngüden diğerine doğal olarak değişir ve takvime dayalı bir formül vücudunda neler olduğunu göremez. Adetlerin sürekli değişiyorsa veya endişeleniyorsan bunu bir doktora ya da kliniğe söyle."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Döngülerim düzensizse ne olur?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tek bir döngü süresi düzensiz bir örüntüyü tarif edemez. ACOG, perimenopozda döngülerin uzayabileceğini veya kısalabileceğini ve adetlerin atlanabileceğini belirtir. Aralığı görmek için son zamanlardaki en kısa ve en uzun döngünü hesaplama aracında dene ve tek bir sayıya güvenmek yerine gerçek adet tarihlerini ve semptomlarını birkaç döngü boyunca kaydet."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Verilerim kaydediliyor veya bir yere gönderiliyor mu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hayır. Girdiğin tarihler yalnızca tarayıcında hesaplama yapmak için kullanılır. Saklanmaz, bir sunucuya gönderilmez ve paylaşılmaz; sayfa çerez veya tarayıcı depolaması kullanmaz."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<header class="site">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;width:100%;max-width:880px;margin:0 auto;padding:0 20px;">
+    <a class="brand" href="index.html"><span class="dot">⛵</span> Maren</a>
+    <nav>
+      <a href="index.html#features">Özellikler</a>
+      <a href="privacy.html">Gizlilik</a>
+      <a href="https://apps.apple.com/app/apple-store/id6795029983?pt=129087449&amp;ct=web_maren_periodcalc_tr&amp;mt=8">App Store</a>
+    </nav>
+  </div>
+  <nav class="lang-switch" aria-label="Dil"><a href="period-calculator-tr.html" hreflang="en" lang="en">English</a><a href="period-calculator-de.html" hreflang="de" lang="de">Deutsch</a><a href="period-calculator-fr.html" hreflang="fr" lang="fr">Français</a><a href="period-calculator-it.html" hreflang="it" lang="it">Italiano</a><a href="period-calculator-es.html" hreflang="es" lang="es">Español</a><a href="period-calculator-pt-br.html" hreflang="pt-BR" lang="pt-BR">Português</a><a href="period-calculator-ru.html" hreflang="ru" lang="ru">Русский</a><a href="period-calculator-tr.html" hreflang="tr" lang="tr" aria-current="page">Türkçe</a></nav>
+</header>
+
+<div class="doc">
+  <div class="wrap">
+    <p class="crumb"><a href="index.html">&larr; Maren’e dön</a></p>
+    <h1>Adet Hesaplama</h1>
+    <p class="meta">Ücretsiz ve gizli · yalnızca tahmin · doğum kontrol yöntemi değildir · tıbbi tavsiye değildir</p>
+    <p class="lead-p">Sonraki adetinin ne zaman başlayabileceğini, bu döngüdeki olası yumurtlama gününü ve doğurgan dönemini tahmin etmek için son adetinin ilk gününü gir. Tüm hesaplama tarayıcında yapılır.</p>
+
+    <div class="disclaimer strong-disc" role="note"><strong>Yalnızca tahmindir.</strong> Döngüler aydan aya değişir; bu yüzden gerçek tarihlerin gösterilenden birkaç gün önce veya sonra olabilir. Bu hesaplama aracı <strong>bir doğum kontrol yöntemi değildir</strong> ve ne zaman hamile kalıp kalamayacağını söyleyemez. Tıbbi tavsiye değildir.</div>
+
+    <form id="calc-form" class="card calc-card" novalidate>
+      <h2>Bilgilerin</h2>
+      <div class="field">
+        <label for="f-last">Son adetinin ilk günü</label>
+        <input type="date" id="f-last" name="last" required>
+        <p class="hint">En son adetinin 1. günü.</p>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="f-cycle">Olağan döngü süresi (gün)</label>
+          <input type="number" id="f-cycle" name="cycle" value="28" min="15" max="90" step="1" inputmode="numeric">
+          <p class="hint">Bir adetin ilk gününden bir sonrakinin ilk gününe kadar. Tipik: 28.</p>
+        </div>
+        <div class="field">
+          <label for="f-plen">Adet süresi (gün)</label>
+          <input type="number" id="f-plen" name="plen" value="5" min="1" max="14" step="1" inputmode="numeric">
+          <p class="hint">Adetinin genellikle kaç gün sürdüğü. Tipik: yaklaşık 5.</p>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary calc-btn">Hesapla</button>
+      <p id="err" class="err" role="alert" hidden></p>
+      <p class="note priv">Girdiğin hiçbir şey saklanmaz veya bir yere gönderilmez. Hesaplama tarayıcında yapılır; bu sayfa çerez kullanmaz, tarayıcı depolamasını kullanmaz ve hesaplama sırasında hiçbir ağ isteği göndermez.</p>
+    </form>
+
+    <div id="result-box" class="card result-card" aria-live="polite" hidden>
+      <h2>Tahminin</h2>
+      <div id="out"></div>
+      <div class="disclaimer" role="note"><strong>Döngülerin düzensizse</strong> (örneğin perimenopozda veya PKOS’ta), bunun gibi takvime dayalı bir tahmin çok daha az güvenilirdir. Gerçek adet tarihlerini ve semptomlarını birkaç döngü boyunca kaydetmek, herhangi bir formülden daha net bir tablo sunar.</div>
+    </div>
+
+    <h2>Bu tahmin nasıl hesaplanır?</h2>
+    <p>Sonraki adetin, son adetinin ilk gününden itibaren olağan döngü süren kadar ileri sayılarak bulunur. Girdiğin son adet bir süre önceyse, hesaplama aracı henüz geçmemiş ilk tarihe ulaşana kadar döngü süreni eklemeye devam eder.</p>
+    <p>Yumurtlamanın, bu sonraki adetten yaklaşık 14 gün önce olduğu tahmin edilir. NHS’e göre yumurtlama, bir sonraki adetin başlamasından yaklaşık 12 ila 16 gün önce gerçekleşir; 14 bu aralığın ortasıdır. Gösterilen doğurgan dönem, tahmini yumurtlama gününden 5 gün öncesinden yumurtlama gününün kendisine kadar uzanır: womenshealth.gov’a göre sperm üreme organlarında 3 ila 5 gün yaşayabilir, yumurta ise yumurtlamadan sonra yalnızca 12 ila 24 saat yaşar. Bu kaba bir yol göstericidir, bir ölçüm değildir.</p>
+
+    <h2>Tipik bir döngü nasıldır?</h2>
+    <p>NHS’e göre çoğu kişinin adeti yaklaşık 28 günde bir gelir; döngüler genellikle 21 ile 35 gün arasında değişir ve adet çoğunlukla yaklaşık 5 gün sürer (2 ile 7 gün arası). Diğer kaynaklar sınırı biraz farklı çizer: womenshealth.gov, 24 ile 38 gün arasını normal döngü olarak tanımlar. Döngü süresi, bir adetin ilk gününden bir sonrakinin ilk gününe kadar sayılır.</p>
+
+    <h2>Ne zaman doktora görünmeli?</h2>
+    <p>NHS’e göre adetlerindeki bir değişiklik mutlaka bir sorun olduğu anlamına gelmez, ancak incelenmesi gerekir; bu yüzden adetlerin değişirse bir aile hekimine veya kliniğe başvur. womenshealth.gov, sık sık sekiz günden uzun süren kanamayı yoğun kanamanın bir belirtisi olarak sayar. 30’lu ve 40’lı yaşlarda döngülerin uzaması veya kısalması, adetlerin atlanması ve akışın hafiflemesi veya yoğunlaşması perimenopozun yaygın işaretleridir; ACOG yine de adet kanamasındaki değişikliklerin bir sağlık uzmanına bildirilmesini önerir.</p>
+
+    <div class="disclaimer" role="note"><strong>Tıbbi tavsiye değildir.</strong> Bu sayfa genel bilgi ve basit bir tarih hesaplama aracıdır. Hiçbir şeye tanı koymaz ve döngünün sağlıklı olup olmadığını söyleyemez. Yeni, şiddetli veya endişe verici bir durum varsa yetkin bir sağlık uzmanıyla konuş.</div>
+
+    <h2>Sık sorulan sorular</h2>
+    <h3>Bunu doğum kontrolü için kullanabilir miyim?</h3>
+    <p>Hayır. Takvime dayalı bir tahmin doğum kontrol yöntemi değildir ve bu araç yalnızca gün sayar. NHS’e göre gün saymaktan çok daha kapsamlı olan doğurganlık farkındalığı yöntemleri, her zaman doğru kullanıldığında gebeliği önlemede %91 ila %99 etkilidir; ancak talimatlara tam olarak uyulmazsa yalnızca %76 etkilidir ve adetlerin düzensizse sana uygun olmayabilir.</p>
+    <h3>Yumurtlama tahmini ne kadar doğru?</h3>
+    <p>Kaba bir yol göstericidir. NHS, yumurtlama ile sonraki adet arasında 12 ila 16 gün olduğunu belirtir; womenshealth.gov ise bu sürenin 7 günden 2 haftadan fazlasına (19 gün) kadar değişebileceğini söyler. Bu nedenle gerçek yumurtlama günü tahminden birkaç gün farklı olabilir; döngülerin değişkense fark daha da büyür.</p>
+    <h3>Adetim neden tahmin edilenden önce veya sonra geldi?</h3>
+    <p>Döngü süresi bir döngüden diğerine doğal olarak değişir ve takvime dayalı bir formül vücudunda neler olduğunu göremez. Adetlerin sürekli değişiyorsa veya endişeleniyorsan bunu bir doktora ya da kliniğe söyle.</p>
+    <h3>Döngülerim düzensizse ne olur?</h3>
+    <p>Tek bir döngü süresi düzensiz bir örüntüyü tarif edemez. ACOG, perimenopozda döngülerin uzayabileceğini veya kısalabileceğini ve adetlerin atlanabileceğini belirtir. Aralığı görmek için son zamanlardaki en kısa ve en uzun döngünü hesaplama aracında dene ve tek bir sayıya güvenmek yerine gerçek adet tarihlerini ve semptomlarını birkaç döngü boyunca kaydet.</p>
+    <h3>Verilerim kaydediliyor veya bir yere gönderiliyor mu?</h3>
+    <p>Hayır. Girdiğin tarihler yalnızca tarayıcında hesaplama yapmak için kullanılır. Saklanmaz, bir sunucuya gönderilmez ve paylaşılmaz; sayfa çerez veya tarayıcı depolaması kullanmaz.</p>
+
+    <h2>Gerçek verilerini Maren ile takip et</h2>
+    <p>Maren, düzensiz döngüler ve perimenopoz için tasarlanmış, iPhone’a özel gizli bir adet, ruh hali ve semptom takipçisidir. Hesap oluşturman gerekmez, kayıtların cihazında kalır; takip ve tahmin ücretsizdir (Premium isteğe bağlıdır). Maren Türkçe olarak da kullanılabilir.</p>
+    <p>Diğer ücretsiz araçlar: <a href="perimenopause-symptom-checklist-tr.html">Perimenopoz belirti listesi</a> · <a href="track-perimenopause-symptoms-tr.html">Perimenopoz belirtilerini doktorun için nasıl takip edersin?</a></p>
+
+    <h2>Kaynaklar</h2>
+    <ul class="source-list">
+      <li><a href="https://www.nhs.uk/conditions/periods/" target="_blank" rel="noopener">NHS, “Periods”</a> (İngilizce) — döngü süresi, adet süresi, yumurtlama zamanı</li>
+      <li><a href="https://www.womenshealth.gov/menstrual-cycle/your-menstrual-cycle" target="_blank" rel="noopener">womenshealth.gov, “Your menstrual cycle”</a> (İngilizce) — normal döngü aralığı, doğurgan dönem, yumurta ve sperm ömrü</li>
+      <li><a href="https://www.nhs.uk/contraception/methods-of-contraception/natural-family-planning/" target="_blank" rel="noopener">NHS, “Natural family planning”</a> (İngilizce) — doğurganlık farkındalığı yöntemlerinin etkinliği, düzensiz adetler</li>
+      <li><a href="https://www.acog.org/womens-health/faqs/the-menopause-years" target="_blank" rel="noopener">ACOG, “The Menopause Years”</a> (İngilizce) — perimenopozda döngü değişiklikleri</li>
+    </ul>
+    <p class="note">Kaynaklar İngilizcedir.</p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://apps.apple.com/app/apple-store/id6795029983?pt=129087449&amp;ct=web_maren_periodcalc_tr&amp;mt=8">Maren’i App Store’dan indir</a>
+      <p class="note" style="margin-top:12px;"></p>
+      <p class="note"><a href="index.html">&larr; Maren ana sayfasına dön</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var T = {
+ "assume": "{date} tarihinde başlayan son adet, {c} günlük döngü ve {p} günlük adet süresi temel alınmıştır.",
+ "outsideNote": "Döngü süren, NHS’in olağan aralık olarak tanımladığı 21 ila 35 günün dışında. Bu mutlaka bir sorun olduğu anlamına gelmez; ancak döngülerin sık sık bu aralığın dışında kalıyorsa veya sürekli değişiyorsa bunu bir doktora söylemeye değer. Aşağıdaki tarihler yalnızca takvime dayalı tahminlerdir.",
+ "tagEstimate": "Tahmin",
+ "nextLabel": "Beklenen sonraki adet",
+ "listHead": "Sonraki 6 adetin (tahmini)",
+ "colNo": "#",
+ "colStart": "Başlangıç",
+ "colEnd": "Bitiş",
+ "ovHead": "Yumurtlama ve doğurgan dönem (tahmini)",
+ "ovLabel": "Tahmini yumurtlama günü",
+ "ovNote": "Sonraki adetinden yaklaşık 14 gün önce.",
+ "fwLabel": "Tahmini doğurgan dönem (bu döngü)",
+ "fwNote": "Tahmini yumurtlama gününden 5 gün öncesinden yumurtlama gününe kadar. Doğum kontrol yöntemi değildir.",
+ "relFallback": "{n} gün sonra",
+ "errors": {
+  "date": "Lütfen son adetinin ilk gününü seç.",
+  "future": "Bu tarih gelecekte. Lütfen en son adetinin ilk gününü gir.",
+  "old": "Bu tarih bir yıldan daha eski. Lütfen en son adetini gir.",
+  "cycle": "Döngü süresi 15 ile 90 gün arasında bir tam sayı olmalıdır.",
+  "plen": "Adet süresi 1 ile 14 gün arasında bir tam sayı olmalıdır."
+ },
+ "dateLocale": "tr-TR"
+};
+  var DAY = 86400000;
+  var LIMITS = { cycleMin: 15, cycleMax: 90, plenMin: 1, plenMax: 14, typMin: 21, typMax: 35, maxAgeDays: 366, fertileBefore: 5, lutealDays: 14 };
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  // All dates are UTC midnights (ms). Adding whole days in UTC is immune to daylight-saving changes.
+  function parseISO(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ""));
+    if (!m) return null;
+    var y = +m[1], mo = +m[2], d = +m[3], t = Date.UTC(y, mo - 1, d), dt = new Date(t);
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
+    return t;
+  }
+  function iso(t) { var d = new Date(t); return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()); }
+  function intOf(v) { var s = String(v).trim(); return /^\d+$/.test(s) ? Number(s) : NaN; }
+
+  function compute(lastISO, cycleRaw, plenRaw, todayISO) {
+    var last = parseISO(lastISO), today = parseISO(todayISO);
+    if (last === null) return { ok: false, error: "date" };
+    if (last > today) return { ok: false, error: "future" };
+    if ((today - last) / DAY > LIMITS.maxAgeDays) return { ok: false, error: "old" };
+    var cycle = intOf(cycleRaw), plen = intOf(plenRaw);
+    if (!(cycle >= LIMITS.cycleMin && cycle <= LIMITS.cycleMax)) return { ok: false, error: "cycle" };
+    if (!(plen >= LIMITS.plenMin && plen <= LIMITS.plenMax)) return { ok: false, error: "plen" };
+    var k = Math.max(1, Math.ceil((today - last) / (cycle * DAY)));
+    var next = last + k * cycle * DAY;
+    var periods = [];
+    for (var i = 0; i < 6; i++) {
+      var s = next + i * cycle * DAY;
+      periods.push({ start: s, end: s + (plen - 1) * DAY });
+    }
+    var ov = next - LIMITS.lutealDays * DAY;
+    var cycleStart = next - cycle * DAY;
+    var fs = Math.max(ov - LIMITS.fertileBefore * DAY, cycleStart);
+    return {
+      ok: true, cycle: cycle, plen: plen, last: last, next: next, daysUntil: Math.round((next - today) / DAY),
+      periods: periods, ovulation: ov, fertileStart: fs, fertileEnd: ov,
+      outsideTypical: cycle < LIMITS.typMin || cycle > LIMITS.typMax
+    };
+  }
+
+  function todayLocalISO() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+
+  var fmtLong, fmtShort;
+  function setupFormatters() {
+    try {
+      fmtLong = new Intl.DateTimeFormat(T.dateLocale, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+      fmtShort = new Intl.DateTimeFormat(T.dateLocale, { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+    } catch (e) {
+      fmtLong = fmtShort = { format: function (t) { return iso(t); } };
+    }
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function tm(t, f) { return '<time datetime="' + iso(t) + '">' + esc(f.format(new Date(t))) + "</time>"; }
+  function rel(n) {
+    try { return new Intl.RelativeTimeFormat(T.dateLocale, { numeric: "auto" }).format(n, "day"); }
+    catch (e) { return T.relFallback.replace("{n}", n); }
+  }
+  function fill(s, o) { return s.replace(/\{(\w+)\}/g, function (m, k) { return o[k] === undefined ? m : o[k]; }); }
+
+  function render(r) {
+    var h = "";
+    h += '<p class="est-line">' + esc(fill(T.assume, { date: fmtLong.format(new Date(r.last)), c: r.cycle, p: r.plen })) + "</p>";
+    if (r.outsideTypical) h += '<p class="gentle">' + esc(T.outsideNote) + "</p>";
+    h += '<div class="big"><span class="tag">' + esc(T.tagEstimate) + "</span><h3>" + esc(T.nextLabel) + "</h3>";
+    h += '<p class="bigdate" data-days="' + r.daysUntil + '">' + tm(r.next, fmtLong) + "</p>";
+    h += '<p class="rel">' + esc(rel(r.daysUntil)) + "</p></div>";
+    h += "<h3>" + esc(T.listHead) + "</h3>";
+    h += '<div class="tbl"><table><thead><tr><th scope="col">' + esc(T.colNo) + '</th><th scope="col">' + esc(T.colStart) + '</th><th scope="col">' + esc(T.colEnd) + "</th></tr></thead><tbody>";
+    for (var i = 0; i < r.periods.length; i++) {
+      h += "<tr><td>" + (i + 1) + "</td><td>" + tm(r.periods[i].start, fmtShort) + "</td><td>" + tm(r.periods[i].end, fmtShort) + "</td></tr>";
+    }
+    h += "</tbody></table></div>";
+    h += "<h3>" + esc(T.ovHead) + '</h3><div class="ov">';
+    h += '<p><span class="tag">' + esc(T.tagEstimate) + "</span> <strong>" + esc(T.ovLabel) + ":</strong> " + tm(r.ovulation, fmtLong) + '<br><span class="small">' + esc(T.ovNote) + "</span></p>";
+    h += '<p><span class="tag">' + esc(T.tagEstimate) + "</span> <strong>" + esc(T.fwLabel) + ":</strong> " + tm(r.fertileStart, fmtLong) + " &ndash; " + tm(r.fertileEnd, fmtLong) + '<br><span class="small">' + esc(T.fwNote) + "</span></p></div>";
+    return h;
+  }
+
+  function init() {
+    var form = document.getElementById("calc-form");
+    if (!form) return;
+    var fLast = document.getElementById("f-last"), fCycle = document.getElementById("f-cycle"), fPlen = document.getElementById("f-plen");
+    var out = document.getElementById("out"), err = document.getElementById("err"), box = document.getElementById("result-box");
+    setupFormatters();
+    fLast.max = todayLocalISO();
+    function run() {
+      var r = compute(fLast.value, fCycle.value, fPlen.value, todayLocalISO());
+      if (!r.ok) {
+        out.innerHTML = ""; box.hidden = true;
+        err.textContent = T.errors[r.error]; err.hidden = false;
+        return;
+      }
+      err.textContent = ""; err.hidden = true;
+      out.innerHTML = render(r); box.hidden = false;
+    }
+    form.addEventListener("submit", function (e) { e.preventDefault(); run(); });
+    ["change", "input"].forEach(function (ev) {
+      [fLast, fCycle, fPlen].forEach(function (el) { el.addEventListener(ev, function () { if (fLast.value) run(); }); });
+    });
+  }
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+  }
+})();
+</script>
+
+<footer class="site">
+  <div class="wrap" style="text-align:center">
+    <p>© 2026 Jun Yu · <a href="mailto:billy.yu@me.com">billy.yu@me.com</a></p>
+    <p><a href="privacy.html">Gizlilik Politikası</a> · <a href="terms.html">Kullanım Koşulları</a> · <a href="index.html">Ana Sayfa</a></p>
+  </div>
+</footer>
+</body>
+</html>

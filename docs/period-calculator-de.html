@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Periodenrechner: nächste Periode &amp; Eisprung | Maren</title>
+<meta name="description" content="Kostenloser Periodenrechner: Schätze deine nächste Periode, die nächsten 6 Perioden, Eisprung und fruchtbare Tage. Privat, direkt in deinem Browser.">
+<meta name="apple-itunes-app" content="app-id=6795029983, affiliate-data=pt=129087449&amp;ct=web_maren_periodcalc_de">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Maren">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Periodenrechner: nächste Periode, Eisprung &amp; fruchtbare Tage">
+<meta property="og:description" content="Schätze deine nächste Periode, die nächsten 6 Perioden, deinen wahrscheinlichen Eisprung und deine fruchtbaren Tage. Kostenlos, privat, im Browser berechnet. Nur eine Schätzung, keine Verhütung.">
+<meta property="og:url" content="https://junyu17.github.io/Maren/period-calculator-de.html">
+<meta property="og:image" content="https://junyu17.github.io/Maren/og-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Periodenrechner: nächste Periode, Eisprung &amp; fruchtbare Tage">
+<meta name="twitter:description" content="Kostenloser Periodenrechner mit Schätzung von Eisprung und fruchtbaren Tagen. Nichts wird gespeichert oder gesendet. Nur eine Schätzung, keine Verhütung.">
+<meta name="twitter:image" content="https://junyu17.github.io/Maren/og-card.jpg">
+<link rel="canonical" href="https://junyu17.github.io/Maren/period-calculator-de.html">
+<link rel="alternate" hreflang="en" href="https://junyu17.github.io/Maren/period-calculator.html">
+<link rel="alternate" hreflang="de" href="https://junyu17.github.io/Maren/period-calculator-de.html">
+<link rel="alternate" hreflang="fr" href="https://junyu17.github.io/Maren/period-calculator-fr.html">
+<link rel="alternate" hreflang="it" href="https://junyu17.github.io/Maren/period-calculator-it.html">
+<link rel="alternate" hreflang="es" href="https://junyu17.github.io/Maren/period-calculator-es.html">
+<link rel="alternate" hreflang="pt-BR" href="https://junyu17.github.io/Maren/period-calculator-pt-br.html">
+<link rel="alternate" hreflang="ru" href="https://junyu17.github.io/Maren/period-calculator-ru.html">
+<link rel="alternate" hreflang="tr" href="https://junyu17.github.io/Maren/period-calculator-tr.html">
+<link rel="alternate" hreflang="x-default" href="https://junyu17.github.io/Maren/period-calculator.html">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .crumb { font-size: 0.9rem; margin-bottom: 10px; }
+  .crumb a { text-decoration: none; }
+  .doc { overflow-wrap: break-word; }
+  .lead-p { font-size: 1.05rem; color: var(--muted); }
+  .strong-disc { border-color: var(--rose); color: var(--ink); font-size: 0.95rem; margin: 16px 0; }
+  .calc-card, .result-card { padding: 22px; margin: 18px 0; }
+  .calc-card h2, .result-card h2 { margin-top: 0; font-size: 1.25rem; }
+  .field { margin-bottom: 14px; min-width: 0; flex: 1 1 200px; }
+  .field label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
+  .field input { display: block; width: 100%; max-width: 100%; min-width: 0; font: inherit; padding: 9px 12px; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
+  .field input:focus { outline: 2px solid var(--rose); outline-offset: 1px; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hint { font-size: 0.82rem; color: var(--muted); margin: 4px 0 0; }
+  .calc-btn { border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+  .err { color: #a3001b; font-weight: 600; margin: 12px 0 0; }
+  .priv { margin: 14px 0 0; }
+  .result-card .est-line { color: var(--muted); font-size: 0.92rem; margin-top: 0; }
+  .result-card .gentle { background: #fff5f6; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 0.92rem; }
+  .big { background: #fff5f6; border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .big h3 { margin: 6px 0 2px; }
+  .big .bigdate { font-size: 1.45rem; font-weight: 800; color: var(--rose-dark); margin: 0; line-height: 1.25; }
+  .big .rel { margin: 2px 0 0; color: var(--muted); }
+  .tag { display: inline-block; background: var(--line); color: var(--rose-dark); border-radius: 999px; padding: 1px 10px; font-size: 0.75rem; font-weight: 700; }
+  .tbl { overflow-x: auto; max-width: 100%; }
+  .tbl table { margin: 6px 0; }
+  .tbl td, .tbl th { white-space: normal; }
+  .small { font-size: 0.85rem; color: var(--muted); }
+  .ov p { margin: 10px 0; }
+  .source-list { padding-left: 1.2em; }
+  .source-list li { margin-bottom: 4px; font-size: 0.92rem; }
+  .cta-row { text-align: center; margin: 30px 0 10px; }
+  .doc h3 { overflow-wrap: break-word; }
+  /* lang-switch */
+  header.site { flex-wrap: wrap; }
+  .lang-switch { flex-basis: 100%; width: 100%; max-width: 880px; margin: 10px auto 0; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--rose-dark); }
+  .lang-switch a[aria-current] { font-weight: 700; color: var(--ink); }
+  /* /lang-switch */
+  header.site nav:not(.lang-switch) { flex-wrap: wrap; gap: 4px 14px; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Periodenrechner",
+  "description": "Kostenloser Periodenrechner, der anhand des ersten Tages deiner letzten Periode und deiner Zykluslänge die nächste Periode, die nächsten sechs Perioden, den Eisprung und die fruchtbaren Tage schätzt.",
+  "url": "https://junyu17.github.io/Maren/period-calculator-de.html",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "de",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Jun Yu"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kann ich das zur Verhütung nutzen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nein. Eine Kalenderschätzung ist keine Verhütung, und dieses Tool zählt nur Tage. Laut NHS sind Methoden der natürlichen Familienplanung (Fertility Awareness), die weit gründlicher sind als bloßes Tagezählen, bei durchgehend korrekter Anwendung zu 91 % bis 99 % wirksam, aber nur zu 76 %, wenn die Anleitung nicht genau befolgt wird, und sie eignen sich möglicherweise nicht für dich, wenn deine Periode unregelmäßig ist."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Wie genau ist die Schätzung des Eisprungs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sie ist ein grober Anhaltspunkt. Die NHS nennt 12 bis 16 Tage zwischen Eisprung und nächster Periode, und womenshealth.gov zufolge kann der Abstand irgendwo zwischen 7 Tagen und mehr als 2 Wochen (19 Tagen) liegen. Der tatsächliche Eisprung kann daher um mehrere Tage von der Schätzung abweichen, umso mehr, wenn deine Zyklen schwanken."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Warum kam meine Periode früher oder später als vorhergesagt?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Die Zykluslänge schwankt natürlicherweise von Zyklus zu Zyklus, und eine Kalenderformel kann nicht sehen, was in deinem Körper passiert. Wenn sich deine Periode immer wieder verändert oder du dir Sorgen machst, sprich es bei einer Ärztin, einem Arzt oder in einer Klinik an."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Was, wenn meine Zyklen unregelmäßig sind?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Eine einzelne Zykluslänge kann ein unregelmäßiges Muster nicht beschreiben. ACOG weist darauf hin, dass Zyklen in der Perimenopause länger oder kürzer werden können und Perioden ausbleiben können. Probiere im Rechner deinen kürzesten und deinen längsten Zyklus der letzten Zeit aus, um die Spanne zu sehen, und trage deine tatsächlichen Periodendaten und Symptome über mehrere Zyklen ein, statt dich auf eine einzige Zahl zu verlassen."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Werden meine Daten gespeichert oder irgendwohin gesendet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nein. Die eingegebenen Daten werden nur für die Berechnung in deinem Browser verwendet. Sie werden nicht gespeichert, nicht an einen Server gesendet und nicht weitergegeben, und die Seite nutzt weder Cookies noch Browserspeicher."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<header class="site">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;width:100%;max-width:880px;margin:0 auto;padding:0 20px;">
+    <a class="brand" href="index.html"><span class="dot">⛵</span> Maren</a>
+    <nav>
+      <a href="index.html#features">Funktionen</a>
+      <a href="privacy.html">Datenschutz</a>
+      <a href="https://apps.apple.com/app/apple-store/id6795029983?pt=129087449&amp;ct=web_maren_periodcalc_de&amp;mt=8">App Store</a>
+    </nav>
+  </div>
+  <nav class="lang-switch" aria-label="Sprache"><a href="period-calculator-de.html" hreflang="en" lang="en">English</a><a href="period-calculator-de.html" hreflang="de" lang="de" aria-current="page">Deutsch</a><a href="period-calculator-fr.html" hreflang="fr" lang="fr">Français</a><a href="period-calculator-it.html" hreflang="it" lang="it">Italiano</a><a href="period-calculator-es.html" hreflang="es" lang="es">Español</a><a href="period-calculator-pt-br.html" hreflang="pt-BR" lang="pt-BR">Português</a><a href="period-calculator-ru.html" hreflang="ru" lang="ru">Русский</a><a href="period-calculator-tr.html" hreflang="tr" lang="tr">Türkçe</a></nav>
+</header>
+
+<div class="doc">
+  <div class="wrap">
+    <p class="crumb"><a href="index.html">&larr; Zurück zu Maren</a></p>
+    <h1>Periodenrechner</h1>
+    <p class="meta">Kostenlos &amp; privat · nur Schätzungen · keine Verhütung · keine medizinische Beratung</p>
+    <p class="lead-p">Gib den ersten Tag deiner letzten Periode ein, um zu schätzen, wann die nächste fällig ist – dazu deinen wahrscheinlichen Eisprung und deine fruchtbaren Tage in diesem Zyklus. Alles wird in deinem Browser berechnet.</p>
+
+    <div class="disclaimer strong-disc" role="note"><strong>Nur Schätzungen.</strong> Zyklen schwanken von Monat zu Monat, deshalb können deine tatsächlichen Termine einige Tage früher oder später liegen als angezeigt. Dieser Rechner ist <strong>keine Verhütungsmethode</strong> und kann dir nicht sagen, wann du schwanger werden kannst oder nicht. Er ist keine medizinische Beratung.</div>
+
+    <form id="calc-form" class="card calc-card" novalidate>
+      <h2>Deine Angaben</h2>
+      <div class="field">
+        <label for="f-last">Erster Tag deiner letzten Periode</label>
+        <input type="date" id="f-last" name="last" required>
+        <p class="hint">Tag 1 deiner letzten Periode.</p>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="f-cycle">Übliche Zykluslänge (Tage)</label>
+          <input type="number" id="f-cycle" name="cycle" value="28" min="15" max="90" step="1" inputmode="numeric">
+          <p class="hint">Vom ersten Tag einer Periode bis zum ersten Tag der nächsten. Typisch: 28.</p>
+        </div>
+        <div class="field">
+          <label for="f-plen">Periodendauer (Tage)</label>
+          <input type="number" id="f-plen" name="plen" value="5" min="1" max="14" step="1" inputmode="numeric">
+          <p class="hint">Wie viele Tage deine Periode normalerweise dauert. Typisch: etwa 5.</p>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary calc-btn">Berechnen</button>
+      <p id="err" class="err" role="alert" hidden></p>
+      <p class="note priv">Nichts, was du eingibst, wird gespeichert oder irgendwohin gesendet. Die Berechnung läuft in deinem Browser; diese Seite setzt keine Cookies, nutzt keinen Browserspeicher und stellt beim Berechnen keine Netzwerkanfragen.</p>
+    </form>
+
+    <div id="result-box" class="card result-card" aria-live="polite" hidden>
+      <h2>Deine Schätzung</h2>
+      <div id="out"></div>
+      <div class="disclaimer" role="note"><strong>Wenn deine Zyklen unregelmäßig sind</strong> (zum Beispiel in der Perimenopause oder bei PCOS), ist eine Kalenderschätzung wie diese deutlich weniger zuverlässig. Wenn du deine tatsächlichen Periodendaten und Symptome über mehrere Zyklen einträgst, bekommst du ein besseres Bild als mit jeder Formel.</div>
+    </div>
+
+    <h2>So funktioniert die Schätzung</h2>
+    <p>Deine nächste Periode wird vom ersten Tag deiner letzten Periode aus um deine übliche Zykluslänge vorwärts gezählt. Liegt die eingegebene Periode schon länger zurück, addiert der Rechner so lange deine Zykluslänge, bis er das nächste Datum erreicht, das noch nicht vorbei ist.</p>
+    <p>Der Eisprung wird auf etwa 14 Tage vor dieser nächsten Periode geschätzt. Laut NHS findet der Eisprung etwa 12 bis 16 Tage vor Beginn der nächsten Periode statt, 14 liegt also in der Mitte dieses Bereichs. Die angezeigten fruchtbaren Tage reichen von 5 Tagen vor dem geschätzten Eisprung bis zum Eisprungtag selbst: womenshealth.gov zufolge können Spermien 3 bis 5 Tage in den Fortpflanzungsorganen überleben, und die Eizelle lebt nach dem Eisprung nur 12 bis 24 Stunden. Das ist ein grober Anhaltspunkt, keine Messung.</p>
+
+    <h2>Was ist ein typischer Zyklus?</h2>
+    <p>Laut NHS haben die meisten Menschen etwa alle 28 Tage ihre Periode, wobei Zyklen üblicherweise zwischen 21 und 35 Tagen liegen, und eine Periode dauert meist etwa 5 Tage (zwischen 2 und 7). Andere Quellen ziehen die Grenze etwas anders: womenshealth.gov beschreibt 24 bis 38 Tage als normalen Zyklus. Die Zykluslänge wird vom ersten Tag einer Periode bis zum ersten Tag der nächsten gezählt.</p>
+
+    <h2>Wann du ärztlichen Rat suchen solltest</h2>
+    <p>Laut NHS bedeutet eine Veränderung deiner Periode nicht unbedingt, dass ein Problem vorliegt, sie sollte aber abgeklärt werden – geh also zu deiner Hausarztpraxis oder in eine Klinik, wenn sich deine Periode verändert. womenshealth.gov nennt Blutungen, die oft länger als acht Tage dauern, als Symptom starker Blutungen. In den 30ern und 40ern sind länger oder kürzer werdende Zyklen, ausbleibende Perioden und schwächere oder stärkere Blutungen häufige Anzeichen der Perimenopause, und ACOG rät trotzdem, Veränderungen der Menstruationsblutung einer medizinischen Fachperson zu melden.</p>
+
+    <div class="disclaimer" role="note"><strong>Keine medizinische Beratung.</strong> Diese Seite bietet allgemeine Informationen und einen einfachen Datumsrechner. Sie stellt keine Diagnose und kann dir nicht sagen, ob dein Zyklus gesund ist. Wenn etwas neu, stark oder beunruhigend ist, sprich mit einer qualifizierten medizinischen Fachperson.</div>
+
+    <h2>Häufige Fragen</h2>
+    <h3>Kann ich das zur Verhütung nutzen?</h3>
+    <p>Nein. Eine Kalenderschätzung ist keine Verhütung, und dieses Tool zählt nur Tage. Laut NHS sind Methoden der natürlichen Familienplanung (Fertility Awareness), die weit gründlicher sind als bloßes Tagezählen, bei durchgehend korrekter Anwendung zu 91 % bis 99 % wirksam, aber nur zu 76 %, wenn die Anleitung nicht genau befolgt wird, und sie eignen sich möglicherweise nicht für dich, wenn deine Periode unregelmäßig ist.</p>
+    <h3>Wie genau ist die Schätzung des Eisprungs?</h3>
+    <p>Sie ist ein grober Anhaltspunkt. Die NHS nennt 12 bis 16 Tage zwischen Eisprung und nächster Periode, und womenshealth.gov zufolge kann der Abstand irgendwo zwischen 7 Tagen und mehr als 2 Wochen (19 Tagen) liegen. Der tatsächliche Eisprung kann daher um mehrere Tage von der Schätzung abweichen, umso mehr, wenn deine Zyklen schwanken.</p>
+    <h3>Warum kam meine Periode früher oder später als vorhergesagt?</h3>
+    <p>Die Zykluslänge schwankt natürlicherweise von Zyklus zu Zyklus, und eine Kalenderformel kann nicht sehen, was in deinem Körper passiert. Wenn sich deine Periode immer wieder verändert oder du dir Sorgen machst, sprich es bei einer Ärztin, einem Arzt oder in einer Klinik an.</p>
+    <h3>Was, wenn meine Zyklen unregelmäßig sind?</h3>
+    <p>Eine einzelne Zykluslänge kann ein unregelmäßiges Muster nicht beschreiben. ACOG weist darauf hin, dass Zyklen in der Perimenopause länger oder kürzer werden können und Perioden ausbleiben können. Probiere im Rechner deinen kürzesten und deinen längsten Zyklus der letzten Zeit aus, um die Spanne zu sehen, und trage deine tatsächlichen Periodendaten und Symptome über mehrere Zyklen ein, statt dich auf eine einzige Zahl zu verlassen.</p>
+    <h3>Werden meine Daten gespeichert oder irgendwohin gesendet?</h3>
+    <p>Nein. Die eingegebenen Daten werden nur für die Berechnung in deinem Browser verwendet. Sie werden nicht gespeichert, nicht an einen Server gesendet und nicht weitergegeben, und die Seite nutzt weder Cookies noch Browserspeicher.</p>
+
+    <h2>Mit Maren das echte Geschehen festhalten</h2>
+    <p>Maren ist ein privater Perioden-, Stimmungs- und Symptomtracker für das iPhone, gemacht für unregelmäßige Zyklen und die Perimenopause. Du musst kein Konto anlegen, deine Einträge bleiben auf deinem Gerät, und Tracking und Vorhersage sind kostenlos (Premium ist optional). Maren ist auch auf Deutsch verfügbar.</p>
+    <p>Weitere kostenlose Tools: <a href="perimenopause-symptom-checklist-de.html">Checkliste für Perimenopause-Symptome</a> · <a href="track-perimenopause-symptoms-de.html">Perimenopause-Symptome für deinen Arztbesuch festhalten</a></p>
+
+    <h2>Quellen</h2>
+    <ul class="source-list">
+      <li><a href="https://www.nhs.uk/conditions/periods/" target="_blank" rel="noopener">NHS, „Periods“</a> (auf Englisch) – Zykluslänge, Periodendauer, Zeitpunkt des Eisprungs</li>
+      <li><a href="https://www.womenshealth.gov/menstrual-cycle/your-menstrual-cycle" target="_blank" rel="noopener">womenshealth.gov, „Your menstrual cycle“</a> (auf Englisch) – normaler Zyklusbereich, fruchtbare Tage, Lebensdauer von Eizelle und Spermien</li>
+      <li><a href="https://www.nhs.uk/contraception/methods-of-contraception/natural-family-planning/" target="_blank" rel="noopener">NHS, „Natural family planning“</a> (auf Englisch) – Wirksamkeit der natürlichen Familienplanung, unregelmäßige Perioden</li>
+      <li><a href="https://www.acog.org/womens-health/faqs/the-menopause-years" target="_blank" rel="noopener">ACOG, „The Menopause Years“</a> (auf Englisch) – Zyklusveränderungen in der Perimenopause</li>
+    </ul>
+    <p class="note">Die Quellen sind auf Englisch.</p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://apps.apple.com/app/apple-store/id6795029983?pt=129087449&amp;ct=web_maren_periodcalc_de&amp;mt=8">Maren im App Store laden</a>
+      <p class="note" style="margin-top:12px;"></p>
+      <p class="note"><a href="index.html">&larr; Zurück zur Maren-Startseite</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var T = {
+ "assume": "Grundlage: letzte Periode ab {date}, Zykluslänge in Tagen: {c}, Periodendauer in Tagen: {p}.",
+ "outsideNote": "Deine Zykluslänge liegt außerhalb der 21 bis 35 Tage, die die NHS als üblichen Bereich beschreibt. Das bedeutet nicht unbedingt, dass etwas nicht stimmt, aber wenn deine Zyklen oft außerhalb dieses Bereichs liegen oder sich immer wieder verändern, solltest du es bei einer Ärztin oder einem Arzt ansprechen. Die Daten unten sind reine Kalenderschätzungen.",
+ "tagEstimate": "Schätzung",
+ "nextLabel": "Nächste Periode erwartet",
+ "listHead": "Deine nächsten 6 Perioden (geschätzt)",
+ "colNo": "Nr.",
+ "colStart": "Beginn",
+ "colEnd": "Ende",
+ "ovHead": "Eisprung und fruchtbare Tage (Schätzungen)",
+ "ovLabel": "Geschätzter Eisprung",
+ "ovNote": "Etwa 14 Tage vor deiner nächsten Periode.",
+ "fwLabel": "Geschätzte fruchtbare Tage (dieser Zyklus)",
+ "fwNote": "Von 5 Tagen vor dem geschätzten Eisprung bis zum Eisprungtag selbst. Keine Verhütung.",
+ "relFallback": "in {n} Tagen",
+ "errors": {
+  "date": "Bitte wähle den ersten Tag deiner letzten Periode.",
+  "future": "Dieses Datum liegt in der Zukunft. Bitte gib den ersten Tag deiner letzten Periode ein.",
+  "old": "Dieses Datum liegt mehr als ein Jahr zurück. Bitte gib deine letzte Periode ein.",
+  "cycle": "Die Zykluslänge muss eine ganze Zahl von 15 bis 90 Tagen sein.",
+  "plen": "Die Periodendauer muss eine ganze Zahl von 1 bis 14 Tagen sein."
+ },
+ "dateLocale": "de-DE"
+};
+  var DAY = 86400000;
+  var LIMITS = { cycleMin: 15, cycleMax: 90, plenMin: 1, plenMax: 14, typMin: 21, typMax: 35, maxAgeDays: 366, fertileBefore: 5, lutealDays: 14 };
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  // All dates are UTC midnights (ms). Adding whole days in UTC is immune to daylight-saving changes.
+  function parseISO(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ""));
+    if (!m) return null;
+    var y = +m[1], mo = +m[2], d = +m[3], t = Date.UTC(y, mo - 1, d), dt = new Date(t);
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
+    return t;
+  }
+  function iso(t) { var d = new Date(t); return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()); }
+  function intOf(v) { var s = String(v).trim(); return /^\d+$/.test(s) ? Number(s) : NaN; }
+
+  function compute(lastISO, cycleRaw, plenRaw, todayISO) {
+    var last = parseISO(lastISO), today = parseISO(todayISO);
+    if (last === null) return { ok: false, error: "date" };
+    if (last > today) return { ok: false, error: "future" };
+    if ((today - last) / DAY > LIMITS.maxAgeDays) return { ok: false, error: "old" };
+    var cycle = intOf(cycleRaw), plen = intOf(plenRaw);
+    if (!(cycle >= LIMITS.cycleMin && cycle <= LIMITS.cycleMax)) return { ok: false, error: "cycle" };
+    if (!(plen >= LIMITS.plenMin && plen <= LIMITS.plenMax)) return { ok: false, error: "plen" };
+    var k = Math.max(1, Math.ceil((today - last) / (cycle * DAY)));
+    var next = last + k * cycle * DAY;
+    var periods = [];
+    for (var i = 0; i < 6; i++) {
+      var s = next + i * cycle * DAY;
+      periods.push({ start: s, end: s + (plen - 1) * DAY });
+    }
+    var ov = next - LIMITS.lutealDays * DAY;
+    var cycleStart = next - cycle * DAY;
+    var fs = Math.max(ov - LIMITS.fertileBefore * DAY, cycleStart);
+    return {
+      ok: true, cycle: cycle, plen: plen, last: last, next: next, daysUntil: Math.round((next - today) / DAY),
+      periods: periods, ovulation: ov, fertileStart: fs, fertileEnd: ov,
+      outsideTypical: cycle < LIMITS.typMin || cycle > LIMITS.typMax
+    };
+  }
+
+  function todayLocalISO() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+
+  var fmtLong, fmtShort;
+  function setupFormatters() {
+    try {
+      fmtLong = new Intl.DateTimeFormat(T.dateLocale, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+      fmtShort = new Intl.DateTimeFormat(T.dateLocale, { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+    } catch (e) {
+      fmtLong = fmtShort = { format: function (t) { return iso(t); } };
+    }
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function tm(t, f) { return '<time datetime="' + iso(t) + '">' + esc(f.format(new Date(t))) + "</time>"; }
+  function rel(n) {
+    try { return new Intl.RelativeTimeFormat(T.dateLocale, { numeric: "auto" }).format(n, "day"); }
+    catch (e) { return T.relFallback.replace("{n}", n); }
+  }
+  function fill(s, o) { return s.replace(/\{(\w+)\}/g, function (m, k) { return o[k] === undefined ? m : o[k]; }); }
+
+  function render(r) {
+    var h = "";
+    h += '<p class="est-line">' + esc(fill(T.assume, { date: fmtLong.format(new Date(r.last)), c: r.cycle, p: r.plen })) + "</p>";
+    if (r.outsideTypical) h += '<p class="gentle">' + esc(T.outsideNote) + "</p>";
+    h += '<div class="big"><span class="tag">' + esc(T.tagEstimate) + "</span><h3>" + esc(T.nextLabel) + "</h3>";
+    h += '<p class="bigdate" data-days="' + r.daysUntil + '">' + tm(r.next, fmtLong) + "</p>";
+    h += '<p class="rel">' + esc(rel(r.daysUntil)) + "</p></div>";
+    h += "<h3>" + esc(T.listHead) + "</h3>";
+    h += '<div class="tbl"><table><thead><tr><th scope="col">' + esc(T.colNo) + '</th><th scope="col">' + esc(T.colStart) + '</th><th scope="col">' + esc(T.colEnd) + "</th></tr></thead><tbody>";
+    for (var i = 0; i < r.periods.length; i++) {
+      h += "<tr><td>" + (i + 1) + "</td><td>" + tm(r.periods[i].start, fmtShort) + "</td><td>" + tm(r.periods[i].end, fmtShort) + "</td></tr>";
+    }
+    h += "</tbody></table></div>";
+    h += "<h3>" + esc(T.ovHead) + '</h3><div class="ov">';
+    h += '<p><span class="tag">' + esc(T.tagEstimate) + "</span> <strong>" + esc(T.ovLabel) + ":</strong> " + tm(r.ovulation, fmtLong) + '<br><span class="small">' + esc(T.ovNote) + "</span></p>";
+    h += '<p><span class="tag">' + esc(T.tagEstimate) + "</span> <strong>" + esc(T.fwLabel) + ":</strong> " + tm(r.fertileStart, fmtLong) + " &ndash; " + tm(r.fertileEnd, fmtLong) + '<br><span class="small">' + esc(T.fwNote) + "</span></p></div>";
+    return h;
+  }
+
+  function init() {
+    var form = document.getElementById("calc-form");
+    if (!form) return;
+    var fLast = document.getElementById("f-last"), fCycle = document.getElementById("f-cycle"), fPlen = document.getElementById("f-plen");
+    var out = document.getElementById("out"), err = document.getElementById("err"), box = document.getElementById("result-box");
+    setupFormatters();
+    fLast.max = todayLocalISO();
+    function run() {
+      var r = compute(fLast.value, fCycle.value, fPlen.value, todayLocalISO());
+      if (!r.ok) {
+        out.innerHTML = ""; box.hidden = true;
+        err.textContent = T.errors[r.error]; err.hidden = false;
+        return;
+      }
+      err.textContent = ""; err.hidden = true;
+      out.innerHTML = render(r); box.hidden = false;
+    }
+    form.addEventListener("submit", function (e) { e.preventDefault(); run(); });
+    ["change", "input"].forEach(function (ev) {
+      [fLast, fCycle, fPlen].forEach(function (el) { el.addEventListener(ev, function () { if (fLast.value) run(); }); });
+    });
+  }
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+  }
+})();
+</script>
+
+<footer class="site">
+  <div class="wrap" style="text-align:center">
+    <p>© 2026 Jun Yu · <a href="mailto:billy.yu@me.com">billy.yu@me.com</a></p>
+    <p><a href="privacy.html">Datenschutzerklärung</a> · <a href="terms.html">Nutzungsbedingungen</a> · <a href="index.html">Startseite</a></p>
+  </div>
+</footer>
+</body>
+</html>

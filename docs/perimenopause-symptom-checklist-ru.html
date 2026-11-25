@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Симптомы перименопаузы: чек-лист для печати | Maren</title>
+<meta name="description" content="Бесплатный чек-лист симптомов перименопаузы для печати: цикл, приливы, сон, настроение, туман в голове, тело — и почему записи за недели помогают на приёме.">
+<meta name="apple-itunes-app" content="app-id=6795029983, affiliate-data=pt=129087449&amp;ct=web_maren_checklist_ru">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Maren">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Бесплатный чек-лист симптомов перименопаузы для печати">
+<meta property="og:description" content="Чек-лист частых симптомов перименопаузы, сгруппированных по циклу, приливам, сну, настроению, туману в голове и телу, — с простыми пояснениями, почему записи за несколько недель помогают в разговоре с врачом.">
+<meta property="og:url" content="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-ru.html">
+<meta property="og:image" content="https://junyu17.github.io/Maren/og-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Бесплатный чек-лист симптомов перименопаузы для печати">
+<meta name="twitter:description" content="Бесплатный чек-лист частых симптомов перименопаузы для печати, по группам и простым языком. Это не диагноз.">
+<meta name="twitter:image" content="https://junyu17.github.io/Maren/og-card.jpg">
+<link rel="canonical" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-ru.html">
+<link rel="alternate" hreflang="en" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist.html">
+<link rel="alternate" hreflang="de" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-de.html">
+<link rel="alternate" hreflang="fr" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-fr.html">
+<link rel="alternate" hreflang="it" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-it.html">
+<link rel="alternate" hreflang="es" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-es.html">
+<link rel="alternate" hreflang="pt-BR" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-pt-br.html">
+<link rel="alternate" hreflang="ru" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-ru.html">
+<link rel="alternate" hreflang="tr" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist-tr.html">
+<link rel="alternate" hreflang="x-default" href="https://junyu17.github.io/Maren/perimenopause-symptom-checklist.html">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Checklist-specific styles, layered on top of the shared site stylesheet. */
+  .crumb { font-size: 0.9rem; margin-bottom: 10px; }
+  .crumb a { text-decoration: none; }
+  .print-bar { display: flex; justify-content: flex-end; margin: 4px 0 22px; }
+  .print-bar button {
+    font: inherit; font-weight: 600; font-size: 0.9rem;
+    background: var(--card); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 9px 18px; cursor: pointer;
+  }
+  .print-bar button:hover { border-color: var(--rose); color: var(--rose-dark); }
+  .checklist-intro-grid { display:grid; grid-template-columns: 1fr; gap: 4px; }
+  .symptom-group {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 20px 8px; margin: 0 0 16px; break-inside: avoid;
+  }
+  .symptom-group h3 { margin: 0 0 2px; font-size: 1.05rem; }
+  .symptom-group .group-note { margin: 0 0 10px; color: var(--muted); font-size: 0.88rem; }
+  .symptom-list { list-style: none; margin: 0; padding: 0; }
+  .symptom-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 7px 0; border-top: 1px solid var(--line);
+  }
+  .symptom-item:first-child { border-top: none; }
+  .symptom-item input[type="checkbox"] {
+    width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--rose);
+  }
+  .symptom-item label { flex: 1; font-size: 0.96rem; }
+  .starred::after {
+    content: " ★"; color: var(--rose-dark); font-size: 0.85em;
+  }
+  .fill-line { border-bottom: 1px solid var(--line); min-width: 160px; display: inline-block; }
+  .legend { font-size: 0.85rem; color: var(--muted); margin: 4px 0 26px; }
+  .source-list { padding-left: 1.2em; }
+  .source-list li { margin-bottom: 4px; font-size: 0.92rem; }
+  .print-header { display: none; }
+
+  @media print {
+    header.site, footer.site, .print-bar, .cta-row, .no-print { display: none !important; }
+    body { background: #fff; }
+    .print-header {
+      display: block; text-align: center; margin-bottom: 14px;
+      font-weight: 700; font-size: 1.05rem; color: var(--ink);
+    }
+    .doc { padding-top: 6px; }
+    .symptom-group {
+      border: 1px solid #999; box-shadow: none; background: #fff;
+      page-break-inside: avoid;
+    }
+    .symptom-item input[type="checkbox"] {
+      appearance: none; -webkit-appearance: none;
+      width: 15px; height: 15px; border: 1.4px solid #333; border-radius: 3px;
+      background: #fff; margin-top: 3px;
+    }
+    a { color: #000; text-decoration: underline; }
+    .wrap { max-width: 100%; }
+  }
+  
+  /* lang-switch */
+  header.site { flex-wrap: wrap; }
+  .lang-switch { flex-basis: 100%; width: 100%; max-width: 880px; margin: 10px auto 0; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  .lang-switch a { color: var(--muted); text-decoration: none; }
+  .lang-switch a:hover { color: var(--rose-dark); }
+  .lang-switch a[aria-current] { font-weight: 700; color: var(--ink); }
+  /* /lang-switch */
+  header.site nav:not(.lang-switch) { flex-wrap: wrap; gap: 4px 14px; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Бесплатный чек-лист симптомов перименопаузы для печати",
+  "description": "Бесплатный чек-лист симптомов перименопаузы для печати: цикл, приливы, сон, настроение, туман в голове, тело — и почему записи за недели помогают на приёме.",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://junyu17.github.io/Maren/perimenopause-symptom-checklist-ru.html"
+  },
+  "image": "https://junyu17.github.io/Maren/og-card.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Jun Yu"
+  },
+  "datePublished": "2026-11-25",
+  "dateModified": "2026-11-25",
+  "inLanguage": "ru"
+}
+</script>
+</head>
+<body>
+<header class="site">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;width:100%;max-width:880px;margin:0 auto;padding:0 20px;">
+    <a class="brand" href="index.html"><span class="dot">⛵</span> Maren</a>
+    <nav>
+      <a href="index.html#features">Возможности</a>
+      <a href="privacy.html">Конфиденциальность</a>
+      <a href="https://apps.apple.com/app/apple-store/id6795029983?pt=129087449&amp;ct=web_maren_checklist_ru&amp;mt=8">App Store</a>
+    </nav>
+  </div>
+  <nav class="lang-switch" aria-label="Язык"><a href="perimenopause-symptom-checklist-ru.html" hreflang="en" lang="en">English</a><a href="perimenopause-symptom-checklist-de.html" hreflang="de" lang="de">Deutsch</a><a href="perimenopause-symptom-checklist-fr.html" hreflang="fr" lang="fr">Français</a><a href="perimenopause-symptom-checklist-it.html" hreflang="it" lang="it">Italiano</a><a href="perimenopause-symptom-checklist-es.html" hreflang="es" lang="es">Español</a><a href="perimenopause-symptom-checklist-pt-br.html" hreflang="pt-BR" lang="pt-BR">Português</a><a href="perimenopause-symptom-checklist-ru.html" hreflang="ru" lang="ru" aria-current="page">Русский</a><a href="perimenopause-symptom-checklist-tr.html" hreflang="tr" lang="tr">Türkçe</a></nav>
+</header>
+
+<div class="doc">
+  <div class="wrap">
+    <p class="crumb no-print"><a href="index.html">&larr; Назад к Maren</a></p>
+    <div class="print-header">Maren — Чек-лист симптомов перименопаузы · junyu17.github.io/Maren</div>
+
+    <h1>Чек-лист симптомов перименопаузы</h1>
+    <p class="meta">Бесплатно и для печати · не диагноз · дополняет бесплатную 30- и 90-дневную сводку в приложении Maren</p>
+
+    <div class="print-bar no-print">
+      <button type="button" onclick="window.print()">🖨️ Распечатать чек-лист</button>
+    </div>
+
+    <p>Перименопауза — переходный период перед менопаузой, когда уровень гормонов меняется, а месячные могут становиться длиннее, короче, обильнее, скуднее или вовсе пропускаться. Она может длиться несколько лет, и симптомы сильно различаются от человека к человеку (<a href="https://www.acog.org/womens-health/faqs/the-menopause-years" target="_blank" rel="noopener">ACOG</a>).</p>
+
+    <h2>Почему помогают записи за несколько недель</h2>
+    <p>Симптомы перименопаузы обычно появляются и исчезают неравномерно: приливы то усиливаются на какое-то время, то стихают, сон то нормальный, то нет, цикл то пропускается, то укорачивается. Вспомнить всё это по памяти за короткий приём трудно. Если записывать, <em>что</em> ты заметила и <em>когда</em>, расплывчатое впечатление («кажется, в последнее время я больше устаю») превращается в хронологию, которую врач действительно может посмотреть: какие недели были другими, как часто что-то появлялось и становится ли это чаще, реже или остаётся примерно на том же уровне. Если в перименопаузе характер кровотечений заметно меняется, стоит записать дату, продолжительность и интенсивность и без промедления обсудить это с врачом (<a href="https://www.acog.org/womens-health/faqs/perimenopausal-bleeding-and-bleeding-after-menopause" target="_blank" rel="noopener">ACOG</a>).</p>
+    <p>Используй чек-лист ниже на бумаге или записывай те же симптомы в приложении Maren — его бесплатная 30- и 90-дневная сводка о перименопаузе сама всё подсчитает и сравнит по записям, которые никогда не покидают твоё устройство (подробности ниже).</p>
+    <p class="no-print">Не знаешь, что записывать или как превратить недели заметок в то, чем сможет воспользоваться врач? Прочитай руководство: <a href="track-perimenopause-symptoms-ru.html">Как отслеживать симптомы перименопаузы и свести их на одну страницу для врача</a>.</p>
+
+    <div class="disclaimer no-print" style="margin: 18px 0;"><strong>Это не диагноз.</strong> Этот чек-лист нужен для твоего собственного понимания и для того, чтобы упорядочить то, что ты расскажешь врачу. Это не медицинская рекомендация, и он не может сказать, находишься ли ты в перименопаузе. Всегда обсуждай новые, сильные или тревожащие симптомы с квалифицированным медицинским специалистом — особенно любые кровотечения после менопаузы, которые нужно обсудить без промедления.</div>
+
+    <h2>Чек-лист</h2>
+    <p class="legend">Отмечай всё, что замечала в последнее время, или ставь отметки день за днём, если отслеживаешь несколько недель. Пункты, отмеченные <span class="starred"></span>, бесплатная 30-/90-дневная сводка Maren о перименопаузе подсчитывает и сравнивает автоматически, если записывать их в приложении.</p>
+
+    <p class="fill-line-row">Имя (необязательно): <span class="fill-line">&nbsp;</span> &nbsp;&nbsp; Недель отслеживания: <span class="fill-line">&nbsp;</span></p>
+
+    <div class="symptom-group">
+      <h3>Изменения цикла</h3>
+      <p class="group-note">Кровотечения и сроки цикла — вкладки «Сегодня» и «Календарь» в Maren</p>
+      <ul class="symptom-list">
+        <li class="symptom-item"><input type="checkbox" id="s-irregularCycle"><label for="s-irregularCycle">Нерегулярный цикл (длина меняется сильнее обычного)</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-latePeriod"><label for="s-latePeriod">Задержка месячных</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-shortCycle"><label for="s-shortCycle">Короткий цикл</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-heavyFlow"><label for="s-heavyFlow">Более обильные</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-lightFlow"><label for="s-lightFlow">Более скудные</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-missedPeriod"><label for="s-missedPeriod">Задержка месячных (месячные пропущены)</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-spotting"><label for="s-spotting">Мажущие выделения между месячными</label></li>
+      </ul>
+    </div>
+
+    <div class="symptom-group">
+      <h3>Вазомоторные (приливы и ночная потливость)</h3>
+      <p class="group-note">Вкладка «Сегодня» в Maren</p>
+      <ul class="symptom-list">
+        <li class="symptom-item"><input type="checkbox" id="s-hotFlashes"><label for="s-hotFlashes" class="starred">Приливы</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-nightSweats"><label for="s-nightSweats" class="starred">Ночная потливость</label></li>
+      </ul>
+    </div>
+
+    <div class="symptom-group">
+      <h3>Сон</h3>
+      <p class="group-note">Вкладка «Сегодня» в Maren — все три пункта ниже учитываются в бесплатной сводке как «прерывистый сон»</p>
+      <ul class="symptom-list">
+        <li class="symptom-item"><input type="checkbox" id="s-insomnia"><label for="s-insomnia" class="starred">Бессонница</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-restlessSleep"><label for="s-restlessSleep" class="starred">Беспокойный сон</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-earlyWaking"><label for="s-earlyWaking" class="starred">Раннее пробуждение</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-fatigue"><label for="s-fatigue">Усталость</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-drowsiness"><label for="s-drowsiness">Сонливость</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-excessiveSleep"><label for="s-excessiveSleep">Чрезмерная сонливость</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-vividDreams"><label for="s-vividDreams">Яркие сны</label></li>
+      </ul>
+    </div>
+
+    <div class="symptom-group">
+      <h3>Настроение</h3>
+      <p class="group-note">Вкладка «Сегодня» в Maren</p>
+      <ul class="symptom-list">
+        <li class="symptom-item"><input type="checkbox" id="s-anxious"><label for="s-anxious">Тревожность</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-irritable"><label for="s-irritable">Раздражительность</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-moodSwings"><label for="s-moodSwings">Перепады настроения</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-lowMood"><label for="s-lowMood">Подавленное настроение</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-overwhelmed"><label for="s-overwhelmed">Перегруженность</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-emotional"><label for="s-emotional">Эмоциональность</label></li>
+      </ul>
+    </div>
+
+    <div class="symptom-group">
+      <h3>Мышление</h3>
+      <p class="group-note">Вкладка «Сегодня» в Maren — записывается как «Туман в голове», трекер Maren для трудностей с концентрацией или провалов в памяти</p>
+      <ul class="symptom-list">
+        <li class="symptom-item"><input type="checkbox" id="s-brainFog"><label for="s-brainFog" class="starred">Туман в голове / трудно сосредоточиться</label></li>
+      </ul>
+    </div>
+
+    <div class="symptom-group">
+      <h3>Тело</h3>
+      <p class="group-note">Вкладка «Сегодня» в Maren</p>
+      <ul class="symptom-list">
+        <li class="symptom-item"><input type="checkbox" id="s-jointPain"><label for="s-jointPain" class="starred">Боль в суставах</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-heartRacing"><label for="s-heartRacing" class="starred">Учащённое сердцебиение</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-vaginalDryness"><label for="s-vaginalDryness" class="starred">Сухость влагалища</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-coldHands"><label for="s-coldHands">Холодные руки и ноги</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-dryEyes"><label for="s-dryEyes">Сухость глаз</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-tingling"><label for="s-tingling">Покалывание</label></li>
+        <li class="symptom-item"><input type="checkbox" id="s-dizziness"><label for="s-dizziness">Головокружение</label></li>
+      </ul>
+    </div>
+
+    <p class="note">Каждый симптом выше — один из встроенных трекеров Maren, поэтому всё, что ты здесь отмечаешь, можно записать и в приложении парой касаний. Maren также поддерживает собственные трекеры для всего, что связано с перименопаузой и чего нет в этом списке.</p>
+
+    <h2>Бесплатная сводка Maren о перименопаузе</h2>
+    <p>Если записывать эти симптомы в приложении, на вкладке «Тенденции» в Maren есть бесплатная описательная 30- или 90-дневная сводка о перименопаузе: она подсчитывает, как часто семь отмеченных звёздочкой симптомов выше (приливы, ночная потливость, сухость влагалища, туман в голове, учащённое сердцебиение, боль в суставах и прерывистый сон) появлялись за недавний период, и сравнивает это с предыдущим периодом, а также показывает простой охват записей, чтобы ты видела, насколько полны твои записи. Она не диагностирует перименопаузу или какое-либо заболевание — она лишь описывает то, что ты записала. Эта сводка, как и все функции отслеживания, прогнозов и экспорта в Maren, бесплатна; она не входит в необязательную подписку Premium.</p>
+
+    <h2>Твои записи остаются на твоём устройстве</h2>
+    <p>У Maren нет аккаунта, которым управлял бы разработчик, и нет сервера для данных о здоровье. Всё, что ты записываешь, включая симптомы из этого чек-листа, хранится локально на твоём iPhone и никогда не загружается в iCloud или на какой-либо сервер разработчика. Ты можешь в любой момент экспортировать данные, сделать резервную копию в файле, зашифрованном паролем, или удалить их.</p>
+
+    <h2>Источники</h2>
+    <ul class="source-list">
+      <li>Американская коллегия акушеров и гинекологов (ACOG), <a href="https://www.acog.org/womens-health/faqs/the-menopause-years" target="_blank" rel="noopener">«The Menopause Years»</a> (на английском)</li>
+      <li>Американская коллегия акушеров и гинекологов (ACOG), <a href="https://www.acog.org/womens-health/faqs/perimenopausal-bleeding-and-bleeding-after-menopause" target="_blank" rel="noopener">«Perimenopausal Bleeding and Bleeding After Menopause»</a> (на английском)</li>
+    </ul>
+    <p class="note">Это те же два источника, на которые ссылаются встроенные статьи Maren о перименопаузе («Библиотека» в приложении).</p>
+
+    <div class="disclaimer" style="margin: 22px 0;"><strong>Не медицинская рекомендация.</strong> Maren — инструмент для отслеживания и просвещения, а не медицинское изделие. Он не ставит диагнозы, и эта страница тоже. Прогнозы и сводки являются оценками и могут быть неточными. Для принятия медицинских решений всегда консультируйся с квалифицированным медицинским специалистом.</div>
+
+    <div class="cta-row" style="text-align:center; margin: 30px 0 10px;">
+      <a class="btn btn-primary" href="https://apps.apple.com/app/apple-store/id6795029983?pt=129087449&amp;ct=web_maren_checklist_ru&amp;mt=8">Скачать Maren в App Store</a>
+      <p class="note" style="margin-top:12px;"><a href="index.html">&larr; На главную Maren</a></p>
+    </div>
+  </div>
+</div>
+
+
+
+<footer class="site">
+  <div class="wrap" style="text-align:center">
+    <p>© 2026 Jun Yu · <a href="mailto:billy.yu@me.com">billy.yu@me.com</a></p>
+    <p><a href="privacy.html">Политика конфиденциальности</a> · <a href="terms.html">Условия использования</a> · <a href="index.html">Главная</a></p>
+  </div>
+</footer>
+</body>
+</html>
